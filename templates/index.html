@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'layout.html' %}
+{{ super() }}
+{% block content %}
+        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+<div id="app">
+[[ message ]]
+</div>
+    <script>
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    message: 'Hello Vue!'
+  },
+    delimiters: ['[[', ']]']
+});
+socket.on('upd', function (data) {
+    app.message = data;
+})
+    </script>
+{% endblock %}

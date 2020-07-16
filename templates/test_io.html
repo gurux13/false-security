@@ -1,10 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+<script type="text/javascript" charset="utf-8">
+    var socket = io();
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+    function onBtnClick() {
+        socket.emit('clicked');
+    }
+    socket.on('upd', function(data) {
+        document.getElementById('pressed').innerText = data;
+    });
+</script>
     <meta charset="UTF-8">
-    <title>$Title$</title>
+    <title>Title</title>
 </head>
 <body>
-$END$
+This is a test webpage to show how WebSockets work with flask.<br/>
+
+Try pressing this button to interact with the server:
+<button onclick="onBtnClick()">Press me</button>
+<div id="pressed"></div>
 </body>
 </html>
