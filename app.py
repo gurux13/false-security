@@ -1,8 +1,14 @@
 from flask import Flask, render_template
 from flask_socketio import SocketIO, emit
 
+from mod_gameselect.controller import mod_gameselect
+
+
 app = Flask(__name__)
+# TODO: Replace with server-side configuration
 app.config['SECRET_KEY'] = 'secret!'
+app.register_blueprint(mod_gameselect)
+
 socketio = SocketIO(app)
 print('starting...')
 @app.route('/io')
