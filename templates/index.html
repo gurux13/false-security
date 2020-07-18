@@ -3,23 +3,23 @@
 {% block content %}
     <script src="../static/vue.js"></script>
     <div id="app">
+        <form method="POST">
+                {{ form.csrf_token }}
         Имя игрока<br/>
         <input type="text" name="player_name">
         <br/>
         Для входа в игру Вам потребуется уникальный код игры.<br/>
-        <form method="POST">
-            Код игры: <input type="text" v-model="game_key">
+
+            Код игры: <input type="text" name="game_key" v-model="game_key">
             <transition name="fade">
-                <input type="submit" value="Войти" v-if="game_key != ''">
+                <button  v-if="game_key != ''" type="submit" value="join" name="action">Войти</button>
             </transition>
-        </form>
         <br/>
         Если Вы хотите создать новую игру, нажмите <a href="#" v-on:click="show_creation=!show_creation">здесь</a>.
         <br/>
         <transition name="fade">
             <div v-if="show_creation" class="new-game">
                 Создание новой игры<br/>
-                <form method="POST">
                     <table class="form-table">
                         <tr>
                             <td>Начальное количество <span class="falsic"></span></td>
@@ -67,11 +67,10 @@
                         </tr>
                         <tr>
                             <td colspan="2">
-                                <input type="submit" value="Создать игру">
+                                <button type="submit" value="create" name="action">Создать игру</button>
                             </td>
                         </tr>
                     </table>
-                </form>
             </div>
         </transition>
 
