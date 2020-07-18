@@ -8,7 +8,6 @@ mod_gameselect = Blueprint('gameselect', __name__)
 
 @mod_gameselect.route('/')
 def index():
-    if SessionHelper.has(SessionKeys.GAME_KEY):
-        return "Welcome back!"
-    SessionHelper.set(SessionKeys.GAME_KEY, "meh")
-    return "hello"
+    game_key = SessionHelper.get(SessionKeys.GAME_KEY, '')
+    g.game_key = game_key
+    return render_template("index.html")

@@ -1,0 +1,28 @@
+.form-table {
+    border: none;
+    padding: 3px;
+}
+.new-game {
+    border: #CCC solid 2px;
+    box-shadow: black;
+    border-radius: 5px;
+    display: inline-block;
+    padding: 5px;
+    margin-top: 10px;
+}
+.falsic:after {
+    content: "Ƒ";
+    color: red;
+}
+
+.new-game td {
+    vertical-align: top;
+}
+
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0;
+}

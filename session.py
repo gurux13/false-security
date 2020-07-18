@@ -9,11 +9,15 @@ class SessionKeys:
 class SessionHelper:
     def __init__(self):
         pass
+
     @staticmethod
     def __convert_key__(key):
         return key
+
     @staticmethod
-    def get(key):
+    def get(key, default=None):
+        if not SessionHelper.has(key):
+            return default
         key = SessionHelper.__convert_key__(key)
         return session[key]
 
@@ -26,6 +30,7 @@ class SessionHelper:
     def has(key):
         key = SessionHelper.__convert_key__(key)
         return key in session
+
     @staticmethod
     def delete(key):
         key = SessionHelper.__convert_key__(key)

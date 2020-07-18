@@ -7,6 +7,8 @@ from mod_gameselect.controller import mod_gameselect
 app = Flask(__name__)
 # TODO: Replace with server-side configuration
 app.config['SECRET_KEY'] = 'secret!'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+
 app.register_blueprint(mod_gameselect)
 
 socketio = SocketIO(app)

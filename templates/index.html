@@ -1,22 +1,94 @@
 {% extends 'layout.html' %}
 {{ super() }}
 {% block content %}
-        <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="../static/vue.js"></script>
+    <div id="app">
+        Имя игрока<br/>
+        <input type="text" name="player_name">
+        <br/>
+        Для входа в игру Вам потребуется уникальный код игры.<br/>
+        <form method="POST">
+            Код игры: <input type="text" v-model="game_key">
+            <transition name="fade">
+                <input type="submit" value="Войти" v-if="game_key != ''">
+            </transition>
+        </form>
+        <br/>
+        Если Вы хотите создать новую игру, нажмите <a href="#" v-on:click="show_creation=!show_creation">здесь</a>.
+        <br/>
+        <transition name="fade">
+            <div v-if="show_creation" class="new-game">
+                Создание новой игры<br/>
+                <form method="POST">
+                    <table class="form-table">
+                        <tr>
+                            <td>Начальное количество <span class="falsic"></span></td>
+                            <td><input name="b_falsics" type="text" value="100"></td>
+                        </tr>
+                        <tr>
+                            <td>Число карт нападения в начале игры</td>
+                            <td><input name="b_offence" type="text" value="2"></td>
+                        </tr>
+                        <tr>
+                            <td>Число карт защиты в начале игры</td>
+                            <td><input name="b_defence" type="text" value="3"></td>
+                        </tr>
+                        <tr>
+                            <td>Вероятность карты случайности<br/> в начале раунда</td>
+                            <td><input type="range" value="0" min="0" max="100" step="1" list="probs" name="acc_prob"
+                                       v-model="acc_prob">
+                                <datalist id="probs">
+                                    <option value="0">
+                                    <option value="25">
+                                    <option value="50">
+                                    <option value="75">
+                                    <option value="100">
+                                </datalist>
+                                <span>[[ acc_prob ]]%</span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Условие окончания игры</td>
+                            <td><select name="endgame" v-model="endgame">
+                                <option value="0">Исчерпание колоды</option>
+                                <option value="1">Фиксированное число раундов</option>
+                                <option value="2">Проигрыш одного игрока</option>
+                                <option value="3">Остался один игрок</option>
+                            </select>
+                                <transition name="fade">
+                                    <p v-if="endgame==0">
+                                        Размер колоды: <input type="number" value="50" name="deck_size">
+                                    </p>
+                                    <p v-if="endgame==1">
+                                        Число раундов: <input type="number" value="50" name="num_rounds">
+                                    </p>
+                                </transition>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <input type="submit" value="Создать игру">
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </transition>
 
-<div id="app">
-[[ message ]]
-</div>
+    </div>
     <script>
-
-var app = new Vue({
-  el: '#app',
-  data: {
-    message: 'Hello Vue!'
-  },
-    delimiters: ['[[', ']]']
-});
-socket.on('upd', function (data) {
-    app.message = data;
-})
+        const app = new Vue({
+            el: '#app',
+            data: {
+                show_creation: true,
+                acc_prob: 0,
+                endgame: 3,
+                game_key: "{{ g.game_key }}"
+            },
+            delimiters: ['[[', ']]']
+        });
+        socket.on('upd', function (data) {
+            app.message = data;
+        });
     </script>
 {% endblock %}
