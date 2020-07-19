@@ -1,0 +1,51 @@
+/* Style the tab */
+.game-selector .tab {
+  overflow: hidden;
+  border: 1px solid #ccc;
+  background-color: #f1f1f1;
+}
+
+/* Style the buttons that are used to open the tab content */
+.game-selector .tab button {
+    width: 50%;
+  background-color: inherit;
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  padding: 14px 16px;
+  transition: 0.3s;
+}
+
+/* Change background color of buttons on hover */
+.game-selector .tab button:hover {
+  background-color: #ddd;
+}
+
+/* Create an active/current tablink class */
+.game-selector .tab button.active {
+  background-color: #ccc;
+}
+
+/* Style the tab content */
+.game-selector .tabcontent {
+
+  padding: 6px 12px;
+  border: 1px solid #ccc;
+  border-top: none;
+}
+
+.game-selector {
+    min-width: 35em;
+    display: inline-block;
+    text-align: left;
+    vertical-align: top;
+}
+
+.center {
+    text-align: center;
+}
+
+.player-name {
+    padding-bottom: 5px;
+}

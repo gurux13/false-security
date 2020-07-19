@@ -1,79 +1,95 @@
 {% extends 'layout.html' %}
 {{ super() }}
+{% block extrahead %}
+<link rel="stylesheet" href="{{ url_for("static", filename="mod_gameselect/styles.css") }}">
+{% endblock %}
 {% block content %}
     <script src="../static/vue.js"></script>
+
     <div id="app">
-        <form method="POST">
-                {{ form.csrf_token }}
-        Имя игрока<br/>
-        <input type="text" name="player_name">
-        <br/>
-        Для входа в игру Вам потребуется уникальный код игры.<br/>
+        <div class="center">
+            <div class="game-selector">
+                <form method="POST">
+                    {{ form.csrf_token }}
+                    <div class="player-name">
+                        Имя игрока
+                        <input type="text" name="player_name" required>
+                    </div>
+                    <div class="tab">
+                        <button class="tablinks" v-on:click.prevent="show_creation=false"
+                                v-bind:class="{ active: !show_creation }">Присоединиться к игре
+                        </button>
+                        <button class="tablinks" v-on:click.prevent="show_creation=true"
+                                v-bind:class="{ active: show_creation }">Создать игру
+                        </button>
+                    </div>
 
-            Код игры: <input type="text" name="game_key" v-model="game_key">
-            <transition name="fade">
-                <button  v-if="game_key != ''" type="submit" value="join" name="action">Войти</button>
-            </transition>
-        <br/>
-        Если Вы хотите создать новую игру, нажмите <a href="#" v-on:click="show_creation=!show_creation">здесь</a>.
-        <br/>
-        <transition name="fade">
-            <div v-if="show_creation" class="new-game">
-                Создание новой игры<br/>
-                    <table class="form-table">
-                        <tr>
-                            <td>Начальное количество <span class="falsic"></span></td>
-                            <td><input name="b_falsics" type="text" value="100"></td>
-                        </tr>
-                        <tr>
-                            <td>Число карт нападения в начале игры</td>
-                            <td><input name="b_offence" type="text" value="2"></td>
-                        </tr>
-                        <tr>
-                            <td>Число карт защиты в начале игры</td>
-                            <td><input name="b_defence" type="text" value="3"></td>
-                        </tr>
-                        <tr>
-                            <td>Вероятность карты случайности<br/> в начале раунда</td>
-                            <td><input type="range" value="0" min="0" max="100" step="1" list="probs" name="acc_prob"
-                                       v-model="acc_prob">
-                                <datalist id="probs">
-                                    <option value="0">
-                                    <option value="25">
-                                    <option value="50">
-                                    <option value="75">
-                                    <option value="100">
-                                </datalist>
-                                <span>[[ acc_prob ]]%</span>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Условие окончания игры</td>
-                            <td><select name="endgame" v-model="endgame">
-                                <option value="0">Исчерпание колоды</option>
-                                <option value="1">Фиксированное число раундов</option>
-                                <option value="2">Проигрыш одного игрока</option>
-                                <option value="3">Остался один игрок</option>
-                            </select>
-                                <transition name="fade">
-                                    <p v-if="endgame==0">
-                                        Размер колоды: <input type="number" value="50" name="deck_size">
-                                    </p>
-                                    <p v-if="endgame==1">
-                                        Число раундов: <input type="number" value="50" name="num_rounds">
-                                    </p>
-                                </transition>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2">
-                                <button type="submit" value="create" name="action">Создать игру</button>
-                            </td>
-                        </tr>
-                    </table>
+                    <div v-if="!show_creation" class="tabcontent">
+                        Уникальный код игры:
+                        <input type="text" name="game_key" v-model="game_key" required>
+                        <!--<transition name="fade">-->
+                            <button v-if="true || game_key != ''" type="submit" value="join" name="action">Войти</button>
+{#                        </transition>#}
+                    </div>
+                    <div v-if="show_creation" class="tabcontent">
+                        <table class="form-table">
+                            <tr>
+                                <td>Начальное количество <span class="falsic"></span></td>
+                                <td><input name="b_falsics" type="number" min="1" value="100" required></td>
+                            </tr>
+                            <tr>
+                                <td>Число карт нападения в начале игры</td>
+                                <td><input name="b_offence" type="number" min="1" value="2" required></td>
+                            </tr>
+                            <tr>
+                                <td>Число карт защиты в начале игры</td>
+                                <td><input name="b_defence" type="number" min="1" value="3" required></td>
+                            </tr>
+                            <tr>
+                                <td>Вероятность карты случайности<br/> в начале раунда</td>
+                                <td><input type="range" value="50" min="0" max="100" step="1" list="probs"
+                                           name="acc_prob"
+                                           v-model="acc_prob">
+                                    <datalist id="probs">
+                                        <option value="0">
+                                        <option value="25">
+                                        <option value="50">
+                                        <option value="75">
+                                        <option value="100">
+                                    </datalist>
+                                    <span>[[ acc_prob ]]%</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Условие окончания игры</td>
+                                <td><select name="endgame" v-model="endgame">
+                                    <option value="0">Исчерпание колоды</option>
+                                    <option value="1">Фиксированное число раундов</option>
+                                    <option value="2">Проигрыш одного игрока</option>
+                                    <option value="3">Остался один игрок</option>
+                                </select>
+                                    <transition name="fade">
+                                        <p v-if="endgame==0">
+                                            Размер колоды: <input type="number" value="50" name="deck_size" min="1"
+                                                                  required>
+                                        </p>
+                                        <p v-if="endgame==1">
+                                            Число раундов: <input type="number" value="50" name="num_rounds" min="1"
+                                                                  required>
+                                        </p>
+                                    </transition>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2">
+                                    <button type="submit" value="create" name="action">Создать игру</button>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </form>
             </div>
-        </transition>
-
+        </div>
     </div>
     <script>
         const app = new Vue({

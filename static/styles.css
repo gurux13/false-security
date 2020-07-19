@@ -1,21 +1,19 @@
+body {
+    font-family: arial,sans-serif;
+}
+
 .form-table {
     border: none;
     padding: 3px;
 }
-.new-game {
-    border: #CCC solid 2px;
-    box-shadow: black;
-    border-radius: 5px;
-    display: inline-block;
-    padding: 5px;
-    margin-top: 10px;
-}
+
 .falsic:after {
     content: "Ƒ";
     color: red;
 }
 
-.new-game td {
+.form-table td {
+    padding-top: 5px;
     vertical-align: top;
 }
 
