@@ -3,6 +3,7 @@ from flask import request, render_template, \
 
 from flask import Blueprint
 from session import SessionKeys, SessionHelper
+
 from flask_wtf import FlaskForm
 from wtforms import StringField, SubmitField, IntegerField
 from wtforms.validators import DataRequired
@@ -11,6 +12,7 @@ import random
 import string
 
 mod_gameselect = Blueprint('gameselect', __name__)
+
 
 
 def get_random_string(length):
@@ -60,3 +62,10 @@ def index():
         print("Taking from request...")
     g.game_key = game_key
     return render_template("index.html", form=create_form)
+
+
+
+@mod_gameselect.route('/test')
+def test():
+    return 'x'
+
