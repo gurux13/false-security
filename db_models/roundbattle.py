@@ -5,6 +5,7 @@ from db_models.card import Card
 
 class RoundBattle(db.Model):
     __tablename__ = 'roundbattle'
+    # TODO: Add relationships
     id = db.Column(db.Integer, primary_key=True)
     offendingPlayer = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
     defendingPlayer = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)

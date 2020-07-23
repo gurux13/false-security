@@ -4,6 +4,7 @@ from db_models.game import Game, Player
 
 class GameRound(db.Model):
     __tablename__ = 'gameround'
+    # TODO: Add relationships
     id = db.Column(db.Integer, primary_key=True)
     game = db.Column(db.Integer, db.ForeignKey('game.id'), nullable=False)
     roundNo = db.Column(db.Integer, nullable=False)

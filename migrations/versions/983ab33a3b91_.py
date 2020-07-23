@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: aacab54ff099
+Revision ID: 983ab33a3b91
 Revises: 
-Create Date: 2020-07-20 22:52:56.532897
+Create Date: 2020-07-23 01:34:03.192785
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'aacab54ff099'
+revision = '983ab33a3b91'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -32,59 +32,41 @@ def upgrade():
     sa.Column('params', sa.Text(), nullable=False),
     sa.Column('roundsCompleted', sa.Integer(), nullable=False),
     sa.Column('isComplete', sa.Boolean(), nullable=True),
-    sa.Column('adminPlayer', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['adminPlayer'], ['player.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('uniqueCode')
-    )
-    op.create_table('player',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('gameId', sa.Integer(), nullable=False),
-    sa.Column('name', sa.String(length=20), nullable=False),
-    sa.Column('playerStateId', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['gameId'], ['game.id'], ),
-    sa.ForeignKeyConstraint(['playerStateId'], ['playerstate.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('id')
-    )
-    op.create_table('playerstate',
-    sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('money', sa.Integer(), nullable=False),
-    sa.Column('hand', sa.Text(), nullable=False),
-    sa.Column('neighbour', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['neighbour'], ['player.id'], ),
-    sa.PrimaryKeyConstraint('id'),
-    sa.UniqueConstraint('id')
     )
     op.create_table('card',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('name', sa.String(length=40), nullable=False),
     sa.Column('text', sa.Text(), nullable=False),
     sa.Column('imageURL', sa.Text(), nullable=False),
-    sa.Column('type', sa.Integer(), nullable=False),
+    sa.Column('typeId', sa.Integer(), nullable=False),
     sa.Column('isCovid', sa.Boolean(), nullable=True),
     sa.Column('damage', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['type'], ['cardtype.id'], ),
+    sa.ForeignKeyConstraint(['typeId'], ['cardtype.id'], ),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('name')
     )
-    op.create_table('gameround',
+    op.create_table('player',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('game', sa.Integer(), nullable=False),
-    sa.Column('roundNo', sa.Integer(), nullable=False),
-    sa.Column('isComplete', sa.Boolean(), nullable=True),
-    sa.Column('currentPlayer', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['currentPlayer'], ['player.id'], ),
-    sa.ForeignKeyConstraint(['game'], ['game.id'], ),
-    sa.PrimaryKeyConstraint('id')
+    sa.Column('gameId', sa.Integer(), nullable=False),
+    sa.Column('name', sa.String(length=20), nullable=False),
+    sa.Column('money', sa.Integer(), nullable=False),
+    sa.Column('hand', sa.Text(), nullable=True),
+    sa.Column('neighbourId', sa.Integer(), nullable=True),
+    sa.Column('isAdmin', sa.Boolean(), nullable=False),
+    sa.ForeignKeyConstraint(['gameId'], ['game.id'], ),
+    sa.ForeignKeyConstraint(['neighbourId'], ['player.id'], ),
+    sa.PrimaryKeyConstraint('id'),
+    sa.UniqueConstraint('id')
     )
     op.create_table('deckentry',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('card', sa.Integer(), nullable=False),
-    sa.Column('game', sa.Integer(), nullable=False),
+    sa.Column('cardId', sa.Integer(), nullable=True),
+    sa.Column('gameId', sa.Integer(), nullable=False),
     sa.Column('order', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['card'], ['card.id'], ),
-    sa.ForeignKeyConstraint(['game'], ['game.id'], ),
+    sa.ForeignKeyConstraint(['cardId'], ['card.id'], ),
+    sa.ForeignKeyConstraint(['gameId'], ['game.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_table('defence',
@@ -98,9 +80,19 @@ def upgrade():
     )
     op.create_table('discardentry',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('card', sa.Integer(), nullable=False),
+    sa.Column('cardId', sa.Integer(), nullable=False),
+    sa.Column('gameId', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['cardId'], ['card.id'], ),
+    sa.ForeignKeyConstraint(['gameId'], ['game.id'], ),
+    sa.PrimaryKeyConstraint('id')
+    )
+    op.create_table('gameround',
+    sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('game', sa.Integer(), nullable=False),
-    sa.ForeignKeyConstraint(['card'], ['card.id'], ),
+    sa.Column('roundNo', sa.Integer(), nullable=False),
+    sa.Column('isComplete', sa.Boolean(), nullable=True),
+    sa.Column('currentPlayer', sa.Integer(), nullable=False),
+    sa.ForeignKeyConstraint(['currentPlayer'], ['player.id'], ),
     sa.ForeignKeyConstraint(['game'], ['game.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -122,13 +114,12 @@ def upgrade():
 def downgrade():
     # ### commands auto generated by Alembic - please adjust! ###
     op.drop_table('roundbattle')
+    op.drop_table('gameround')
     op.drop_table('discardentry')
     op.drop_table('defence')
     op.drop_table('deckentry')
-    op.drop_table('gameround')
-    op.drop_table('card')
-    op.drop_table('playerstate')
     op.drop_table('player')
+    op.drop_table('card')
     op.drop_table('game')
     op.drop_table('cardtype')
     # ### end Alembic commands ###

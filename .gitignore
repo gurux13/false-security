@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Backups
+test_db_backup.db
+migrations_backup/

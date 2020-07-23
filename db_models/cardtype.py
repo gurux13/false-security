@@ -7,11 +7,7 @@ class CardType(db.Model):
     name = db.Column(db.String(40), unique=True, nullable=False)
     color = db.Column(db.String(128), nullable=False) 
     isAccident = db.Column(db.Boolean, default=False)
+    cards = db.relationship('Card', back_populates='type', lazy=True)
 
     def __repr__(self):
         return '<Card Type %r>'%self.name
-
-    def __init__(self, name, color, isAccident):
-        self.name = name
-        self.color = color
-        self.isAccident = isAccident

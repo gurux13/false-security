@@ -3,7 +3,7 @@ from flask_migrate import Migrate, MigrateCommand
 from db_models.cardtype import CardType
 from db_models.card import Card
 from db_models.defence import Defence
-from db_models.game import Game, Player, PlayerState
+from db_models.game import Game, Player
 from db_models.gameround import GameRound
 from db_models.roundbattle import RoundBattle
 from db_models.deckentry import DeckEntry
