@@ -95,7 +95,7 @@
         const app = new Vue({
             el: '#app',
             data: {
-                show_creation: true,
+                show_creation: "" === "{{ g.game_key }}",
                 acc_prob: 0,
                 endgame: 3,
                 game_key: "{{ g.game_key }}"
