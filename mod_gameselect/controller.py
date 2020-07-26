@@ -51,7 +51,7 @@ class CreateGameForm(GameForm):
 
 
 def on_join(form):
-    game = get_game_manager().GetGame(form.game_key.data)
+    game = get_game_manager().get_game(form.game_key.data)
     # TODO: wipe the old player, if set in session
     player = get_player_manager().create_player(form.player_name.data, game)
     game.join_player(player, False)
@@ -62,7 +62,7 @@ def on_join(form):
 
 def on_create(form):
     params = GameParams(form.b_falsics.data)
-    game = get_game_manager().CreateGame(params)
+    game = get_game_manager().create_game(params)
     # TODO: wipe the old player, if set in session
     player = get_player_manager().create_player(form.player_name.data, game)
     game.join_player(player, True)
@@ -94,9 +94,7 @@ def index():
 def wr():
     game = get_game_manager().get_my_game()
     player = get_player_manager().get_my_player()
-    return "Здравствуйте, " + player.model.name + " в игре " + game.model.uniqueCode
+    all_players = [x.name for x in game.model.players]
 
-
-@mod_gameselect.route('/test')
-def test():
-    return 'x'
+    return "Здравствуйте, " + player.model.name + " в игре " + game.model.uniqueCode + "<br/>" + \
+        "<br/>".join(all_players)

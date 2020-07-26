@@ -12,7 +12,7 @@ from sqlalchemy.exc import IntegrityError
 from session import SessionHelper, SessionKeys
 
 
-def get_random_string(length):
+def get_random_string(length: int) -> str:
     letters = string.ascii_uppercase + string.ascii_lowercase
     result_str = ''.join(random.choice(letters) for i in range(length))
     return result_str
@@ -22,7 +22,7 @@ class GameManager:
     def __init__(self, db: SQLAlchemy):
         self.db = db
 
-    def CreateGame(self, params: GameParams) -> GameLogic:
+    def create_game(self, params: GameParams) -> GameLogic:
         retries = 5
         while retries > 0:
             # TODO: Make sure this is cryptographically secure
@@ -39,12 +39,12 @@ class GameManager:
         else:
             raise InternalError("Не удалось создать игру. Это странно.")
 
-    def GetGame(self, game_key: str) -> GameLogic:
+    def get_game(self, game_key: str) -> GameLogic:
         game = Game.query.filter_by(uniqueCode=game_key).first()
         if game is None:
             # TODO: maybe remove the exception and make it Optional (everywhere)?
             raise UserError("К сожалению, такая игра не найдена. Проверьте уникальный код.")
         return GameLogic(self.db, game)
 
-    def get_my_game(self):
-        return self.GetGame(SessionHelper.get(SessionKeys.GAME_KEY))
+    def get_my_game(self) -> GameLogic:
+        return self.get_game(SessionHelper.get(SessionKeys.GAME_KEY))
