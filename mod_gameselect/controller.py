@@ -4,6 +4,7 @@ from flask import request, render_template, \
 from flask import Blueprint
 from sqlalchemy.exc import IntegrityError
 
+from Exceptions.hack_attempt import HackAttemptError
 from Exceptions.user_error import UserError
 from db_models.deckentry import DeckEntry
 from game_logic.game_manager import GameManager
@@ -81,7 +82,10 @@ def index():
 
     game_key = SessionHelper.get(SessionKeys.GAME_KEY, '')
     if 'k' in request.args:
+        if not request.args['k'].isalpha():
+            raise HackAttemptError("Некорректный ключ игры")
         game_key = request.args['k']
+
     g.game_key = game_key
     return render_template("index.html", form=create_form)
 
