@@ -9,6 +9,7 @@ class Game(db.Model):
     params = db.Column(db.Text, nullable=False)
     roundsCompleted = db.Column(db.Integer, nullable=False)
     isComplete = db.Column(db.Boolean, default=False)
+    isStarted = db.Column(db.Boolean, default=False)
     players = db.relationship('Player', back_populates='game')
     deck = db.relationship('DeckEntry', back_populates='game', lazy=True)
     #discard = db.relationship('DiscardEntry', back_populates='game', lazy=True)

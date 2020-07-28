@@ -4,6 +4,7 @@ from flask import request, render_template, \
 from flask import Blueprint
 from sqlalchemy.exc import IntegrityError
 
+from Exceptions.hack_attempt import HackAttemptError
 from Exceptions.user_error import UserError
 from db_models.deckentry import DeckEntry
 from game_logic.game_manager import GameManager
@@ -50,7 +51,7 @@ class CreateGameForm(GameForm):
 
 
 def on_join(form):
-    game = get_game_manager().GetGame(form.game_key.data)
+    game = get_game_manager().get_game(form.game_key.data)
     # TODO: wipe the old player, if set in session
     player = get_player_manager().create_player(form.player_name.data, game)
     game.join_player(player, False)
@@ -61,7 +62,7 @@ def on_join(form):
 
 def on_create(form):
     params = GameParams(form.b_falsics.data)
-    game = get_game_manager().CreateGame(params)
+    game = get_game_manager().create_game(params)
     # TODO: wipe the old player, if set in session
     player = get_player_manager().create_player(form.player_name.data, game)
     game.join_player(player, True)
@@ -81,7 +82,10 @@ def index():
 
     game_key = SessionHelper.get(SessionKeys.GAME_KEY, '')
     if 'k' in request.args:
+        if not request.args['k'].isalpha():
+            raise HackAttemptError("Некорректный ключ игры")
         game_key = request.args['k']
+
     g.game_key = game_key
     return render_template("index.html", form=create_form)
 
@@ -90,9 +94,7 @@ def index():
 def wr():
     game = get_game_manager().get_my_game()
     player = get_player_manager().get_my_player()
-    return "Здравствуйте, " + player.model.name + " в игре " + game.model.uniqueCode
+    all_players = [x.name for x in game.model.players]
 
-
-@mod_gameselect.route('/test')
-def test():
-    return 'x'
+    return "Здравствуйте, " + player.model.name + " в игре " + game.model.uniqueCode + "<br/>" + \
+        "<br/>".join(all_players)
