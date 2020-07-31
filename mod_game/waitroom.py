@@ -35,7 +35,7 @@ def get_state():
         return WaitroomResponse(game_found=True, in_waitroom=False)
     return WaitroomResponse(
         game_found=True,
-        in_waitroom=False,
+        in_waitroom=True,
         game_name=game.model.uniqueCode,
         players=[x.model.name for x in game.get_players()],
         can_start=game.can_start(pm.get_my_player()),
