@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
-from app import db
-from db_models.card import Card
+from globals import db
+import db_models.card
 
 class Defence(db.Model):
     __tablename__ = 'defence'

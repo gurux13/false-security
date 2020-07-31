@@ -3,7 +3,7 @@ from db_models.card import Card
 from db_models.defence import Defence
 from flask_script import Manager
 
-from app import app, db
+from globals import app, db
 
 manager = Manager(app)
 
@@ -246,6 +246,7 @@ def fill():
     accidentCards = сreate_accident_type()
     defence(defenceCards, offenceCards, accidentCards)
     db.session.commit()
+    print("DB data initialized")
 
 
 if __name__ == '__main__':

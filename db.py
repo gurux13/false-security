@@ -9,7 +9,7 @@ from db_models.roundbattle import RoundBattle
 from db_models.deckentry import DeckEntry
 from db_models.discardentry import DiscardEntry
 
-from app import app, db
+from globals import app, db
 
 migrate = Migrate(app, db)
 manager = Manager(app)

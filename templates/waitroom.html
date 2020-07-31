@@ -1,0 +1,46 @@
+{% extends 'layout.html' %}
+{{ super() }}
+{% block extrahead %}
+    <!--<link rel="stylesheet" href="{{ url_for("static", filename="mod_gameselect/styles.css") }}">-->
+{% endblock %}
+{% block content %}
+    <script src="../static/vue.js"></script>
+
+    <div id="app">
+        <div v-if="ready">
+            Приветствуем в игре [[game_name]]! <br/>
+            На данный момент игроки:
+            <ul>
+                <li v-for="player in players" :key="player">
+                    [[ player ]]
+                </li>
+            </ul>
+        </div>
+    </div>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                game_name: "???",
+                players: [],
+                ready: false,
+            },
+            delimiters: ['[[', ']]']
+        });
+        socket.on('waitroom', function (data) {
+            if (data.ok) {
+                app.game_name = data.value.game_name
+                app.players = data.value.players
+            }
+            app.ready = data.ok;
+
+        });
+        socket.on('connect', function() {
+            socket.emit('waitroom');
+        });
+        socket.on('upd', function () {
+            socket.emit('waitroom');
+        });
+
+    </script>
+{% endblock %}

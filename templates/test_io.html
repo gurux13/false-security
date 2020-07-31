@@ -8,9 +8,9 @@
         socket.emit('my event', {data: 'I\'m connected!'});
     });
     function onBtnClick() {
-        socket.emit('clicked');
+        socket.emit('waitroom');
     }
-    socket.on('upd', function(data) {
+    socket.on('waitroom', function(data) {
         document.getElementById('pressed').innerText = data;
     });
 </script>

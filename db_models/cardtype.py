@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from app import db
+from globals import db
 
 class CardType(db.Model):
     __tablename__ = 'cardtype'

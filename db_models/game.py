@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from app import db
+from globals import db
 import db_models.deckentry
 
 class Game(db.Model):

@@ -8,3 +8,4 @@ mv migrations migrations_backup
 python3 db.py db init
 python3 db.py db migrate
 python3 db.py db upgrade
+python3 create_cards.py fill

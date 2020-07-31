@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from app import db
+from globals import db
 from db_models.game import Game, Player
 
 class GameRound(db.Model):

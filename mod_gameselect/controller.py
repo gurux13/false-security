@@ -17,7 +17,7 @@ from wtforms.validators import DataRequired
 
 from db_models.game import Game, Player
 from game_logic.gameparams import GameParams
-from app import db
+from globals import db
 
 import random
 import string
@@ -57,6 +57,7 @@ def on_join(form):
     game.join_player(player, False)
     SessionHelper.set(SessionKeys.GAME_KEY, form.game_key.data)
     SessionHelper.set(SessionKeys.PLAYER_ID, player.model.id)
+
     return redirect('/waitroom')
 
 
@@ -89,12 +90,3 @@ def index():
     g.game_key = game_key
     return render_template("index.html", form=create_form)
 
-
-@mod_gameselect.route('/waitroom')
-def wr():
-    game = get_game_manager().get_my_game()
-    player = get_player_manager().get_my_player()
-    all_players = [x.name for x in game.model.players]
-
-    return "Здравствуйте, " + player.model.name + " в игре " + game.model.uniqueCode + "<br/>" + \
-        "<br/>".join(all_players)

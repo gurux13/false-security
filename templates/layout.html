@@ -6,7 +6,9 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css')}}">
     {% block extrahead %}{% endblock %}
     <script>
-        var socket = io();
+//        var socket = io();
+        var socket = io({transports: ['websocket'], upgrade: false});
+
     </script>
     <meta charset="UTF-8">
     <title>{% block title %}{% endblock %}</title>
