@@ -47,6 +47,7 @@ class GameLogic:
             raise UserError("Невозможно присоединиться к запущенной игре")
         if is_admin:
             player.make_admin()
+        self.db.session.commit()
         self.notify()
 
     def get_players(self):
@@ -55,3 +56,9 @@ class GameLogic:
     def can_start(self, player: PlayerLogic):
         # TODO: Make it depend on game params!
         return player.model.isAdmin
+
+    def start(self):
+        self.model.isStarted = True
+        self.db.session.commit()
+        self.notify()
+        pass

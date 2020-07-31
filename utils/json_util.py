@@ -24,5 +24,4 @@ def to_dicts(obj):
     if isinstance(obj, dict):
         return {k: to_dicts(obj[k]) for k in obj}
 
-
     return to_dicts(obj.__dict__)

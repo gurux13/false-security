@@ -22,24 +22,25 @@ class WaitroomResponse:
     game_name: str = None
     players: list = None
     can_start: bool = False
-    is_admin: bool = False
+    admin_player: str = None
+    redirect_to: str = None
 
 
 def get_state():
     gm = GameManager(db)
     pm = PlayerManager(db)
     if not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
-        return WaitroomResponse(game_found=False)
+        return WaitroomResponse(game_found=False, redirect_to='/')
     game = gm.get_my_game()
     if not game.is_waitroom():
-        return WaitroomResponse(game_found=True, in_waitroom=False)
+        return WaitroomResponse(game_found=True, in_waitroom=False, redirect_to='/game')
     return WaitroomResponse(
         game_found=True,
         in_waitroom=True,
         game_name=game.model.uniqueCode,
         players=[x.model.name for x in game.get_players()],
         can_start=game.can_start(pm.get_my_player()),
-        is_admin=pm.get_my_player().model.isAdmin
+        admin_player=next((p.model.name for p in game.get_players() if p.model.isAdmin), None)
     )
 
 
@@ -52,10 +53,14 @@ def waitroom():
         db.session.commit()
         db.session.remove()
     except Exception as e:
-        emit('waitroom', Response.Error(str(e)).as_dicts())
+        emit('waitroom', Response.Error("Что-то сломалось.").as_dicts())
         db.session.rollback()
         db.session.remove()
 
+@socketio.on('start')
+def start_game():
+    gm = get_game_manager()
+    gm.get_my_game().start()
 
 @Memoize
 def get_game_manager():

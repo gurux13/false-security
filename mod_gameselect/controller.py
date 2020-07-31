@@ -67,6 +67,7 @@ def on_create(form):
     # TODO: wipe the old player, if set in session
     player = get_player_manager().create_player(form.player_name.data, game)
     game.join_player(player, True)
+    db.session.commit()
     SessionHelper.set(SessionKeys.GAME_KEY, game.model.uniqueCode)
     SessionHelper.set(SessionKeys.PLAYER_ID, player.model.id)
     return redirect('/waitroom')

@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {{ super() }}
 {% block extrahead %}
-    <!--<link rel="stylesheet" href="{{ url_for("static", filename="mod_gameselect/styles.css") }}">-->
+<link rel="stylesheet" href="{{ url_for("static", filename="mod_game/waitroom.css") }}">
 {% endblock %}
 {% block content %}
     <script src="../static/vue.js"></script>
@@ -11,10 +11,11 @@
             Приветствуем в игре [[game_name]]! <br/>
             На данный момент игроки:
             <ul>
-                <li v-for="player in players" :key="player">
-                    [[ player ]]
+                <li v-for="player in players" :key="player.name" v-bind:class="{admin_player:player.is_admin}">
+                    [[ player.name ]]
                 </li>
             </ul>
+            <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
         </div>
     </div>
     <script>
@@ -24,16 +25,31 @@
                 game_name: "???",
                 players: [],
                 ready: false,
+                show_start: false,
+                admin_player: '',
+                start_disabled: false,
             },
-            delimiters: ['[[', ']]']
+            delimiters: ['[[', ']]'],
+            methods:{
+                start: function () {
+                    app.start_disabled = true;
+                    socket.emit('start')
+
+                }
+            }
         });
         socket.on('waitroom', function (data) {
             if (data.ok) {
-                app.game_name = data.value.game_name
-                app.players = data.value.players
+                if (data.value.redirect_to) {
+                    window.location.href = data.value.redirect_to;
+                } else {
+                    app.game_name = data.value.game_name;
+                    app.players = data.value.players.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
+                    app.show_start = data.value.can_start;
+                    app.admin_player = data.value.admin_player;
+                    app.ready = true;
+                }
             }
-            app.ready = data.ok;
-
         });
         socket.on('connect', function() {
             socket.emit('waitroom');
