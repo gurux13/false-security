@@ -43,7 +43,7 @@
                     window.location.href = data.value.redirect_to;
                 } else {
                     app.game_name = data.value.game_name;
-                    app.players = data.value.players.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
+                    app.players = data.value.players;//.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
                     app.show_start = data.value.can_start;
                     app.admin_player = data.value.admin_player;
                     app.ready = true;

@@ -38,9 +38,9 @@ def get_state():
         game_found=True,
         in_waitroom=True,
         game_name=game.model.uniqueCode,
-        players=[x.model.name for x in game.get_players()],
+        players=[{'name': x.model.name, 'is_admin': True, 'is_online': True} for x in game.get_players()],
         can_start=game.can_start(pm.get_my_player()),
-        admin_player=next((p.model.name for p in game.get_players() if p.model.isAdmin), None)
+        # admin_player=next((p.model.name for p in game.get_players() if p.model.isAdmin), None)
     )
 
 
