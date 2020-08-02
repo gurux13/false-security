@@ -43,7 +43,8 @@ class GameManager:
         game = Game.query.filter_by(uniqueCode=game_key).first()
         if game is None:
             # TODO: maybe remove the exception and make it Optional (everywhere)?
-            raise UserError("К сожалению, такая игра не найдена. Проверьте уникальный код.")
+            raise UserError("К сожалению, такая игра не найдена. Проверьте уникальный код.",
+                            UserError.ErrorType.INVALID_GAME)
         return GameLogic(self.db, game)
 
     def get_my_game(self) -> GameLogic:

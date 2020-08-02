@@ -26,16 +26,11 @@ print('starting...')
 def hello_world():
     return render_template('test_io.html')
 
-@globals.socketio.on('disconnect')
-def on_disconnect():
-    if (SessionHelper.has(SessionKeys.PLAYER_ID)):
-        print("Had game!")
-    print("Client disconnected...")
 
 if __name__ == '__main__':
     # Registering socketio listeners
     import mod_game.waitroom
-
+    import connection_events
     from mod_gameselect.controller import mod_gameselect
 
     app.register_blueprint(mod_gameselect)

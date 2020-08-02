@@ -19,7 +19,7 @@ class PlayerManager:
         self.db = db
 
     def create_player(self, name: str, game: GameLogic) -> PlayerLogic:
-        player = Player(name=name, game=game.model, money=0, isAdmin=False)
+        player = Player(name=name, game=game.model, money=0, isAdmin=False, isOnline=False)
         self.db.session.add(player)
         try:
             self.db.session.commit()

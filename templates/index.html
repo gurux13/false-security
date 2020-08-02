@@ -28,9 +28,9 @@
                     <div v-if="!show_creation" class="tabcontent">
                         Уникальный код игры:
                         <input type="text" name="game_key" v-model="game_key" required>
-                        <!--<transition name="fade">-->
-                            <button v-if="true || game_key != ''" type="submit" value="join" name="action">Войти</button>
-{#                        </transition>#}
+                            <button v-if="true || game_key != ''" type="submit" value="join" name="action">Войти!</button>
+                        <br>
+                        <span v-if="error_game" class="validation-error">[[error_game]]</span>
                     </div>
                     <div v-if="show_creation" class="tabcontent">
                         <table class="form-table">
@@ -96,11 +96,12 @@
         const app = new Vue({
             el: '#app',
             data: {
-                show_creation: "" === "{{ g.game_key }}",
+                show_creation: "" === "{{ g.game_key }}" && !( "{{ g.error_game }}" ),
                 acc_prob: 0,
                 endgame: 3,
                 game_key: "{{ g.game_key }}",
                 error_name: "{{ g.error_name }}",
+                error_game: "{{ g.error_game }}",
             },
             delimiters: ['[[', ']]']
         });

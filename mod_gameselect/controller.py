@@ -88,6 +88,8 @@ def index():
     except UserError as e:
         if e.error_type == UserError.ErrorType.INVALID_NAME:
             g.error_name = e.message
+        elif e.error_type == UserError.ErrorType.INVALID_GAME:
+            g.error_game = e.message
         else:
             raise
         return render_template('index.html', form=form)
