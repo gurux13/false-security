@@ -26,7 +26,8 @@ class PlayerManager:
         except IntegrityError as e:
             print("Player creation problem: " + str(e))
             self.db.session.rollback()
-            raise UserError("Игрок с таким именем уже существует. Пожалуйста, измените имя.")
+            raise UserError("Игрок с таким именем уже существует. Пожалуйста, измените имя.",
+                            UserError.ErrorType.INVALID_NAME)
         return PlayerLogic(self.db, player)
 
     def get_player(self, id: int) -> PlayerLogic:

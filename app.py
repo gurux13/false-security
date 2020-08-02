@@ -1,5 +1,7 @@
 from flask import g, Flask, render_template, json
 
+from session import SessionHelper, SessionKeys
+
 if __name__ != '__main__':
     import sys, os
     if os.path.split(sys.argv[0])[1].replace('.py', '') == __name__:
@@ -24,6 +26,11 @@ print('starting...')
 def hello_world():
     return render_template('test_io.html')
 
+@globals.socketio.on('disconnect')
+def on_disconnect():
+    if (SessionHelper.has(SessionKeys.PLAYER_ID)):
+        print("Had game!")
+    print("Client disconnected...")
 
 if __name__ == '__main__':
     # Registering socketio listeners

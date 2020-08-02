@@ -3,7 +3,8 @@ from enum import Enum
 
 class UserError(Exception):
     class ErrorType(Enum):
-        GENERIC_ERROR = 0
+        GENERIC_ERROR = 0,
+        INVALID_NAME = 1,
 
     def __init__(self, message, error_type=ErrorType.GENERIC_ERROR):
         self.message = message

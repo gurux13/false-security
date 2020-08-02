@@ -76,12 +76,21 @@ def on_create(form):
 @mod_gameselect.route('/', methods=['GET', 'POST'])
 def index():
     join_form = JoinForm()
-    if join_form.validate_on_submit():
-        return on_join(join_form)
     create_form = CreateGameForm()
-    if create_form.validate_on_submit():
-        return on_create(create_form)
-
+    form = None
+    try:
+        if join_form.validate_on_submit():
+            form = join_form
+            return on_join(join_form)
+        if create_form.validate_on_submit():
+            form = create_form
+            return on_create(create_form)
+    except UserError as e:
+        if e.error_type == UserError.ErrorType.INVALID_NAME:
+            g.error_name = e.message
+        else:
+            raise
+        return render_template('index.html', form=form)
     game_key = SessionHelper.get(SessionKeys.GAME_KEY, '')
     if 'k' in request.args:
         if not request.args['k'].isalpha():

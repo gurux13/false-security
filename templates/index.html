@@ -14,6 +14,7 @@
                     <div class="player-name">
                         Имя игрока
                         <input type="text" name="player_name" required>
+                        <span v-if="error_name" class="validation-error">[[error_name]]</span>
                     </div>
                     <div class="tab">
                         <button class="tablinks" v-on:click.prevent="show_creation=false"
@@ -98,7 +99,8 @@
                 show_creation: "" === "{{ g.game_key }}",
                 acc_prob: 0,
                 endgame: 3,
-                game_key: "{{ g.game_key }}"
+                game_key: "{{ g.game_key }}",
+                error_name: "{{ g.error_name }}",
             },
             delimiters: ['[[', ']]']
         });
