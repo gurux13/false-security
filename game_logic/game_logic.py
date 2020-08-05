@@ -54,8 +54,10 @@ class GameLogic:
         return [PlayerLogic(self.db, x) for x in self.model.players]
 
     def can_start(self, player: PlayerLogic):
-        # TODO: Make it depend on game params!
-        return player.model.isAdmin
+        if self.params.only_admin_starts:
+            return player.model.isAdmin
+        else:
+            return True
 
     def start(self):
         self.model.isStarted = True

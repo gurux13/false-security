@@ -12,11 +12,11 @@ from game_logic.player_manager import PlayerManager
 from session import SessionKeys, SessionHelper
 
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField, IntegerField
-from wtforms.validators import DataRequired
+from wtforms import StringField, SubmitField, IntegerField, BooleanField
+from wtforms.validators import DataRequired, InputRequired
 
 from db_models.game import Game, Player
-from game_logic.gameparams import GameParams
+from game_logic.gameparams import GameParams, EndGameDeaths
 from globals import db
 
 import random
@@ -47,7 +47,14 @@ class JoinForm(GameForm):
 
 
 class CreateGameForm(GameForm):
-    b_falsics = IntegerField(validators=[DataRequired()])
+    b_falsics = IntegerField(validators=[InputRequired()])
+    b_offence = IntegerField(validators=[InputRequired()])
+    b_defence = IntegerField(validators=[InputRequired()])
+    acc_prob = IntegerField(validators=[InputRequired()])
+    endgame = IntegerField(validators=[InputRequired()])
+    only_admin_starts = BooleanField(validators=[])
+    deck_size = IntegerField()
+    num_rounds = IntegerField()
 
 
 def on_join(form):
@@ -62,7 +69,16 @@ def on_join(form):
 
 
 def on_create(form):
-    params = GameParams(form.b_falsics.data)
+    endgame_map = {
+        0: EndGameDeaths.NotEnabled,
+        1: EndGameDeaths.NotEnabled,
+        2: EndGameDeaths.OneDead,
+        3: EndGameDeaths.AllButOneDead
+    }
+    params = GameParams(form.b_falsics.data, form.b_defence.data,
+                        form.b_offence.data, form.acc_prob.data / 100.0,
+                        endgame_map[form.endgame.data], form.deck_size.data, form.num_rounds.data,
+                        form.only_admin_starts.data)
     game = get_game_manager().create_game(params)
     # TODO: wipe the old player, if set in session
     player = get_player_manager().create_player(form.player_name.data, game)
@@ -101,4 +117,3 @@ def index():
 
     g.game_key = game_key
     return render_template("index.html", form=create_form)
-

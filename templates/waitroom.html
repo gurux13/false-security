@@ -15,6 +15,7 @@
                     [[ player.name ]]
                 </li>
             </ul>
+            Отправьте ссылку игрокам: <a :href="link">[[link]]</a><br/>
             <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
         </div>
     </div>
@@ -46,6 +47,7 @@
                     app.players = data.value.players;//.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
                     app.show_start = data.value.can_start;
                     app.admin_player = data.value.admin_player;
+                    app.link = (window.location.href.replace(/\/[^\/]*$/, '') + data.value.game_link).toString();
                     app.ready = true;
                 }
             }
