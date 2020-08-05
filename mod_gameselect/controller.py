@@ -68,6 +68,13 @@ def on_join(form):
     return redirect('/waitroom')
 
 
+def rejoin() -> bool:
+    player = get_player_manager().get_my_player()
+    if player is not None:
+        print("this player is already in this game with name", player.model.name )
+        return True
+
+
 def on_create(form):
     endgame_map = {
         0: EndGameDeaths.NotEnabled,
@@ -93,6 +100,8 @@ def on_create(form):
 def index():
     join_form = JoinForm()
     create_form = CreateGameForm()
+    if rejoin():
+        return redirect('/waitroom')
     form = None
     try:
         if join_form.validate_on_submit():

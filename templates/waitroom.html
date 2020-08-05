@@ -8,7 +8,7 @@
 
     <div id="app">
         <div v-if="ready">
-            Приветствуем в игре [[game_name]]! <br/>
+            Приветствуем [[current_player]] в игре [[game_name]]! <br/>
             На данный момент игроки:
             <ul>
                 <li v-for="player in players" :key="player.name" v-bind:class="{admin_player:player.is_admin}">
@@ -44,6 +44,7 @@
                     window.location.href = data.value.redirect_to;
                 } else {
                     app.game_name = data.value.game_name;
+                    app.current_player = data.value.current_player;
                     app.players = data.value.players;//.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
                     app.show_start = data.value.can_start;
                     app.admin_player = data.value.admin_player;

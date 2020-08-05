@@ -25,6 +25,8 @@ class WaitroomResponse:
     admin_player: str = None
     redirect_to: str = None
     game_link: str = None
+    current_player: str = None
+
 
 
 def get_state():
@@ -39,6 +41,7 @@ def get_state():
         game_found=True,
         in_waitroom=True,
         game_name=game.model.uniqueCode,
+        current_player=pm.get_my_player().model.name,
         players=[{'name': x.model.name, 'is_admin': x.model.isAdmin, 'is_online': x.model.isOnline} for x in game.get_players()],
         can_start=game.can_start(pm.get_my_player()),
         game_link='?k=' + game.model.uniqueCode,

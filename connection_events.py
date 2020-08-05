@@ -44,3 +44,6 @@ def change_admin(is_online: bool, player: PlayerLogic):
         if new_adm is not None:
             new_adm.isAdmin = True
             player.model.isAdmin = False
+            db.session.commit()
+            gm.get_my_game().notify()
+
