@@ -1,8 +1,8 @@
 from flask_socketio import SocketIO, emit
 
-from game_logic.game_manager import GameManager
-from game_logic.player_manager import PlayerManager
-from game_logic.player_logic import PlayerLogic
+from logic.game_manager import GameManager
+from logic.player_manager import PlayerManager
+from logic.player_logic import PlayerLogic
 from globals import socketio, db
 from session import SessionHelper, SessionKeys
 from utils.response import Response

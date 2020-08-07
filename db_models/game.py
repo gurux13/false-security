@@ -1,6 +1,8 @@
 from flask_sqlalchemy import SQLAlchemy
 from globals import db
 import db_models.deckentry
+import db_models.discardentry
+import db_models.gameround
 
 class Game(db.Model):
     __tablename__ = 'game'
@@ -12,7 +14,8 @@ class Game(db.Model):
     isStarted = db.Column(db.Boolean, default=False)
     players = db.relationship('Player', back_populates='game')
     deck = db.relationship('DeckEntry', back_populates='game', lazy=True)
-    #discard = db.relationship('DiscardEntry', back_populates='game', lazy=True)
+    discard = db.relationship('DiscardEntry', back_populates='game', lazy=True)
+    rounds = db.relationship('GameRound', back_populates='game')
 
     def __repr__(self):
         return '<Game %r>' % self.uniqueCode

@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+{{ super() }}
+{% block extrahead %}
+<link rel="stylesheet" href="{{ url_for("static", filename="mod_game/waitroom.css") }}">
+{% endblock %}
+{% block content %}
+    <script src="../static/vue.js"></script>
+
+    <div id="app">
+        <div v-if="ready">
+            Приветствуем [[current_player]] в игре [[game_name]]! <br/>
+            На данный момент игроки:
+            <ul>
+                <li v-for="player in players" :key="player.name" v-bind:class="{admin_player:player.is_admin}">
+                    [[ player.name ]]
+                </li>
+            </ul>
+            Отправьте ссылку игрокам: <a :href="link">[[link]]</a><br/>
+            <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
+        </div>
+    </div>
+    <script>
+        const app = new Vue({
+            el: '#app',
+            data: {
+                game_name: "???",
+                players: [],
+                ready: false,
+                show_start: false,
+                admin_player: '',
+                start_disabled: false,
+            },
+            delimiters: ['[[', ']]'],
+            methods:{
+                start: function () {
+                    app.start_disabled = true;
+                    socket.emit('start')
+                }
+            }
+        });
+        socket.on('state', function (data) {
+            if (data.ok) {
+                if (data.value.redirect_to) {
+                    window.location.href = data.value.redirect_to;
+                } else {
+                    app.game_name = data.value.game_name;
+                    app.current_player = data.value.current_player;
+                    app.players = data.value.players;//.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
+                    app.show_start = data.value.can_start;
+                    app.admin_player = data.value.admin_player;
+                    app.link = (window.location.href.replace(/\/[^\/]*$/, '') + data.value.game_link).toString();
+                    app.ready = true;
+                }
+            }
+        });
+        socket.on('connect', function() {
+            socket.emit('state');
+        });
+        socket.on('upd', function () {
+            socket.emit('state');
+        });
+
+    </script>
+{% endblock %}

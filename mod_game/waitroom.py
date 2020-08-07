@@ -4,8 +4,8 @@ from dataclasses import dataclass
 
 from Exceptions.user_error import UserError
 from globals import db
-from game_logic.game_manager import GameManager
-from game_logic.player_manager import PlayerManager
+from logic.game_manager import GameManager
+from logic.player_manager import PlayerManager
 from session import SessionHelper, SessionKeys
 
 from utils.memoize import Memoize

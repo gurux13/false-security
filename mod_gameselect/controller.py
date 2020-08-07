@@ -7,8 +7,8 @@ from sqlalchemy.exc import IntegrityError
 from Exceptions.hack_attempt import HackAttemptError
 from Exceptions.user_error import UserError
 from db_models.deckentry import DeckEntry
-from game_logic.game_manager import GameManager
-from game_logic.player_manager import PlayerManager
+from logic.game_manager import GameManager
+from logic.player_manager import PlayerManager
 from session import SessionKeys, SessionHelper
 
 from flask_wtf import FlaskForm
@@ -16,7 +16,7 @@ from wtforms import StringField, SubmitField, IntegerField, BooleanField
 from wtforms.validators import DataRequired, InputRequired
 
 from db_models.game import Game, Player
-from game_logic.gameparams import GameParams, EndGameDeaths
+from logic.gameparams import GameParams, EndGameDeaths
 from globals import db
 
 import random

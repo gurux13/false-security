@@ -3,8 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from Exceptions.internal_error import InternalError
 from Exceptions.user_error import UserError
 from db_models.game import Game
-from game_logic.game_logic import GameLogic
-from game_logic.gameparams import GameParams
+from logic.game_logic import GameLogic
+from logic.gameparams import GameParams
 import string
 import random
 from sqlalchemy.exc import IntegrityError

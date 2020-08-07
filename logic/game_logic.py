@@ -6,8 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 from Exceptions.user_error import UserError
 from globals import socketio
 from db_models.game import Game
-from game_logic.gameparams import GameParams
-from game_logic.player_logic import PlayerLogic
+from logic.gameparams import GameParams
+from logic.player_logic import PlayerLogic
 
 
 class GameLogic:
@@ -51,7 +51,7 @@ class GameLogic:
         self.notify()
 
     def get_players(self):
-        return [PlayerLogic(self.db, x) for x in self.model.players]
+        return [PlayerLogic(self.db, x, self) for x in self.model.players]
 
     def can_start(self, player: PlayerLogic):
         if self.params.only_admin_starts:

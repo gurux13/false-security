@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 from globals import db
 import db_models.game
 from db_models.card import Card

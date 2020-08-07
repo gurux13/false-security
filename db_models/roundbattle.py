@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from globals import db
-from db_models.gameround import Player
+from db_models.game import Player
 from db_models.card import Card
 
 class RoundBattle(db.Model):

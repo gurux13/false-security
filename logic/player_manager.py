@@ -3,13 +3,13 @@ from flask_sqlalchemy import SQLAlchemy
 from Exceptions.internal_error import InternalError
 from Exceptions.user_error import UserError
 from db_models.game import Game, Player
-from game_logic.game_logic import GameLogic
-from game_logic.gameparams import GameParams
+from logic.game_logic import GameLogic
+from logic.gameparams import GameParams
 import string
 from random import random
 from sqlalchemy.exc import IntegrityError
 
-from game_logic.player_logic import PlayerLogic
+from logic.player_logic import PlayerLogic
 from session import SessionHelper, SessionKeys
 from utils.memoize import Memoize
 

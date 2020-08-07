@@ -1,6 +1,5 @@
-from flask_sqlalchemy import SQLAlchemy
 from globals import db
-from db_models.gameround import Game
+import db_models.game
 from db_models.card import Card
 
 class DiscardEntry(db.Model):
