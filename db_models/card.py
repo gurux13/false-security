@@ -14,6 +14,7 @@ class Card(db.Model):
     type = db.relationship('CardType', back_populates='cards', uselist=False, lazy=False)
     isCovid = db.Column(db.Boolean, default=False)
     damage = db.Column(db.Integer, nullable=True)
+    countInDeck = db.Column(db.Integer, nullable=False)
 
     offensiveAgainst = db.relationship('Defence', foreign_keys='Defence.offenceCardId', back_populates='offence', lazy=False)
     defensiveFrom = db.relationship('Defence', foreign_keys='Defence.defenceCardId', back_populates='defence', lazy=False)

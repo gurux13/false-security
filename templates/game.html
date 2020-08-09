@@ -5,18 +5,20 @@
 {% endblock %}
 {% block content %}
     <script src="../static/vue.js"></script>
+    <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
 
     <div id="app">
         <div v-if="ready">
             Приветствуем [[current_player]] в игре [[game_name]]! <br/>
-            На данный момент игроки:
+            <player-icon v-for="player in players" :key="player.name" :name="player.name" :score="player.score"></player-icon>
+<!--            На данный момент игроки:
             <ul>
                 <li v-for="player in players" :key="player.name" v-bind:class="{admin_player:player.is_admin}">
                     [[ player.name ]]
                 </li>
             </ul>
             Отправьте ссылку игрокам: <a :href="link">[[link]]</a><br/>
-            <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
+            <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>-->
         </div>
     </div>
     <script>
@@ -43,12 +45,12 @@
                 if (data.value.redirect_to) {
                     window.location.href = data.value.redirect_to;
                 } else {
-                    app.game_name = data.value.game_name;
-                    app.current_player = data.value.current_player;
-                    app.players = data.value.players;//.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
-                    app.show_start = data.value.can_start;
-                    app.admin_player = data.value.admin_player;
-                    app.link = (window.location.href.replace(/\/[^\/]*$/, '') + data.value.game_link).toString();
+                    data = data.value.game
+                    app.game_name = data.game_name;
+                    app.current_player = data.current_player;
+                    app.players = data.players;//.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
+                    app.link = (window.location.href.replace(/\/[^\/]*$/, '') + data.game_link).toString();
+                    app.hand = data.hand;
                     app.ready = true;
                 }
             }

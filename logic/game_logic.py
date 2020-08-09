@@ -1,11 +1,16 @@
-
 from enum import Enum
-
+import random
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import func
 
 from Exceptions.user_error import UserError
+from db_models.card import Card
+from db_models.cardtype import CardTypeEnum
+from db_models.deckentry import DeckEntry
 from globals import socketio
 from db_models.game import Game
+from logic.card_logic import CardLogic
+from logic.card_manager import CardManager
 from logic.gameparams import GameParams
 from logic.player_logic import PlayerLogic
 
@@ -21,6 +26,7 @@ class GameLogic:
         self.db = db
         self.model = model
         self.params = GameParams.from_db(model.params)
+        self.card_manager = CardManager(self.db)
 
     def notify(self):
         print("Notifying everyone in room", self.model.uniqueCode)
@@ -59,8 +65,44 @@ class GameLogic:
         else:
             return True
 
+    def initialize_player(self, player):
+        player.model.money = self.params.initial_falsics
+        self.deal(player, self.card_manager.get_type(CardTypeEnum.DEFENCE), self.params.initial_defence_cards)
+        self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE), self.params.initial_offence_cards)
+
+    def make_deck(self):
+        deck_size = self.params.deck_size
+        if deck_size is None:
+            deck_size = self.db.session.query(func.sum(Card.countInDeck).label('count')).scalar()
+        all_cards = self.db.session.query(Card).all()
+        all_cards_dup = []
+        for card in all_cards:
+            all_cards_dup.extend([card] * card.countInDeck)
+        rv = []
+        while len(rv) < deck_size:
+            random.shuffle(all_cards_dup)
+            rv.extend(all_cards_dup[:deck_size - len(rv)])
+        for card in rv:
+            de = DeckEntry(
+                cardId=card.id,
+                game=self.model,
+                order=random.randint(0, 2 ** 31),
+            )
+            self.db.session.add(de)
+
     def start(self):
         self.model.isStarted = True
+        self.make_deck()
+        for player in self.get_players():
+            self.initialize_player(player)
         self.db.session.commit()
         self.notify()
-        pass
+
+    def deal(self, player, typ, count):
+        deck_entries = self.db.session.query(DeckEntry) \
+                           .filter_by(gameId=self.model.id) \
+                           .filter(DeckEntry.card.has(type=typ)) \
+                           .order_by(DeckEntry.order)[:count]
+        player.add_cards([CardLogic(self.db, x.card) for x in deck_entries])
+        for entry in deck_entries:
+            self.db.session.delete(entry)

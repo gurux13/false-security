@@ -13,7 +13,7 @@ class PlayerLogic:
         self.db = db
         self.model = model
         self.game = game
-        self.hand: List[int] = None if self.model.hand is None else json.loads(self.model.hand)
+        self.hand: List[int] = [] if self.model.hand is None else json.loads(self.model.hand)
 
     def make_admin(self):
         self.model.isAdmin = True
@@ -23,6 +23,12 @@ class PlayerLogic:
 
     def get_hand(self) -> List[CardLogic]:
         if self.hand is None:
-            return None
+            return []
         return [CardLogic(self.db, c) for c in Card.query.filter(Card.id.in_(self.hand))]
 
+    def updated_hand(self):
+        self.model.hand = json.dumps(self.hand)
+
+    def add_cards(self, cards: List[CardLogic]):
+        self.hand.extend((c.model.id for c in cards))
+        self.updated_hand()

@@ -1,4 +1,5 @@
 import json
+from enum import Enum
 
 
 class DictObjEncoder(json.JSONEncoder):
@@ -24,4 +25,10 @@ def to_dicts(obj):
     if isinstance(obj, dict):
         return {k: to_dicts(obj[k]) for k in obj}
 
+    if isinstance(obj, map):
+        return [to_dicts(x) for x in obj]
+
+    if isinstance(obj, Enum):
+        return obj.value
+    print("Serializing", obj, "...")
     return to_dicts(obj.__dict__)

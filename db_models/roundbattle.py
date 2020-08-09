@@ -1,24 +1,20 @@
 from flask_sqlalchemy import SQLAlchemy
 from globals import db
-from db_models.game import Player
-from db_models.card import Card
+import db_models.game
+import db_models.card
 
 class RoundBattle(db.Model):
     __tablename__ = 'roundbattle'
     # TODO: Add relationships
     id = db.Column(db.Integer, primary_key=True)
-    offendingPlayer = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
-    defendingPlayer = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
-    offensiveCard = db.Column(db.Integer, db.ForeignKey('card.id'), nullable=False)
+    offendingPlayerId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
+    offendingPlayer = db.relationship('Player', foreign_keys=[offendingPlayerId])
+
+    defendingPlayerId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
+    defendingPlayer = db.relationship('Player', foreign_keys=[defendingPlayerId])
+
+    offensiveCardId = db.Column(db.Integer, db.ForeignKey('card.id'), nullable=False)
+    offensiveCard = db.relationship('Card')
+
     defensiveCards = db.Column(db.Text, nullable=False)
     isComplete = db.Column(db.Boolean, default=False)
-
-    def __repr__(self):
-        return '<Battle round >'
-
-    def __init__(self, offendingPlayer, defendingPlayer, offensiveCard, defensiveCards, isComplete):
-        self.offendingPlayer = offendingPlayer
-        self.defendingPlayer = defendingPlayer
-        self.offensiveCard = offensiveCard
-        self.defensiveCards = defensiveCards
-        self.isComplete = isComplete
