@@ -7,6 +7,8 @@ from Exceptions.user_error import UserError
 from db_models.card import Card
 from db_models.cardtype import CardTypeEnum
 from db_models.deckentry import DeckEntry
+from db_models.gameround import GameRound
+from db_models.roundbattle import RoundBattle
 from globals import socketio
 from db_models.game import Game
 from logic.card_logic import CardLogic
@@ -27,6 +29,7 @@ class GameLogic:
         self.model = model
         self.params = GameParams.from_db(model.params)
         self.card_manager = CardManager(self.db)
+        self.cur_round: GameRound = next(iter(self.model.rounds), None)
 
     def notify(self):
         print("Notifying everyone in room", self.model.uniqueCode)
@@ -90,19 +93,59 @@ class GameLogic:
             )
             self.db.session.add(de)
 
+    def on_accident_played(self):
+        pass
+
+    def start_battle(self, offender: PlayerLogic, defender: PlayerLogic):
+        rb = RoundBattle(
+            offendingPlayer=None if offender is None else offender.model,
+            defendingPlayer=defender.model,
+            isComplete=False,
+        )
+        self.db.session.add(rb)
+        return rb
+
+    def play_accident(self):
+        if random.random() > self.params.accident_probability:
+            self.on_accident_played()
+            return
+        card = self.get_from_deck(self.card_manager.get_type(CardTypeEnum.ACCIDENT), 1)
+        if len(card) == 0:
+            self.on_accident_played()
+            return
+        for player in self.get_players():
+            rb = self.start_battle(None, player)
+            rb.offensiveCard = card[0].card
+
+    def new_round(self):
+        round_no = 0 if self.cur_round is None else self.cur_round + 1
+        the_round = GameRound(
+            game=self.model,
+            roundNo=round_no,
+            isComplete=False,
+            currentPlayer=None
+        )
+        self.db.session.add(the_round)
+        self.play_accident()
+        self.cur_round = the_round
+
     def start(self):
         self.model.isStarted = True
         self.make_deck()
         for player in self.get_players():
             self.initialize_player(player)
+        self.new_round()
         self.db.session.commit()
         self.notify()
 
+    def get_from_deck(self, typ, count):
+        return self.db.session.query(DeckEntry) \
+                   .filter_by(game=self.model) \
+                   .filter(DeckEntry.card.has(type=typ)) \
+                   .order_by(DeckEntry.order)[:count]
+
     def deal(self, player, typ, count):
-        deck_entries = self.db.session.query(DeckEntry) \
-                           .filter_by(gameId=self.model.id) \
-                           .filter(DeckEntry.card.has(type=typ)) \
-                           .order_by(DeckEntry.order)[:count]
+        deck_entries = self.get_from_deck(typ, count)
         player.add_cards([CardLogic(self.db, x.card) for x in deck_entries])
         for entry in deck_entries:
             self.db.session.delete(entry)

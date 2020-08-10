@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from globals import db
 import db_models.game
 
+
 class GameRound(db.Model):
     __tablename__ = 'gameround'
     # TODO: Add relationships
@@ -10,6 +11,7 @@ class GameRound(db.Model):
     game = db.relationship('Game', back_populates='rounds')
     roundNo = db.Column(db.Integer, nullable=False)
     isComplete = db.Column(db.Boolean, default=False)
-    currentPlayer = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
+    currentPlayerId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
+    currentPlayer = db.relationship('Player')
     ### stage: is  played
     #stage = db.Column()

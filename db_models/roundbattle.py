@@ -16,5 +16,5 @@ class RoundBattle(db.Model):
     offensiveCardId = db.Column(db.Integer, db.ForeignKey('card.id'), nullable=False)
     offensiveCard = db.relationship('Card')
 
-    defensiveCards = db.Column(db.Text, nullable=False)
+    defensiveCards = db.Column(db.Text, nullable=True)
     isComplete = db.Column(db.Boolean, default=False)
