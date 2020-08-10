@@ -11,10 +11,33 @@
 
     </script>
     <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %}</title>
-
+    <title>{% block title %}Ложное чувство безопасности{% endblock %}</title>
+<!--    <title>Ложное чувство безопасности</title>-->
 </head>
 <body>
+
+    <nav class="navbar navbar-default">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4">
+                   <h1>Ложное чувство безопасности</h1>
+                </div>
+                {%- if g.current_player -%}
+                <form method="post" action="/logout">
+                    {{ form.csrf_token }}
+                    <div  class="col-md-4">
+                        Вы вошли как {{ g.current_player.model.name }}
+    <!--                    How to get player's name?-->
+                            <span>
+                                <button type="submit" value="exit" name="action">Выход</button>
+                            </span>
+                    </div>
+                </form>
+                {%- endif %}
+            </div>
+        </div>
+    </nav>
 {% block content %}{% endblock %}
 </body>
 </html>
+

@@ -11,67 +11,66 @@ manager = Manager(app)
 def create_offence_type():
     cardTypeOffence = CardType(name='Нападение', color='Red', enumType=CardTypeEnum.OFFENCE)
 
-    cardTypeOffence.cards = [
-        Card(
-            name='Шифровальщик',
-            text='',
-            countInDeck=3,
-            damage=7),
-        Card(
-            name='Кейлогер',
-            text='',
-            countInDeck=3,
-            damage=5),
-        Card(
-            name='MS 17-010',
-            text='',
-            countInDeck=3,
-            damage=7),
-        Card(
-            name='Посредственный фишинг',
-            text='',
-            countInDeck=3,
-            damage=3),
-        Card(
-            name='Подготовленный фишинг',
-            text='',
-            countInDeck=3,
-            damage=5),
-        Card(
-            name='Целенаправленный фишинг',
-            text='',
-            countInDeck=3,
-            damage=7),
-        Card(
-            name='Прослушка',
-            text='',
-            countInDeck=3,
-            damage=4),
-        Card(
-            name='Перехват пакетов Wi-Fi',
-            text='',
-            countInDeck=3,
-            damage=4),
-        Card(
-            name='Выполнение макросов',
-            text='',
-            countInDeck=3,
-            damage=4),
-        Card(
-            name='Ваш пароль взломали перебором',
-            text='',
-            countInDeck=3,
-            damage=4),
-        Card(
-            name='Устаревшее ПО',
-            text='',
-            countInDeck=3,
-            damage=4),
-        Card(
-            name='Вы попали в ботнет',
-            text='',
-            countInDeck=3,
-            damage=5),
+    cardTypeOffence.cards = [Card(
+        name='Шифровальщик', 
+        text='',
+        countInDeck=3,
+        damage=7),
+    Card(
+        name='Кейлогер', 
+        text='',
+        countInDeck=3,
+        damage=5),
+    Card(
+        name='Удаленное выполнение кода', 
+        text='',
+        countInDeck=3,
+        damage=7),
+    Card(
+        name='Посредственный фишинг', 
+        text='',
+        countInDeck=3,
+        damage=3),
+    Card(
+        name='Подготовленный фишинг', 
+        text='',
+        countInDeck=3,
+        damage=5),
+    Card(
+        name='Целенаправленный фишинг', 
+        text='',
+        countInDeck=3,
+        damage=7),
+    Card(
+        name='Прослушка', 
+        text='',
+        countInDeck=3,
+        damage=4),
+    Card(
+        name='Перехват пакетов Wi-Fi', 
+        text='',
+        countInDeck=3,
+        damage=4),
+    Card(
+        name='Выполнение макросов', 
+        text='',
+        countInDeck=3,
+        damage=4),
+    Card(
+        name='Ваш пароль взломали перебором', 
+        text='',
+        countInDeck=3,
+        damage=4),
+    Card(
+        name='Устаревшее ПО', 
+        text='',
+        countInDeck=3,
+        damage=4),
+    Card(
+        name='Вы попали в ботнет', 
+        text='',
+        countInDeck=3,
+        damage=5),
     ]
 
     db.session.add(cardTypeOffence)
@@ -81,43 +80,42 @@ def create_offence_type():
 def сreate_accident_type():
     cardTypeAccident = CardType(name='Случайность', color='Blue', enumType=CardTypeEnum.ACCIDENT)
 
-    cardTypeAccident.cards = [
-        Card(
-            name='Уязвимости нулевого дня',
-            text='Хакеры уже знают об этой ошибке в ПО, а вот его производители о ней еще не догадываются...',
-            countInDeck=3,
-            damage=6),
-        Card(
-            name='Взлом серверов и утечка паролей',
-            text='Увы, не бывает абсолютно надежных сайтов и приложений',
-            countInDeck=3,
-            damage=5),
-        Card(
-            name='Железные бэкдоры',
-            text='Никто не может защитить Вас от недобросовестных производителей железа',
-            countInDeck=3,
-            damage=3),
-        Card(
-            name='Катаклизмы',
-            text='Пожары, наводнения, короткие замыкания. Чего только не случается в этом мире.',
-            countInDeck=3,
-            damage=4),
-        Card(
-            name='Кража ноутбука',
-            text='21 век на дворе. А от краж никуда не деться. Да и кражи бывают разные.',
-            countInDeck=3,
-            damage=5),
-        Card(
-            name='Блокировка доступа к ресурсам',
-            text='',
-            countInDeck=3,
-            damage=3),
-        Card(
-            name='COVID-19',
-            text='От коронавируса защитить не может ничто. Отдайте половину своих денег соседу',
-            isCovid=True,
-            countInDeck=3,
-            damage=0),
+    cardTypeAccident.cards = [Card(
+        name='Уязвимости нулевого дня', 
+        text='Хакеры уже знают об этой ошибке в ПО, а вот его производители о ней еще не догадываются...',
+        countInDeck=3,
+        damage=6),
+    Card(
+        name='Взлом серверов и утечка паролей', 
+        text='Увы, не бывает абсолютно надежных сайтов и приложений',
+        countInDeck=3,
+        damage=5),
+    Card(
+        name='Железные бэкдоры', 
+        text='Никто не может защитить Вас от недобросовестных производителей железа',
+        countInDeck=3,
+        damage=3),
+    Card(
+        name='Катаклизмы', 
+        text='Пожары, наводнения, короткие замыкания. Чего только не случается в этом мире',
+        countInDeck=3,
+        damage=4),
+    Card(
+        name='Кража ноутбука', 
+        text='21 век на дворе. А от краж никуда не деться. Да и кражи бывают разные',
+        countInDeck=3,
+        damage=5),
+    Card(
+        name='Блокировка доступа к ресурсам', 
+        text='',
+        countInDeck=3,
+        damage=3),
+    Card(
+        name='COVID-19', 
+        text='От коронавируса защитить не может ничто. Отдайте половину своих денег соседу', 
+        isCovid=True,
+        countInDeck=3,
+        damage=0),
     ]
 
     db.session.add(cardTypeAccident)
@@ -200,7 +198,7 @@ def defence(cardTypeDefence, cardTypeOffence, cardTypeAccident):
     defences['Антивирус'].defensiveFrom = [
         Defence(offence=offences['Шифровальщик'], value=3),
         Defence(offence=offences['Кейлогер'], value=3),
-        Defence(offence=offences['MS 17-010'], value=2),
+        Defence(offence=offences['Удаленное выполнение кода'], value=2),
         Defence(offence=offences['Выполнение макросов'], value=2),
         Defence(offence=offences['Вы попали в ботнет'], value=2),
         Defence(offence=offences['Посредственный фишинг'], value=1),
@@ -227,13 +225,13 @@ def defence(cardTypeDefence, cardTypeOffence, cardTypeAccident):
     ]
     defences['Регулярные обновления'].defensiveFrom = [
         Defence(offence=offences['Устаревшее ПО'], value=3),
-        Defence(offence=offences['MS 17-010'], value=2),
+        Defence(offence=offences['Удаленное выполнение кода'], value=2),
         Defence(offence=offences['Шифровальщик'], value=1),
         Defence(offence=accidents['Уязвимости нулевого дня'], value=2),
     ]
     defences['Лицензионное ПО'].defensiveFrom = [
         Defence(offence=offences['Шифровальщик'], value=2),
-        Defence(offence=offences['MS 17-010'], value=2),
+        Defence(offence=offences['Удаленное выполнение кода'], value=2),
         Defence(offence=offences['Вы попали в ботнет'], value=2),
         Defence(offence=offences['Устаревшее ПО'], value=1),
     ]

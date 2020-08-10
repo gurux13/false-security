@@ -39,6 +39,16 @@ class GameManager:
         else:
             raise InternalError("Не удалось создать игру. Это странно.")
 
+    def delete_game(self, game: GameLogic):
+        try:
+            self.db.session.delete(game.model)
+            self.db.session.commit()
+        except IntegrityError as e:
+            print("Game deletion problem: " + str(e))
+            self.db.session.rollback()
+            raise UserError("Не удалось удалить игру. По идее, вы не должны видеть эту ошибку",
+                            UserError.ErrorType.INVALID_GAME_DELITION)
+
     def get_game(self, game_key: str) -> GameLogic:
         game = Game.query.filter_by(uniqueCode=game_key).first()
         if game is None:

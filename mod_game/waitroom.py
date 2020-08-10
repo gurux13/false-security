@@ -6,7 +6,9 @@ from Exceptions.user_error import UserError
 from globals import db
 from logic.game_manager import GameManager
 from logic.player_manager import PlayerManager
+from mod_gameselect.controller import ExitForm
 from session import SessionHelper, SessionKeys
+from utils.g_helper import set_current_player
 
 from utils.memoize import Memoize
 from utils.response import Response
@@ -78,9 +80,11 @@ def get_player_manager():
 
 @mod_game_wr.route('/waitroom')
 def wr():
+    set_current_player()
     try:
         game = get_game_manager().get_my_game()
         player = get_player_manager().get_my_player()
     except UserError:
         return redirect(url_for('gameselect.index'))
-    return render_template('waitroom.html')
+    #TODO move ExitForm to different file
+    return render_template('waitroom.html', form=ExitForm())

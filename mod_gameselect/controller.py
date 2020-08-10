@@ -22,6 +22,7 @@ from globals import db
 import random
 import string
 
+from utils.g_helper import set_current_player
 from utils.memoize import Memoize
 
 mod_gameselect = Blueprint('gameselect', __name__)
@@ -57,6 +58,10 @@ class CreateGameForm(GameForm):
     num_rounds = IntegerField()
 
 
+class ExitForm(FlaskForm):
+    action = SubmitField()
+
+
 def on_join(form):
     game = get_game_manager().get_game(form.game_key.data)
     # TODO: wipe the old player, if set in session
@@ -68,10 +73,23 @@ def on_join(form):
     return redirect('/waitroom')
 
 
+def on_exit(form):
+    player = get_player_manager()
+    player.delete_player(player.get_my_player())
+
+    game = get_game_manager()
+    game.get_my_game().notify()
+    participants = game.get_my_game().get_players()
+    if len(participants) == 0:
+        game.delete_game(game.get_my_game())
+
+    return redirect('/')
+
+
 def rejoin() -> bool:
     player = get_player_manager().get_my_player()
     if player is not None:
-        print("this player is already in this game with name", player.model.name )
+        print("this player is already in this game with name", player.model.name)
         return True
 
 
@@ -96,8 +114,16 @@ def on_create(form):
     return redirect('/waitroom')
 
 
+@mod_gameselect.route('/logout', methods=['POST'])
+def logout():
+    exit_form = ExitForm()
+    if exit_form.validate_on_submit():
+        return on_exit(exit_form)
+
+
 @mod_gameselect.route('/', methods=['GET', 'POST'])
 def index():
+    set_current_player()
     join_form = JoinForm()
     create_form = CreateGameForm()
     if rejoin():

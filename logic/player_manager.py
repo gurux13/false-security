@@ -30,6 +30,17 @@ class PlayerManager:
                             UserError.ErrorType.INVALID_NAME)
         return PlayerLogic(self.db, player)
 
+    def delete_player(self, player: PlayerLogic):
+        try:
+            if player is not None:
+                self.db.session.delete(player.model)
+                self.db.session.commit()
+        except IntegrityError as e:
+            print("Player deletion problem: " + str(e))
+            self.db.session.rollback()
+            raise UserError("Не удалось удалить игрока из игры. По идее, вы не должны видеть эту ошибку",
+                            UserError.ErrorType.INVALID_DELITION)
+
     def get_player(self, id: int) -> PlayerLogic:
         player = Player.query.filter_by(id=id).first()
         if player is None:
