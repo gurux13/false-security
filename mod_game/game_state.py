@@ -24,6 +24,7 @@ class UiPlayer:
     is_online: bool
     on_offence: bool
     on_defence: bool
+    neighbour_right: int
 
 
 @dataclass

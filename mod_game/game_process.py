@@ -46,6 +46,7 @@ def get_state():
                 is_online=p.model.isOnline,
                 on_offence=False,
                 on_defence=False,
+                neighbour_right=p.model.neighbourId,
             ) for p in players
         ],
         hand=map_opt(lambda c: c.to_ui(), pm.get_my_player().get_hand()),

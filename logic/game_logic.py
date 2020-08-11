@@ -15,6 +15,7 @@ from logic.card_logic import CardLogic
 from logic.card_manager import CardManager
 from logic.gameparams import GameParams
 from logic.player_logic import PlayerLogic
+from logic.player_manager import PlayerManager
 
 
 class GameLogic:
@@ -29,6 +30,7 @@ class GameLogic:
         self.model = model
         self.params = GameParams.from_db(model.params)
         self.card_manager = CardManager(self.db)
+        self.player_manager = PlayerManager(self.db)
         self.cur_round: GameRound = next(iter(self.model.rounds), None)
 
     def notify(self):
@@ -131,6 +133,7 @@ class GameLogic:
 
     def start(self):
         self.model.isStarted = True
+        self.player_manager.seat_game_players(self)
         self.make_deck()
         for player in self.get_players():
             self.initialize_player(player)

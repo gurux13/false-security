@@ -30,5 +30,4 @@ def to_dicts(obj):
 
     if isinstance(obj, Enum):
         return obj.value
-    print("Serializing", obj, "...")
     return to_dicts(obj.__dict__)

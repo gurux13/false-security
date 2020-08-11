@@ -30,7 +30,7 @@ class Player(db.Model):
     money = db.Column(db.Integer, nullable=False)
     hand = db.Column(db.Text, nullable=True)
     neighbourId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
-    neighbourRight = db.relationship('Player', backref='neighbourLeft', remote_side='Player.id', uselist=False)
+    neighbourRight = db.relationship('Player', backref='neighbourLeft', remote_side='Player.id', uselist=False, post_update=True)
     isAdmin = db.Column(db.Boolean, nullable=False)
     isOnline = db.Column(db.Boolean, nullable=False)
     __table_args__ = (db.UniqueConstraint('name', 'gameId', name='_name_gameid_uc'),

@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from Exceptions.internal_error import InternalError
 from Exceptions.user_error import UserError
 from db_models.game import Game, Player
-from logic.game_logic import GameLogic
+import logic.game_logic
 from logic.gameparams import GameParams
 import string
 from random import random
@@ -18,7 +18,7 @@ class PlayerManager:
     def __init__(self, db: SQLAlchemy):
         self.db = db
 
-    def create_player(self, name: str, game: GameLogic) -> PlayerLogic:
+    def create_player(self, name: str, game: 'GameLogic') -> PlayerLogic:
         player = Player(name=name, game=game.model, money=0, isAdmin=False, isOnline=False)
         self.db.session.add(player)
         try:
@@ -49,3 +49,9 @@ class PlayerManager:
 
     def get_my_player(self) -> PlayerLogic:
         return self.get_player(SessionHelper.get(SessionKeys.PLAYER_ID))
+
+    def seat_game_players(self, game: 'GameLogic'):
+        all_players = game.get_players()
+        neighbours = all_players[1:] + [all_players[0]]
+        for player,neighbour in zip(all_players, neighbours):
+            player.model.neighbourRight = neighbour.model
