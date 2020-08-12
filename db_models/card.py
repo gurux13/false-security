@@ -7,9 +7,11 @@ class Card(db.Model):
     __tablename__ = 'card'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), unique=True, nullable=False)
-    text = db.Column(db.Text, nullable=False) 
+    text = db.Column(db.Text, nullable=True)
     ### TODO imageURL should not be nullable at future
     imageURL = db.Column(db.Text, nullable=True)
+    popUpText = db.Column(db.Text, nullable=True)
+    popUpURL = db.Column(db.Text, nullable=True)
     typeId = db.Column(db.Integer, db.ForeignKey('cardtype.id'), nullable=False)
     type = db.relationship('CardType', back_populates='cards', uselist=False, lazy=False)
     isCovid = db.Column(db.Boolean, default=False)
