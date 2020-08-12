@@ -2,120 +2,125 @@ from db_models.cardtype import CardType, CardTypeEnum
 from db_models.card import Card
 from db_models.defence import Defence
 from flask_script import Manager
+import json
 
 from globals import app, db
 
 manager = Manager(app)
 
 
-def create_offence_type():
+def get_popup_from_json(data: list, name: str) -> str:
+    return [next((i for i in data if i.get("name") == name), None)][0]["popUpText"]
+
+
+def create_offence_type(data: list):
     cardTypeOffence = CardType(name='Нападение', color='Red', enumType=CardTypeEnum.OFFENCE)
 
     cardTypeOffence.cards = [Card(
-        name='Шифровальщик', 
-        text='',
+        name='Шифровальщик',
+        popUpText=get_popup_from_json(data, "Шифровальщик"),
         countInDeck=3,
         damage=7),
-    Card(
-        name='Кейлогер', 
-        text='',
-        countInDeck=3,
-        damage=5),
-    Card(
-        name='Удаленное выполнение кода', 
-        text='',
-        countInDeck=3,
-        damage=7),
-    Card(
-        name='Посредственный фишинг', 
-        text='',
-        countInDeck=3,
-        damage=3),
-    Card(
-        name='Подготовленный фишинг', 
-        text='',
-        countInDeck=3,
-        damage=5),
-    Card(
-        name='Целенаправленный фишинг', 
-        text='',
-        countInDeck=3,
-        damage=7),
-    Card(
-        name='Прослушка', 
-        text='',
-        countInDeck=3,
-        damage=4),
-    Card(
-        name='Перехват пакетов Wi-Fi', 
-        text='',
-        countInDeck=3,
-        damage=4),
-    Card(
-        name='Выполнение макросов', 
-        text='',
-        countInDeck=3,
-        damage=4),
-    Card(
-        name='Ваш пароль взломали перебором', 
-        text='',
-        countInDeck=3,
-        damage=4),
-    Card(
-        name='Устаревшее ПО', 
-        text='',
-        countInDeck=3,
-        damage=4),
-    Card(
-        name='Вы попали в ботнет', 
-        text='',
-        countInDeck=3,
-        damage=5),
+        Card(
+            name='Кейлоггер',
+            popUpText=get_popup_from_json(data, "Кейлоггер"),
+            countInDeck=3,
+            damage=5),
+        Card(
+            name='Удаленное выполнение кода',
+            popUpText=get_popup_from_json(data, "Удаленное выполнение кода"),
+            countInDeck=3,
+            damage=7),
+        Card(
+            name='Посредственный фишинг',
+            popUpText=get_popup_from_json(data, "Фишинг"),
+            countInDeck=3,
+            damage=3),
+        Card(
+            name='Подготовленный фишинг',
+            popUpText=get_popup_from_json(data, "Фишинг"),
+            countInDeck=3,
+            damage=5),
+        Card(
+            name='Целенаправленный фишинг',
+            popUpText=get_popup_from_json(data, "Фишинг"),
+            countInDeck=3,
+            damage=7),
+        Card(
+            name='Прослушка',
+            popUpText=get_popup_from_json(data, "Прослушка"),
+            countInDeck=3,
+            damage=4),
+        Card(
+            name='Перехват пакетов Wi-Fi',
+            popUpText=get_popup_from_json(data, "Перехват пакетов Wi-Fi"),
+            countInDeck=3,
+            damage=4),
+        Card(
+            name='Выполнение макросов',
+            popUpText=get_popup_from_json(data, "Выполнение макросов"),
+            countInDeck=3,
+            damage=4),
+        Card(
+            name='Ваш пароль взломали перебором',
+            popUpText=get_popup_from_json(data, "Ваш пароль взломали перебором"),
+            countInDeck=3,
+            damage=4),
+        Card(
+            name='Устаревшее ПО',
+            popUpText=get_popup_from_json(data, "Устаревшее ПО"),
+            countInDeck=3,
+            damage=4),
+        Card(
+            name='Вы попали в ботнет',
+            popUpText=get_popup_from_json(data, "Вы попали в ботнет"),
+            countInDeck=3,
+            damage=5),
     ]
 
     db.session.add(cardTypeOffence)
     return cardTypeOffence
 
 
-def сreate_accident_type():
+def create_accident_type():
     cardTypeAccident = CardType(name='Случайность', color='Blue', enumType=CardTypeEnum.ACCIDENT)
 
     cardTypeAccident.cards = [Card(
-        name='Уязвимости нулевого дня', 
+        name='Уязвимости нулевого дня',
         text='Хакеры уже знают об этой ошибке в ПО, а вот его производители о ней еще не догадываются...',
         countInDeck=3,
         damage=6),
-    Card(
-        name='Взлом серверов и утечка паролей', 
-        text='Увы, не бывает абсолютно надежных сайтов и приложений',
-        countInDeck=3,
-        damage=5),
-    Card(
-        name='Железные бэкдоры', 
-        text='Никто не может защитить Вас от недобросовестных производителей железа',
-        countInDeck=3,
-        damage=3),
-    Card(
-        name='Катаклизмы', 
-        text='Пожары, наводнения, короткие замыкания. Чего только не случается в этом мире',
-        countInDeck=3,
-        damage=4),
-    Card(
-        name='Кража ноутбука', 
-        text='21 век на дворе. А от краж никуда не деться. Да и кражи бывают разные',
-        countInDeck=3,
-        damage=5),
-    Card(
-        name='Блокировка доступа к ресурсам', 
-        text='',
-        countInDeck=3,
-        damage=3),
-    Card(
-        name='COVID-19', 
-        text='От коронавируса защитить не может ничто. Отдайте половину своих денег соседу', 
-        isCovid=True,
-        countInDeck=3,
-        damage=0),
+        Card(
+            name='Взлом серверов и утечка паролей',
+            text='Увы, не бывает абсолютно надежных сайтов и приложений',
+            countInDeck=3,
+            damage=5),
+        Card(
+            name='Железные бэкдоры',
+            text='Никто не может защитить Вас от недобросовестных производителей железа',
+            countInDeck=3,
+            damage=3),
+        Card(
+            name='Катаклизмы',
+            text='Пожары, наводнения, короткие замыкания. Чего только не случается в этом мире',
+            countInDeck=3,
+            damage=4),
+        Card(
+            name='Кража ноутбука',
+            text='21 век на дворе. А от краж никуда не деться. Да и кражи бывают разные',
+            countInDeck=3,
+            damage=5),
+        Card(
+            name='Блокировка доступа к ресурсам',
+            text='',
+            countInDeck=3,
+            damage=3),
+        Card(
+            name='COVID-19',
+            text='От коронавируса защитить не может ничто. Отдайте половину своих денег соседу',
+            isCovid=True,
+            countInDeck=3,
+            damage=0),
     ]
 
     db.session.add(cardTypeAccident)
@@ -197,7 +202,7 @@ def defence(cardTypeDefence, cardTypeOffence, cardTypeAccident):
     accidents = {card.name: card for card in cardTypeAccident.cards}
     defences['Антивирус'].defensiveFrom = [
         Defence(offence=offences['Шифровальщик'], value=3),
-        Defence(offence=offences['Кейлогер'], value=3),
+        Defence(offence=offences['Кейлоггер'], value=3),
         Defence(offence=offences['Удаленное выполнение кода'], value=2),
         Defence(offence=offences['Выполнение макросов'], value=2),
         Defence(offence=offences['Вы попали в ботнет'], value=2),
@@ -231,6 +236,7 @@ def defence(cardTypeDefence, cardTypeOffence, cardTypeAccident):
     ]
     defences['Лицензионное ПО'].defensiveFrom = [
         Defence(offence=offences['Шифровальщик'], value=2),
+        Defence(offence=offences['Кейлоггер'], value=2),
         Defence(offence=offences['Удаленное выполнение кода'], value=2),
         Defence(offence=offences['Вы попали в ботнет'], value=2),
         Defence(offence=offences['Устаревшее ПО'], value=1),
@@ -245,7 +251,7 @@ def defence(cardTypeDefence, cardTypeOffence, cardTypeAccident):
         Defence(offence=offences['Подготовленный фишинг'], value=3),
         Defence(offence=offences['Целенаправленный фишинг'], value=3),
         Defence(offence=offences['Шифровальщик'], value=2),
-        Defence(offence=offences['Кейлогер'], value=2),
+        Defence(offence=offences['Кейлоггер'], value=2),
         Defence(offence=offences['Выполнение макросов'], value=2),
         Defence(offence=accidents['Взлом серверов и утечка паролей'], value=1),
     ]
@@ -271,10 +277,11 @@ def defence(cardTypeDefence, cardTypeOffence, cardTypeAccident):
 
 @manager.command
 def fill():
-    print("I will try to write to db")
+    with open('descriptions.json') as f:
+        data = json.load(f)
     defenceCards = create_defence_type()
-    offenceCards = create_offence_type()
-    accidentCards = сreate_accident_type()
+    offenceCards = create_offence_type(data)
+    accidentCards = create_accident_type()
     defence(defenceCards, offenceCards, accidentCards)
     db.session.commit()
     print("DB data initialized")
