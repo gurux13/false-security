@@ -13,5 +13,6 @@ class GameRound(db.Model):
     isComplete = db.Column(db.Boolean, default=False)
     currentPlayerId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
     currentPlayer = db.relationship('Player')
+    battles = db.relationship('RoundBattle', back_populates="round")
     ### stage: is  played
     #stage = db.Column()

@@ -13,6 +13,7 @@ from utils.g_helper import set_current_player
 from utils.memoize import Memoize
 from utils.response import Response
 from globals import socketio
+from utils.socketio_helper import wrapped_socketio
 
 mod_game_wr = Blueprint('game_wr', __name__)
 
@@ -50,20 +51,13 @@ def get_state():
     )
 
 
-@socketio.on('waitroom')
+@wrapped_socketio('waitroom', 'waitroom')
 def waitroom():
-    try:
-        result = get_state()
-        join_room(result.game_name)
-        emit('waitroom', Response.Ok(result).as_dicts())
-        db.session.commit()
-        db.session.remove()
-    except Exception as e:
-        emit('waitroom', Response.Error("Что-то сломалось.").as_dicts())
-        db.session.rollback()
-        db.session.remove()
+    result = get_state()
+    join_room(result.game_name)
+    return result
 
-@socketio.on('start')
+@wrapped_socketio('start')
 def start_game():
     gm = get_game_manager()
     gm.get_my_game().start()

@@ -1,5 +1,7 @@
 from enum import Enum
 import random
+from typing import List
+
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 
@@ -11,6 +13,7 @@ from db_models.gameround import GameRound
 from db_models.roundbattle import RoundBattle
 from globals import socketio
 from db_models.game import Game
+from logic.battle_logic import BattleLogic
 from logic.card_logic import CardLogic
 from logic.card_manager import CardManager
 from logic.gameparams import GameParams
@@ -43,6 +46,9 @@ class GameLogic:
         if self.model.isStarted:
             return GameLogic.State.RUNNING
         return GameLogic.State.WAITROOM
+
+    def get_battles(self) -> List[BattleLogic]:
+        return [BattleLogic(self.db, b) for b in self.cur_round.battles]
 
     def is_running(self):
         return self.model.isStarted
@@ -103,6 +109,7 @@ class GameLogic:
             offendingPlayer=None if offender is None else offender.model,
             defendingPlayer=defender.model,
             isComplete=False,
+            round=self.cur_round,
         )
         self.db.session.add(rb)
         return rb
@@ -128,8 +135,9 @@ class GameLogic:
             currentPlayer=None
         )
         self.db.session.add(the_round)
-        self.play_accident()
         self.cur_round = the_round
+        self.play_accident()
+
 
     def start(self):
         self.model.isStarted = True

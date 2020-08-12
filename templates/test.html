@@ -51,16 +51,18 @@
             border: 1px solid black;
             border-collapse: collapse;
         }
+
         .holder .caption {
             border: 1px solid black;
             border-collapse: collapse;
-                margin:-1px 0 0 -1px;
+            margin: -1px 0 0 -1px;
             text-align: center;
             background-color: #86dcdc;
         }
-    pre.renderjson {
-        margin: 0;
-    }
+
+        pre.renderjson {
+            margin: 0;
+        }
     </style>
 
     <script src="../static/vue.js"></script>
@@ -70,20 +72,20 @@
         SocketIO Method:<br/> <input type="text" v-model="sockmethod"><br/>
         SocketIO body:<br/> <textarea v-model="sockdata" cols="120" rows="8"></textarea><br/>
         <button v-on:click="send">Send</button>
+        <button v-on:click="clear">Clear output</button>
         <div id="response">
-            Received:
 
         </div>
     </div>
     <script>
 
-    var onevent = socket.onevent;
-    socket.onevent = function (packet) {
-        var args = packet.data || [];
-        onevent.call (this, packet);    // original call
-        packet.data = ["*"].concat(args);
-        onevent.call(this, packet);      // additional call to catch-all
-    };
+        var onevent = socket.onevent;
+        socket.onevent = function (packet) {
+            var args = packet.data || [];
+            onevent.call(this, packet);    // original call
+            packet.data = ["*"].concat(args);
+            onevent.call(this, packet);      // additional call to catch-all
+        };
 
         const app = new Vue({
             el: '#app',
@@ -99,6 +101,9 @@
                         socket.emit(app.sockmethod, JSON.parse(app.sockdata));
                     else
                         socket.emit(app.sockmethod);
+                },
+                clear: function () {
+                    document.getElementById("response").innerHTML='';
                 }
             }
         });
@@ -106,7 +111,7 @@
         renderjson.set_icons('+', '-');
         socket.on('*', function (evt, data) {
             holder = document.createElement('div');
-            holder.className='holder';
+            holder.className = 'holder';
             holder.innerHTML = "<div class='caption'>" + evt + "</div>";
             document.getElementById("response").appendChild(holder);
             holder.appendChild(

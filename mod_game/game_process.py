@@ -4,6 +4,7 @@ from dataclasses import dataclass
 
 from Exceptions.user_error import UserError
 from globals import db
+from logic.card_manager import CardManager
 from logic.game_manager import GameManager
 from logic.player_manager import PlayerManager
 from mod_game.game_state import UiGame, UiPlayer, UiCard, UiCardType
@@ -13,6 +14,7 @@ from utils.conversion import map_opt
 from utils.memoize import Memoize
 from utils.response import Response
 from globals import socketio
+from utils.socketio_helper import wrapped_socketio
 
 mod_game_process = Blueprint('game_process', __name__)
 
@@ -21,7 +23,7 @@ class GameState:
     redirect_to: str
     game: UiGame = None
 
-
+@wrapped_socketio('state', 'state')
 def get_state():
     gm = GameManager(db)
     pm = PlayerManager(db)
@@ -50,27 +52,26 @@ def get_state():
             ) for p in players
         ],
         hand=map_opt(lambda c: c.to_ui(), pm.get_my_player().get_hand()),
-        table=[]
+        current_battles=[battle.to_ui() for battle in game.get_battles()],
     )
     return GameState(
         redirect_to='',
         game=ui_game
     )
 
+@wrapped_socketio('play')
+def play_card(card_id):
+    print("Playing card", card_id)
 
 
-@socketio.on('state')
-def state():
-    try:
-        result = get_state()
-        emit('state', Response.Ok(result).as_dicts())
-        db.session.commit()
-        db.session.remove()
-    except Exception as e:
-        emit('state', Response.Error("Что-то сломалось.").as_dicts())
-        db.session.rollback()
-        db.session.remove()
-        raise
+@wrapped_socketio('card', 'card')
+def get_card(card_id):
+    return get_card_manager().get_card(card_id).to_ui()
+
+@wrapped_socketio('cards', 'cards')
+def get_cards():
+    return [c.to_ui() for c in get_card_manager().get_all_cards()]
+
 
 @Memoize
 def get_game_manager():
@@ -80,6 +81,11 @@ def get_game_manager():
 @Memoize
 def get_player_manager():
     return PlayerManager(db)
+
+@Memoize
+def get_card_manager():
+    return CardManager(db)
+
 
 
 @mod_game_process.route('/game')

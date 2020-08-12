@@ -39,6 +39,14 @@ class UiCard:
     dealt_by_player: int
 
 
+@dataclass
+class UiBattle:
+    offender: int
+    defender: int
+    offencive_card: int
+    defensive_cards: List[int]
+    
+
 # Game references other objects directly, and other objects reference each other by IDs
 @dataclass
 class UiGame:
@@ -46,4 +54,4 @@ class UiGame:
     players: List[UiPlayer]
     self_player: int
     hand: List[UiCard]
-    table: List[UiCard]
+    current_battles: List[UiBattle]

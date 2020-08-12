@@ -6,6 +6,8 @@ import db_models.card
 class RoundBattle(db.Model):
     __tablename__ = 'roundbattle'
     id = db.Column(db.Integer, primary_key=True)
+    roundId = db.Column(db.Integer, db.ForeignKey('gameround.id'), nullable=False)
+    round = db.relationship('GameRound', back_populates="battles")
     offendingPlayerId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
     offendingPlayer = db.relationship('Player', foreign_keys=[offendingPlayerId])
 
