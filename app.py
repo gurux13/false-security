@@ -1,5 +1,6 @@
 from flask import g, Flask, render_template, json
 
+from mod_test.test import mod_test
 from session import SessionHelper, SessionKeys
 
 if __name__ != '__main__':
@@ -40,4 +41,5 @@ if __name__ == '__main__':
 
     app.register_blueprint(mod_game_wr)
     app.register_blueprint(mod_game_process)
+    app.register_blueprint(mod_test, url_prefix="/test")
     globals.socketio.run(app)

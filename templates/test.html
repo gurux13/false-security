@@ -1,0 +1,123 @@
+{% extends 'layout.html' %}
+{{ super() }}
+{% block extrahead %}
+    <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/waitroom.css") }}">
+{% endblock %}
+{% block content %}
+
+    <style>
+        .renderjson a {
+            text-decoration: none;
+        }
+
+        .renderjson .disclosure {
+            color: crimson;
+            font-size: 150%;
+        }
+
+        .renderjson .syntax {
+            color: grey;
+        }
+
+        .renderjson .string {
+            color: darkred;
+        }
+
+        .renderjson .number {
+            color: darkcyan;
+        }
+
+        .renderjson .boolean {
+            color: blueviolet;
+        }
+
+        .renderjson .key {
+            color: darkblue;
+        }
+
+        .renderjson .keyword {
+            color: blue;
+        }
+
+        .renderjson .object.syntax {
+            color: lightseagreen;
+        }
+
+        .renderjson .array.syntax {
+            color: orange;
+        }
+
+        .holder {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+        .holder .caption {
+            border: 1px solid black;
+            border-collapse: collapse;
+                margin:-1px 0 0 -1px;
+            text-align: center;
+            background-color: #86dcdc;
+        }
+    pre.renderjson {
+        margin: 0;
+    }
+    </style>
+
+    <script src="../static/vue.js"></script>
+    <script src="../static/renderjson.js"></script>
+    <div id="app">
+        Status: <b>[[ status ]]</b><br/>
+        SocketIO Method:<br/> <input type="text" v-model="sockmethod"><br/>
+        SocketIO body:<br/> <textarea v-model="sockdata" cols="120" rows="8"></textarea><br/>
+        <button v-on:click="send">Send</button>
+        <div id="response">
+            Received:
+
+        </div>
+    </div>
+    <script>
+
+    var onevent = socket.onevent;
+    socket.onevent = function (packet) {
+        var args = packet.data || [];
+        onevent.call (this, packet);    // original call
+        packet.data = ["*"].concat(args);
+        onevent.call(this, packet);      // additional call to catch-all
+    };
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                sockmethod: "state",
+                sockdata: "",
+                status: "Not connected",
+            },
+            delimiters: ['[[', ']]'],
+            methods: {
+                send: function () {
+                    if (app.sockdata.trim())
+                        socket.emit(app.sockmethod, JSON.parse(app.sockdata));
+                    else
+                        socket.emit(app.sockmethod);
+                }
+            }
+        });
+        renderjson.set_show_to_level(5);
+        renderjson.set_icons('+', '-');
+        socket.on('*', function (evt, data) {
+            holder = document.createElement('div');
+            holder.className='holder';
+            holder.innerHTML = "<div class='caption'>" + evt + "</div>";
+            document.getElementById("response").appendChild(holder);
+            holder.appendChild(
+                renderjson(data)
+            );
+        });
+        socket.on('connect', function () {
+            app.status = "Connected"
+        });
+        socket.on('disconnect', function () {
+            app.status = "Not Connected"
+        });
+    </script>
+{% endblock %}
