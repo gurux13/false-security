@@ -19,62 +19,62 @@ def create_offence_type(data: list):
     cardTypeOffence.cards = [Card(
         name='Шифровальщик',
         popUpText=get_popup_from_json(data, "Шифровальщик"),
-        countInDeck=3,
+        countInDeck=5,
         damage=7),
         Card(
             name='Кейлоггер',
             popUpText=get_popup_from_json(data, "Кейлоггер"),
-            countInDeck=3,
+            countInDeck=4,
             damage=5),
         Card(
             name='Удаленное выполнение кода',
             popUpText=get_popup_from_json(data, "Удаленное выполнение кода"),
-            countInDeck=3,
+            countInDeck=4,
             damage=7),
         Card(
             name='Посредственный фишинг',
             popUpText=get_popup_from_json(data, "Фишинг"),
-            countInDeck=3,
+            countInDeck=5,
             damage=3),
         Card(
             name='Подготовленный фишинг',
             popUpText=get_popup_from_json(data, "Фишинг"),
-            countInDeck=3,
+            countInDeck=5,
             damage=5),
         Card(
             name='Целенаправленный фишинг',
             popUpText=get_popup_from_json(data, "Фишинг"),
-            countInDeck=3,
+            countInDeck=5,
             damage=7),
         Card(
             name='Прослушка',
             popUpText=get_popup_from_json(data, "Прослушка"),
-            countInDeck=3,
+            countInDeck=4,
             damage=4),
         Card(
             name='Перехват пакетов Wi-Fi',
             popUpText=get_popup_from_json(data, "Перехват пакетов Wi-Fi"),
-            countInDeck=3,
+            countInDeck=4,
             damage=4),
         Card(
             name='Выполнение макросов',
             popUpText=get_popup_from_json(data, "Выполнение макросов"),
-            countInDeck=3,
+            countInDeck=4,
             damage=4),
         Card(
             name='Ваш пароль взломали перебором',
             popUpText=get_popup_from_json(data, "Ваш пароль взломали перебором"),
-            countInDeck=3,
+            countInDeck=5,
             damage=4),
         Card(
             name='Устаревшее ПО',
             popUpText=get_popup_from_json(data, "Устаревшее ПО"),
-            countInDeck=3,
+            countInDeck=4,
             damage=4),
         Card(
             name='Вы попали в ботнет',
             popUpText=get_popup_from_json(data, "Вы попали в ботнет"),
-            countInDeck=3,
+            countInDeck=4,
             damage=5),
     ]
 
@@ -134,62 +134,62 @@ def create_defence_type():
         Card(
             name='Антивирус',
             text='',
-            countInDeck=3,
+            countInDeck=9,
             damage=None),
         Card(
             name='Двухфакторная аутентификация',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None),
         Card(
             name='Сложные пароли',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None),
         Card(
             name='Полнодисковое шифрование',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None),
         Card(
             name='Использование VPN',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None),
         Card(
             name='Регулярные обновления',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None),
         Card(
             name='Лицензионное ПО',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None),
         Card(
             name='Надежные мессенджеры',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None),
         Card(
             name='Пользовательская осторожность',
             text='',
-            countInDeck=3,
+            countInDeck=9,
             damage=None),
         Card(
             name='Использование HTTPS',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None),
         Card(
             name='Регулярные бэкапы',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None),
         Card(
             name='Цифровая подпись и шифрование писем',
             text='',
-            countInDeck=3,
+            countInDeck=8,
             damage=None), ]
 
     db.session.add(cardTypeDefence)

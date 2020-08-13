@@ -127,7 +127,7 @@ class GameLogic:
             rb.offensiveCard = card[0].card
 
     def new_round(self):
-        round_no = 0 if self.cur_round is None else self.cur_round + 1
+        round_no = 0 if self.cur_round is None else self.cur_round.roundNo + 1
         the_round = GameRound(
             game=self.model,
             roundNo=round_no,
