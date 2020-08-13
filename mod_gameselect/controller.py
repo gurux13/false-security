@@ -88,9 +88,15 @@ def on_exit(form):
 
 def rejoin() -> bool:
     player = get_player_manager().get_my_player()
-    if player is not None:
-        print("this player is already in this game with name", player.model.name)
-        return True
+    try:
+        if player is not None and player.model.game.id == get_game_manager().get_my_game().model.id:
+            print("this player is already in this game with name", player.model.name)
+            return True
+    except BaseException as e:
+        print(e)
+    SessionHelper.delete(SessionKeys.PLAYER_ID)
+    SessionHelper.delete(SessionKeys.GAME_KEY)
+    return False
 
 
 def on_create(form):

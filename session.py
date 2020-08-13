@@ -34,5 +34,7 @@ class SessionHelper:
 
     @staticmethod
     def delete(key):
+        if not SessionHelper.has(key):
+            return
         key = SessionHelper.__convert_key__(key)
         del session[key]

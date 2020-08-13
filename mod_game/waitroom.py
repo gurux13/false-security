@@ -59,8 +59,10 @@ def waitroom():
 
 @wrapped_socketio('start')
 def start_game():
+    print("start game")
     gm = get_game_manager()
     gm.get_my_game().start()
+    print("end of start game")
 
 @Memoize
 def get_game_manager():
