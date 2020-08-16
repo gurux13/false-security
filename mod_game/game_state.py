@@ -45,9 +45,10 @@ class UiCard:
 class UiBattle:
     offender: int
     defender: int
-    offencive_card: int
+    offensive_card: int
     defensive_cards: List[int]
-    
+    damage_remains: int
+    is_complete: bool
 
 # Game references other objects directly, and other objects reference each other by IDs
 @dataclass

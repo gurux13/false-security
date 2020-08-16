@@ -11,10 +11,10 @@ class RoundBattle(db.Model):
     offendingPlayerId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
     offendingPlayer = db.relationship('Player', foreign_keys=[offendingPlayerId])
 
-    defendingPlayerId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=False)
+    defendingPlayerId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
     defendingPlayer = db.relationship('Player', foreign_keys=[defendingPlayerId])
 
-    offensiveCardId = db.Column(db.Integer, db.ForeignKey('card.id'), nullable=False)
+    offensiveCardId = db.Column(db.Integer, db.ForeignKey('card.id'), nullable=True)
     offensiveCard = db.relationship('Card')
 
     defensiveCards = db.Column(db.Text, nullable=True)

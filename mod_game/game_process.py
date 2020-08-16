@@ -74,15 +74,17 @@ def get_state():
         game=ui_game
     )
 
+
 @wrapped_socketio('attack', 'attack')
 def attack(player_id):
     print("Attacking", player_id)
     get_game_manager() \
         .get_my_game() \
         .attack(
-            get_player_manager().get_my_player(),
-            get_player_manager().get_player(player_id)
+        get_player_manager().get_my_player(),
+        get_player_manager().get_player(player_id)
     )
+
 
 @wrapped_socketio('play', 'play')
 def play_card(card_id):
@@ -90,10 +92,15 @@ def play_card(card_id):
     get_game_manager() \
         .get_my_game() \
         .play_card(
-            get_card_manager().get_card(card_id),
-            get_player_manager().get_my_player()
+        get_card_manager().get_card(card_id),
+        get_player_manager().get_my_player()
     )
     return True
+
+
+@wrapped_socketio('done_def', 'done_def')
+def done_defending():
+    get_game_manager().get_my_game().end_battle(get_player_manager().get_my_player())
 
 
 @wrapped_socketio('card', 'card')

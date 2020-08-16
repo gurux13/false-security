@@ -11,6 +11,7 @@ class GameRound(db.Model):
     game = db.relationship('Game', back_populates='rounds')
     roundNo = db.Column(db.Integer, nullable=False)
     isComplete = db.Column(db.Boolean, default=False)
+    isAccidentComplete = db.Column(db.Boolean, default=False)
     currentPlayerId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
     currentPlayer = db.relationship('Player')
     battles = db.relationship('RoundBattle', back_populates="round", cascade='all,delete')

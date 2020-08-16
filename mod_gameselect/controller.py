@@ -126,6 +126,7 @@ def logout():
     exit_form = ExitForm()
     if exit_form.validate_on_submit():
         return on_exit(exit_form)
+    return redirect('/')
 
 
 @mod_gameselect.route('/', methods=['GET', 'POST'])

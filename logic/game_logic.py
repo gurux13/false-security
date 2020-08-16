@@ -1,3 +1,4 @@
+import json
 from enum import Enum
 import random
 from typing import List
@@ -102,18 +103,35 @@ class GameLogic:
             )
             self.db.session.add(de)
 
-    def on_accident_played(self):
-        pass
-
-    def start_battle(self, offender: PlayerLogic, defender: PlayerLogic):
-        rb = RoundBattle(
-            offendingPlayer=None if offender is None else offender.model,
-            defendingPlayer=defender.model,
-            isComplete=False,
+    def start_battle(self, offendingPlayer: PlayerLogic):
+        new_battle = RoundBattle(
             round=self.cur_round,
+            offendingPlayer=offendingPlayer.model,
+            isComplete=False,
         )
-        self.db.session.add(rb)
-        return rb
+        self.db.session.add(new_battle)
+        return new_battle
+
+    def on_accident_played(self):
+        self.cur_round.isAccidentComplete = True
+        self.start_battle(self.get_players()[0])
+
+    def complete_battle(self, battle: RoundBattle):
+        if battle.offensiveCard is None:
+            raise UserError("Нельзя завершить битву без карты атаки!")
+        battle.isComplete = True
+        if self.cur_round.isAccidentComplete:
+            next_player = battle.offendingPlayer.neighbourRight
+            if next_player != self.get_players()[0].model:
+                self.start_battle(PlayerLogic(self.db, next_player))
+
+        if all(map(lambda b: b.model.isComplete, self.get_battles())):
+            if battle.offensiveCard.type.enumType == CardTypeEnum.ACCIDENT:
+                print("Round", self.cur_round.roundNo, "has accident completed")
+                self.on_accident_played()
+            else:
+                print("Round", self.cur_round.roundNo, "is complete")
+                self.new_round()
 
     def play_accident(self):
         if random.random() > self.params.accident_probability:
@@ -124,7 +142,8 @@ class GameLogic:
             self.on_accident_played()
             return
         for player in self.get_players():
-            rb = self.start_battle(None, player)
+            rb = self.start_battle(None)
+            rb.defendingPlayer = player.model
             rb.offensiveCard = card[0].card
 
     def new_round(self):
@@ -163,22 +182,40 @@ class GameLogic:
 
     def get_player_battle(self, player: PlayerLogic) -> RoundBattle:
         # There can be at most one battle the player belongs to
-        return next(iter([x for x in
-                          self.cur_round.battles
-                          if x.defendingPlayer == player.model or x.offendingPlayer == player.model
-                          ]), None)
+        return first_or_none([x for x in
+                              self.cur_round.battles
+                              if (x.defendingPlayer == player.model or x.offendingPlayer == player.model)
+                              and not x.isComplete])
 
-    def get_battle_curdamage(self, battle: RoundBattle) -> int:
-        if battle.offensiveCard is None:
-            return None
-        if battle.defensiveCards is None:
-            return battle.offensiveCard.damage
-        total_defence_value = 0
-        for defensive_card in battle.defensiveCards:
-            defence_value = CardLogic(self.db, defensive_card).get_defence_from(battle.offensiveCard)
-            if defence_value is not None:
-                total_defence_value += defence_value
-        return max(0, battle.offensiveCard.damage - total_defence_value)
+    def get_player_battlelogic(self, player: PlayerLogic) -> BattleLogic:
+        # There can be at most one battle the player belongs to
+        model = self.get_player_battle(player)
+        return None if model is None else BattleLogic(self.db, model)
+
+
+    def can_attack(self, me: PlayerLogic, defender: PlayerLogic):
+        if me.model == defender.model:
+            # Logically, the rules don't forbid attacking self... But it's nonsense, right?
+            # We don't have tail loss here, but the player might want to get rid of defense cards?..
+            return False
+        if not self.cur_round.isAccidentComplete:
+            return False
+        my_battle = self.get_player_battle(me)
+        if my_battle is None:
+            return False
+        if my_battle.offendingPlayer != me.model:
+            return False
+        return my_battle.defendingPlayer is None
+
+    def attack(self, me: PlayerLogic, defender: PlayerLogic):
+        if not self.can_attack(me, defender):
+            raise UserError("Сейчас нельзя атаковать этого игрока")
+        cur_battle = self.get_player_battle(me)
+        if cur_battle is not None:
+            cur_battle.defendingPlayer = defender.model
+        else:
+            battle = self.start_battle(me)
+            battle.defendingPlayer = defender.model
 
     def can_play_card(self, card: CardLogic, player: PlayerLogic) -> bool:
         my_battle = self.get_player_battle(player)
@@ -190,7 +227,7 @@ class GameLogic:
         if not any(map(lambda x: x.model == card.model, player.get_hand())):
             return False
         # If we're on offence
-        if my_battle.offendingPlayer == player:
+        if my_battle.offendingPlayer == player.model:
             # Card is already played
             if my_battle.offensiveCard is not None:
                 return False
@@ -199,31 +236,25 @@ class GameLogic:
         # We're on defence then
         if card.model.type.enumType != CardTypeEnum.DEFENCE:
             return False
-        cur_damage = self.get_battle_curdamage(my_battle)
+        cur_damage = BattleLogic(self.db, my_battle).get_curdamage()
         if cur_damage is None or cur_damage <= 0:
             # The round is either fully played, or has no offensive card yet
             return False
         return replace_none(card.get_defence_from(my_battle.offensiveCard), 0) > 0
 
-    def can_attack(self, me: PlayerLogic, defender: PlayerLogic):
 
-        if me == defender:
-            # Logically, the rules don't forbid attacking self... But it's nonsense, right?
-            # We don't have tail loss here, but the player might want to get rid of defense cards?..
-            return False
-        my_battle = self.get_player_battle(me)
-        if my_battle is None:
-            return False
-        if my_battle.offendingPlayer != me.model:
-            return False
-        if my_battle.defendingPlayer is None:
-            return self.params.can_attack_anyone or me.model.neighbourRight == defender.model
-        return False
-
-    def attack(self, me: PlayerLogic, defender: PlayerLogic):
-        if not self.can_attack(me, defender):
-            raise UserError("Сейчас нельзя атаковать этого игрока")
 
     def play_card(self, card: CardLogic, player: PlayerLogic):
         if not self.can_play_card(card, player):
             raise UserError("Сейчас нельзя сыграть эту карту")
+        battle = self.get_player_battle(player)
+        if battle.offendingPlayer == player.model:
+            battle.offensiveCard = card.model
+        else:
+            BattleLogic(self.db, battle).add_defensive_card(card)
+
+    def end_battle(self, player: PlayerLogic):
+        battle = self.get_player_battle(player)
+        if battle.defendingPlayer != player.model:
+            raise UserError("Нельзя завершить раунд, если Вы не защищаетесь!")
+        self.complete_battle(battle)

@@ -24,11 +24,14 @@ def wrapped_socketio(message, response_message=None):
             except Exception as e:
                 rv = Response.Error(str(e)).as_dicts()
                 db.session.rollback()
-                #raise
+                raise
             finally:
                 db.session.remove()
             if response_message is not None:
                 emit(response_message, rv)
+            else:
+                if not rv['ok']:
+                    print("NOT OK Response:", rv.message)
         return socketio.on(message)(thehandler)
 
     return converter

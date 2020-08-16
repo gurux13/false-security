@@ -12,7 +12,7 @@ class Game(db.Model):
     roundsCompleted = db.Column(db.Integer, nullable=False)
     isComplete = db.Column(db.Boolean, default=False)
     isStarted = db.Column(db.Boolean, default=False)
-    players = db.relationship('Player', back_populates='game')
+    players = db.relationship('Player', back_populates='game', order_by='asc(Player.id)')
     deck = db.relationship('DeckEntry', back_populates='game', cascade='all,delete', lazy=True)
     discard = db.relationship('DiscardEntry', back_populates='game', cascade='all,delete', lazy=True)
     rounds = db.relationship('GameRound', back_populates='game', cascade='all,delete', order_by='desc(GameRound.roundNo)')
