@@ -19,6 +19,7 @@ from logic.card_manager import CardManager
 from logic.gameparams import GameParams
 from logic.player_logic import PlayerLogic
 from logic.player_manager import PlayerManager
+from utils.conversion import first_or_none, replace_none
 
 
 class GameLogic:
@@ -138,7 +139,6 @@ class GameLogic:
         self.cur_round = the_round
         self.play_accident()
 
-
     def start(self):
         self.model.isStarted = True
         self.player_manager.seat_game_players(self)
@@ -160,3 +160,47 @@ class GameLogic:
         player.add_cards([CardLogic(self.db, x.card) for x in deck_entries])
         for entry in deck_entries:
             self.db.session.delete(entry)
+
+    def get_player_battle(self, player: PlayerLogic) -> RoundBattle:
+        # There can be at most one battle the player belongs to
+        return next(iter([x for x in
+                          self.cur_round.battles
+                          if x.defendingPlayer == player.model or x.offendingPlayer == player.model
+                          ]), None)
+
+    def get_battle_curdamage(self, battle: RoundBattle) -> int:
+        if battle.offensiveCard is None:
+            return None
+        if battle.defensiveCards is None:
+            return battle.offensiveCard.damage
+        total_defence_value = 0
+        for defensive_card in battle.defensiveCards:
+            defence_value = CardLogic(self.db, defensive_card).get_defence_from(battle.offensiveCard)
+            if defence_value is not None:
+                total_defence_value += defence_value
+        return max(0, battle.offensiveCard.damage - total_defence_value)
+
+    def can_play_card(self, card: CardLogic, player: PlayerLogic) -> bool:
+        my_battle = self.get_player_battle(player)
+        if my_battle is None:
+            return False
+        if my_battle.isComplete:
+            return False
+        # Can't play a card we don't have
+        if not any(map(lambda x: x.model == card.model, player.get_hand())):
+            return False
+        # If we're on offence
+        if my_battle.offendingPlayer == player:
+            # Card is already played
+            if my_battle.offensiveCard is not None:
+                return False
+            return card.model.type.enumType == CardTypeEnum.OFFENCE
+
+        # We're on defence then
+        if card.model.type.enumType != CardTypeEnum.DEFENCE:
+            return False
+        cur_damage = self.get_battle_curdamage(my_battle)
+        if cur_damage is None or cur_damage <= 0:
+            # The round is either fully played, or has no offensive card yet
+            return False
+        return replace_none(card.get_defence_from(my_battle.offensiveCard), 0) > 0

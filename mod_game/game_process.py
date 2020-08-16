@@ -4,8 +4,11 @@ from dataclasses import dataclass
 
 from Exceptions.user_error import UserError
 from globals import db
+from logic.card_logic import CardLogic
 from logic.card_manager import CardManager
+from logic.game_logic import GameLogic
 from logic.game_manager import GameManager
+from logic.player_logic import PlayerLogic
 from logic.player_manager import PlayerManager
 from mod_game.game_state import UiGame, UiPlayer, UiCard, UiCardType
 from mod_gameselect.controller import ExitForm
@@ -20,10 +23,18 @@ from utils.socketio_helper import wrapped_socketio
 
 mod_game_process = Blueprint('game_process', __name__)
 
+
 @dataclass
 class GameState:
     redirect_to: str
     game: UiGame = None
+
+
+def make_ui(card: CardLogic, game: GameLogic, player: PlayerLogic) -> UiCard:
+    rv = card.to_ui()
+    rv.can_play = game.can_play_card(card, player)
+    return rv
+
 
 @wrapped_socketio('state', 'state')
 def get_state():
@@ -34,18 +45,18 @@ def get_state():
     game = gm.get_my_game()
     if game.is_waitroom():
         return GameState(redirect_to='/waitroom')
-
+    player = pm.get_my_player()
     # TODO: What do we do with completed games?
     if not game.is_running():
         return GameState(redirect_to='/')
     players = game.get_players()
     ui_game = UiGame(
         game_name=game.model.uniqueCode,
-        self_player=pm.get_my_player().model.id,
+        self_player=player.model.id,
         players=[
             UiPlayer(
                 id=p.model.id,
-                name = p.model.name,
+                name=p.model.name,
                 is_admin=p.model.isAdmin,
                 is_online=p.model.isOnline,
                 on_offence=False,
@@ -53,13 +64,15 @@ def get_state():
                 neighbour_right=p.model.neighbourId,
             ) for p in players
         ],
-        hand=map_opt(lambda c: c.to_ui(), pm.get_my_player().get_hand()),
+        hand=map_opt(lambda c: make_ui(c, game, player), player.get_hand()),
         current_battles=[battle.to_ui() for battle in game.get_battles()],
     )
+
     return GameState(
         redirect_to='',
         game=ui_game
     )
+
 
 @wrapped_socketio('play')
 def play_card(card_id):
@@ -69,6 +82,7 @@ def play_card(card_id):
 @wrapped_socketio('card', 'card')
 def get_card(card_id):
     return get_card_manager().get_card(card_id).to_ui()
+
 
 @wrapped_socketio('cards', 'cards')
 def get_cards():
@@ -84,10 +98,10 @@ def get_game_manager():
 def get_player_manager():
     return PlayerManager(db)
 
+
 @Memoize
 def get_card_manager():
     return CardManager(db)
-
 
 
 @mod_game_process.route('/game')

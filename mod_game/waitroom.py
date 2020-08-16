@@ -2,6 +2,7 @@ from flask import Blueprint, redirect, url_for, render_template
 from flask_socketio import SocketIO, emit, join_room
 from dataclasses import dataclass
 
+from Exceptions.hack_attempt import HackAttemptError
 from Exceptions.user_error import UserError
 from globals import db
 from logic.game_manager import GameManager
@@ -59,10 +60,14 @@ def waitroom():
 
 @wrapped_socketio('start')
 def start_game():
-    print("start game")
     gm = get_game_manager()
+    pm = get_player_manager()
+    game = gm.get_my_game()
+    if not game.is_waitroom():
+        raise UserError("Игра не может быть начата без комнаты ожидания!")
+    if not game.can_start(pm.get_my_player()):
+        raise HackAttemptError("Попытка начать игру игроком, который не может этого делать!")
     gm.get_my_game().start()
-    print("end of start game")
 
 @Memoize
 def get_game_manager():

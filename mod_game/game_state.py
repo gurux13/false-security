@@ -37,6 +37,7 @@ class UiCard:
     def_against: List[CardPairing]
     off_against: List[CardPairing]
     dealt_by_player: int
+    can_play: bool = None
 
 
 @dataclass
