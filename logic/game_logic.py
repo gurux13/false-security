@@ -204,3 +204,26 @@ class GameLogic:
             # The round is either fully played, or has no offensive card yet
             return False
         return replace_none(card.get_defence_from(my_battle.offensiveCard), 0) > 0
+
+    def can_attack(self, me: PlayerLogic, defender: PlayerLogic):
+
+        if me == defender:
+            # Logically, the rules don't forbid attacking self... But it's nonsense, right?
+            # We don't have tail loss here, but the player might want to get rid of defense cards?..
+            return False
+        my_battle = self.get_player_battle(me)
+        if my_battle is None:
+            return False
+        if my_battle.offendingPlayer != me.model:
+            return False
+        if my_battle.defendingPlayer is None:
+            return self.params.can_attack_anyone or me.model.neighbourRight == defender.model
+        return False
+
+    def attack(self, me: PlayerLogic, defender: PlayerLogic):
+        if not self.can_attack(me, defender):
+            raise UserError("Сейчас нельзя атаковать этого игрока")
+
+    def play_card(self, card: CardLogic, player: PlayerLogic):
+        if not self.can_play_card(card, player):
+            raise UserError("Сейчас нельзя сыграть эту карту")

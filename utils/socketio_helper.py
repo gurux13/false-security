@@ -24,7 +24,7 @@ def wrapped_socketio(message, response_message=None):
             except Exception as e:
                 rv = Response.Error(str(e)).as_dicts()
                 db.session.rollback()
-                raise
+                #raise
             finally:
                 db.session.remove()
             if response_message is not None:

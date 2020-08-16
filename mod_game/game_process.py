@@ -62,6 +62,7 @@ def get_state():
                 on_offence=False,
                 on_defence=False,
                 neighbour_right=p.model.neighbourId,
+                can_attack=game.can_attack(player, p),
             ) for p in players
         ],
         hand=map_opt(lambda c: make_ui(c, game, player), player.get_hand()),
@@ -73,10 +74,26 @@ def get_state():
         game=ui_game
     )
 
+@wrapped_socketio('attack', 'attack')
+def attack(player_id):
+    print("Attacking", player_id)
+    get_game_manager() \
+        .get_my_game() \
+        .attack(
+            get_player_manager().get_my_player(),
+            get_player_manager().get_player(player_id)
+    )
 
-@wrapped_socketio('play')
+@wrapped_socketio('play', 'play')
 def play_card(card_id):
     print("Playing card", card_id)
+    get_game_manager() \
+        .get_my_game() \
+        .play_card(
+            get_card_manager().get_card(card_id),
+            get_player_manager().get_my_player()
+    )
+    return True
 
 
 @wrapped_socketio('card', 'card')

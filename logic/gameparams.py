@@ -11,7 +11,7 @@ class EndGameDeaths(Enum):
 
 class GameParams:
     def __init__(self, initial_falsics, initial_defence_cards, initial_offence_cards, accident_probability,
-                 end_game_deaths, deck_size, num_rounds, only_admin_starts):
+                 end_game_deaths, deck_size, num_rounds, only_admin_starts, can_attack_anyone):
         self.initial_falsics = initial_falsics
         self.initial_defence_cards = initial_defence_cards
         self.initial_offence_cards = initial_offence_cards
@@ -20,6 +20,7 @@ class GameParams:
         self.deck_size = deck_size
         self.num_rounds = num_rounds
         self.only_admin_starts = only_admin_starts
+        self.can_attack_anyone = can_attack_anyone
 
     def to_db(self):
         # Hack to serialize an enum
