@@ -63,6 +63,7 @@ def get_state():
                 on_defence=False,
                 neighbour_right=p.model.neighbourId,
                 can_attack=game.can_attack(player, p),
+                money=p.model.money
             ) for p in players
         ],
         hand=map_opt(lambda c: make_ui(c, game, player), player.get_hand()),

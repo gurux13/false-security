@@ -26,6 +26,7 @@ class UiPlayer:
     on_defence: bool
     neighbour_right: int
     can_attack: bool
+    money: int
 
 
 @dataclass

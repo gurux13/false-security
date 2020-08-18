@@ -53,5 +53,5 @@ class PlayerManager:
     def seat_game_players(self, game: 'GameLogic'):
         all_players = game.get_players()
         neighbours = all_players[1:] + [all_players[0]]
-        for player,neighbour in zip(all_players, neighbours):
+        for player, neighbour in zip(all_players, neighbours):
             player.model.neighbourRight = neighbour.model

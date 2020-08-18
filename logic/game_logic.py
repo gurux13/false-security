@@ -106,7 +106,7 @@ class GameLogic:
     def start_battle(self, offendingPlayer: PlayerLogic):
         new_battle = RoundBattle(
             round=self.cur_round,
-            offendingPlayer=offendingPlayer.model,
+            offendingPlayer=None if offendingPlayer is None else offendingPlayer.model,
             isComplete=False,
         )
         self.db.session.add(new_battle)

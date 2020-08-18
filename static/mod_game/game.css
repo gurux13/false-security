@@ -1,0 +1,59 @@
+.window{
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
+  height: 500px;
+
+}
+
+.head {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%
+}
+
+.head .players{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.head .status{
+}
+
+.table{
+  width: 100%;
+}
+
+.hand{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  align-items: flex-end;
+  width: 100%;
+}
+
+.card{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  width: 150px;
+  height: 200px;
+  padding: 5px;
+  text-align: center;
+  border-radius: 20px;
+}
+
+.card_0{
+  background-color: lightgreen;
+  border: 5px solid green;
+}
+
+.card_1{
+  background-color: #face8d;
+  border: 5px solid red;
+}

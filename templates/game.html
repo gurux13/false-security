@@ -1,59 +1,62 @@
 {% extends 'layout.html' %}
 {{ super() }}
 {% block extrahead %}
-<link rel="stylesheet" href="{{ url_for("static", filename="mod_game/waitroom.css") }}">
+<link rel="stylesheet" href="{{ url_for("static", filename="mod_game/game.css") }}">
 {% endblock %}
 {% block content %}
     <script src="../static/vue.js"></script>
+    <script src="../static/renderjson.js"></script>
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
 
     <div id="app">
-        <div v-if="ready">
-            Приветствуем [[current_player]] в игре [[game_name]]! <br/>
-            <player-icon v-for="player in players" :key="player.name" :name="player.name" :score="player.score"></player-icon>
-<!--            На данный момент игроки:
-            <ul>
-                <li v-for="player in players" :key="player.name" v-bind:class="{admin_player:player.is_admin}">
-                    [[ player.name ]]
-                </li>
-            </ul>
-            Отправьте ссылку игрокам: <a :href="link">[[link]]</a><br/>
-            <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>-->
+        <div class="window">
+            <div class="head">
+                <div v-for="player in get_players_list()" :key="player.name" class="players">
+                    <div>
+                        Игрок: [[player.name]]<br>
+                        Бюджет: [[player.money]]
+                    </div>
+                </div>
+                <div class="status">
+    <!--                Игра: {{ g.current_player.model.game.name }}<br>-->
+                    Игра: [[get_game_name()]]<br>
+                    Номер раунда: [[round_number]]<br>
+                    Карт в колоде: [[deck_count]]<br>
+                </div>
+            </div>
+
+            <div class="table">
+                TABLE
+            </div>
+
+            <div  class="hand">
+                <div v-for="card in get_my_hand()" :key="card.name" class="card" :class="'card_' + card.type">
+                    [[card.name]]
+                </div>
+            </div>
+<!--            <div class="hand">-->
+<!--                <div class="card">card</div>-->
+<!--                <div class="card">card</div>-->
+<!--                <div class="card">card</div>-->
+<!--                <div class="card">card</div>-->
+<!--                <div class="card">card</div>-->
+<!--                <div class="card">card</div>-->
+<!--                <div class="card">card</div>-->
+<!--                <div class="card">card</div>-->
+<!--            </div>-->
         </div>
     </div>
+
     <script>
-        const app = new Vue({
-            el: '#app',
-            data: {
-                game_name: "???",
-                players: [],
-                ready: false,
-                show_start: false,
-                admin_player: '',
-                start_disabled: false,
-            },
-            delimiters: ['[[', ']]'],
-            methods:{
-                start: function () {
-                    app.start_disabled = true;
-                    socket.emit('start')
-                }
-            }
-        });
+        var onevent = socket.onevent;
+        socket.onevent = function (packet) {
+            var args = packet.data || [];
+            onevent.call(this, packet);    // original call
+            packet.data = ["*"].concat(args);
+            onevent.call(this, packet);      // additional call to catch-all
+        };
         socket.on('state', function (data) {
-            if (data.ok) {
-                if (data.value.redirect_to) {
-                    window.location.href = data.value.redirect_to;
-                } else {
-                    data = data.value.game
-                    app.game_name = data.game_name;
-                    app.current_player = data.current_player;
-                    app.players = data.players;//.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
-                    app.link = (window.location.href.replace(/\/[^\/]*$/, '') + data.game_link).toString();
-                    app.hand = data.hand;
-                    app.ready = true;
-                }
-            }
+            app.data = data;
         });
         socket.on('connect', function() {
             socket.emit('state');
@@ -61,6 +64,37 @@
         socket.on('upd', function () {
             socket.emit('state');
         });
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                players: [],
+                ready: false,
+                data: "",
+            },
+            delimiters: ['[[', ']]'],
+            methods:{
+                get_game_name: function () {
+<!--                    console.log(this.data);-->
+                    if ( this.data ){
+                        return this.data.value.game.game_name;
+                    }
+                },
+                get_players_list: function(){
+                    console.log(this);
+                    if ( this.data ){
+                        return this.data.value.game.players;
+                        }
+                },
+                get_my_hand: function () {
+                    console.log(this.data.value.game.hand);
+                    if ( this.data ){
+                        return this.data.value.game.hand;
+                    }
+                }
+            }
+        });
+
 
     </script>
 {% endblock %}

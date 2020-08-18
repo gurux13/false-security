@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" integrity="sha256-yr4fRk/GU1ehYJPAs8P4JlTgu0Hdsp4ZKrx8bDEDC3I=" crossorigin="anonymous"></script>
+    <script src="../static/vue.js"></script>
+    <script src="../static/socket.io.js" ></script>
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css')}}">
     {% block extrahead %}{% endblock %}
     <script>
@@ -18,7 +18,7 @@
 
     <nav class="navbar navbar-default">
         <div class="container">
-            <div class="row">
+            <div class="my-navbar">
                 <div class="col-md-4">
                    <h1>Ложное чувство безопасности</h1>
                 </div>

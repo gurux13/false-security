@@ -27,3 +27,11 @@ body {
 .validation-error {
     color: red;
 }
+
+.my-navbar {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-basis: 140px;
+}
