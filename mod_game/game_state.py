@@ -59,3 +59,4 @@ class UiGame:
     self_player: int
     hand: List[UiCard]
     current_battles: List[UiBattle]
+    round_no: int

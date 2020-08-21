@@ -50,6 +50,7 @@ def get_state():
     if not game.is_running():
         return GameState(redirect_to='/')
     players = game.get_players()
+    round_number = game.model.roundsCompleted
     ui_game = UiGame(
         game_name=game.model.uniqueCode,
         self_player=player.model.id,
@@ -63,11 +64,12 @@ def get_state():
                 on_defence=False,
                 neighbour_right=p.model.neighbourId,
                 can_attack=game.can_attack(player, p),
-                money=p.model.money
+                money=p.model.money,
             ) for p in players
         ],
         hand=map_opt(lambda c: make_ui(c, game, player), player.get_hand()),
         current_battles=[battle.to_ui() for battle in game.get_battles()],
+        round_no=round_number,
     )
 
     return GameState(

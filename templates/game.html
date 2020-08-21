@@ -18,9 +18,8 @@
                     </div>
                 </div>
                 <div class="status">
-    <!--                Игра: {{ g.current_player.model.game.name }}<br>-->
                     Игра: [[get_game_name()]]<br>
-                    Номер раунда: [[round_number]]<br>
+                    Номер раунда: [[get_round_no()]]<br>
                     Карт в колоде: [[deck_count]]<br>
                 </div>
             </div>
@@ -34,16 +33,6 @@
                     [[card.name]]
                 </div>
             </div>
-<!--            <div class="hand">-->
-<!--                <div class="card">card</div>-->
-<!--                <div class="card">card</div>-->
-<!--                <div class="card">card</div>-->
-<!--                <div class="card">card</div>-->
-<!--                <div class="card">card</div>-->
-<!--                <div class="card">card</div>-->
-<!--                <div class="card">card</div>-->
-<!--                <div class="card">card</div>-->
-<!--            </div>-->
         </div>
     </div>
 
@@ -75,7 +64,6 @@
             delimiters: ['[[', ']]'],
             methods:{
                 get_game_name: function () {
-<!--                    console.log(this.data);-->
                     if ( this.data ){
                         return this.data.value.game.game_name;
                     }
@@ -87,9 +75,13 @@
                         }
                 },
                 get_my_hand: function () {
-                    console.log(this.data.value.game.hand);
                     if ( this.data ){
                         return this.data.value.game.hand;
+                    }
+                },
+                get_round_no: function () {
+                    if(this.data){
+                        return this.data.value.game.round_no;
                     }
                 }
             }
