@@ -20,13 +20,14 @@
         <div class="container">
             <div class="my-navbar">
                 <div class="col-md-4">
-                   <h1>Ложное чувство безопасности</h1>
+                   Ложное чувство безопасности
                 </div>
                 {%- if g.current_player -%}
+                    <div class="game-name">Игра <a href="{{ url_for('gameselect.index') + "?key=" + g.current_game.model.uniqueCode }}">{{ g.current_game.model.uniqueCode }}</a></div>
                 <form method="post" action="/logout">
                     {{ form.csrf_token }}
                     <div  class="col-md-4">
-                        Вы вошли как {{ g.current_player.model.name }}
+                        Вы вошли как <span class="self-name">{{ g.current_player.model.name }}</span>
     <!--                    How to get player's name?-->
                             <span>
                                 <button type="submit" value="exit" name="action">Выход</button>
@@ -37,7 +38,13 @@
             </div>
         </div>
     </nav>
+    <div class="content">
 {% block content %}{% endblock %}
+    </div>
+<div class="footer footer-height">
+    Разработано в 2020. Nuff said.
+</div>
+<div class="footer-height">&nbsp;</div>
 </body>
 </html>
 

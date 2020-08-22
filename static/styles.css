@@ -1,5 +1,5 @@
 body {
-    font-family: arial,sans-serif;
+    font-family: arial, sans-serif;
 }
 
 .form-table {
@@ -19,19 +19,61 @@ body {
 
 
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 0.5s;
+    transition: opacity 0.5s;
 }
-.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
-  opacity: 0;
+
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */
+{
+    opacity: 0;
 }
+
 .validation-error {
     color: red;
 }
 
 .my-navbar {
-  display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  justify-content: space-between;
-  flex-basis: 140px;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    flex-basis: 140px;
+    background-color: #cccccc;
+    padding: 5px;
+    margin-bottom: 10px;
+    margin-top: 0;
+    text-align: center;
+}
+.col-md-4 {
+    height: 100%;
+    vertical-align: center;
+    font-family: monospace;
+    font-size: 13pt;
+}
+body {
+    margin: 0;
+}
+.content {
+    margin: 5px;
+}
+.footer {
+    bottom: 0%;
+    position: fixed;
+    text-align: center;
+    background-color: aquamarine;
+    padding: 5px;
+    left: 0;
+    width: 100%;
+}
+
+.footer-height {
+    height: 20px;
+}
+
+.self-name {
+    font-weight: bold;
+}
+
+.game-name {
+    font-family: monospace;
+    font-size: 13pt;
 }

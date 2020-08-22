@@ -1,22 +1,26 @@
 {% extends 'layout.html' %}
 {{ super() }}
 {% block extrahead %}
-<link rel="stylesheet" href="{{ url_for("static", filename="mod_game/waitroom.css") }}">
+    <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/waitroom.css") }}">
 {% endblock %}
 {% block content %}
     <script src="../static/vue.js"></script>
+    <div class="waitroom-container">
+        <div class="waitroom-main">
+            <div id="app">
+                <div v-if="ready">
+                    <div class="players">
+                        Игроки:
 
-    <div id="app">
-        <div v-if="ready">
-            Приветствуем [[current_player]] в игре [[game_name]]! <br/>
-            На данный момент игроки:
-            <ul>
-                <li v-for="player in players" :key="player.name" v-bind:class="{admin_player:player.is_admin}">
-                    [[ player.name ]]
-                </li>
-            </ul>
-            Отправьте ссылку игрокам: <a :href="link">[[link]]</a><br/>
-            <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
+                        <div v-for="player in players" :key="player.name" class="player-name"
+                             v-bind:class="{admin_player:player.is_admin}">
+                            [[ player.name ]]
+                        </div>
+                    </div>
+                    Отправьте ссылку игрокам: <a :href="link">[[link]]</a><br/>
+                    <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
+                </div>
+            </div>
         </div>
     </div>
     <script>
@@ -31,7 +35,7 @@
                 start_disabled: false,
             },
             delimiters: ['[[', ']]'],
-            methods:{
+            methods: {
                 start: function () {
                     app.start_disabled = true;
                     socket.emit('start')
@@ -53,7 +57,7 @@
                 }
             }
         });
-        socket.on('connect', function() {
+        socket.on('connect', function () {
             socket.emit('waitroom');
         });
         socket.on('upd', function () {
