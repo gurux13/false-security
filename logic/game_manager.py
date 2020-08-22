@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask_sqlalchemy import SQLAlchemy
 
 from Exceptions.internal_error import InternalError
@@ -27,7 +29,8 @@ class GameManager:
         while retries > 0:
             # TODO: Make sure this is cryptographically secure
             game_key = get_random_string(6)
-            game = Game(uniqueCode=game_key, params=params.to_db(), roundsCompleted=0, isComplete=False)
+            game = Game(uniqueCode=game_key, params=params.to_db(), roundsCompleted=0, isComplete=False,
+                        lastActionAt=datetime.now())
             try:
                 self.db.session.add(game)
                 self.db.session.commit()

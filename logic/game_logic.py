@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from enum import Enum
 import random
 from typing import List
@@ -38,6 +39,9 @@ class GameLogic:
         self.card_manager = CardManager(self.db)
         self.player_manager = PlayerManager(self.db)
         self.cur_round: GameRound = next(iter(self.model.rounds), None)
+
+    def keep_alive(self):
+        self.model.lastActionAt = datetime.now()
 
     def notify(self):
         print("Notifying everyone in room", self.model.uniqueCode)

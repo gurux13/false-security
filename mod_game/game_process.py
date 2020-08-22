@@ -38,11 +38,13 @@ def make_ui(card: CardLogic, game: GameLogic, player: PlayerLogic) -> UiCard:
 
 @wrapped_socketio('state', 'state')
 def get_state():
+    keep_alive()
     gm = GameManager(db)
     pm = PlayerManager(db)
     if not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
         return GameState(redirect_to='/')
     game = gm.get_my_game()
+
     if game.is_waitroom():
         return GameState(redirect_to='/waitroom')
     player = pm.get_my_player()
@@ -77,13 +79,20 @@ def get_state():
         game=ui_game
     )
 
+def keep_alive():
+    game = get_game_manager().get_my_game()
+    if game is not None:
+        game.keep_alive()
+
 @wrapped_socketio('log', 'log')
 def log(starting_from):
+    keep_alive()
     return [x.to_ui() for x in get_game_manager().get_my_game().get_old_rounds(starting_from)]
 
 @wrapped_socketio('attack', 'attack')
 def attack(player_id):
     print("Attacking", player_id)
+    keep_alive()
     get_game_manager() \
         .get_my_game() \
         .attack(
@@ -95,6 +104,7 @@ def attack(player_id):
 @wrapped_socketio('play', 'play')
 def play_card(card_id):
     print("Playing card", card_id)
+    keep_alive()
     get_game_manager() \
         .get_my_game() \
         .play_card(
@@ -106,16 +116,19 @@ def play_card(card_id):
 
 @wrapped_socketio('done_def', 'done_def')
 def done_defending():
+    keep_alive()
     get_game_manager().get_my_game().end_battle(get_player_manager().get_my_player())
 
 
 @wrapped_socketio('card', 'card')
 def get_card(card_id):
+    keep_alive()
     return get_card_manager().get_card(card_id).to_ui()
 
 
 @wrapped_socketio('cards', 'cards')
 def get_cards():
+    keep_alive()
     return [c.to_ui() for c in get_card_manager().get_all_cards()]
 
 
@@ -137,6 +150,7 @@ def get_card_manager():
 @mod_game_process.route('/game')
 def game():
     set_current_player()
+    keep_alive()
     try:
         game = get_game_manager().get_my_game()
         player = get_player_manager().get_my_player()

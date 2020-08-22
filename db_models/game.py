@@ -16,6 +16,7 @@ class Game(db.Model):
     deck = db.relationship('DeckEntry', back_populates='game', cascade='all,delete', lazy=True)
     discard = db.relationship('DiscardEntry', back_populates='game', cascade='all,delete', lazy=True)
     rounds = db.relationship('GameRound', back_populates='game', cascade='all,delete', order_by='desc(GameRound.roundNo)')
+    lastActionAt = db.Column(db.DateTime, nullable=False)
 
     def __repr__(self):
         return '<Game %r>' % self.uniqueCode
