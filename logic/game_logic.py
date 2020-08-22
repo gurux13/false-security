@@ -20,6 +20,7 @@ from logic.card_manager import CardManager
 from logic.gameparams import GameParams
 from logic.player_logic import PlayerLogic
 from logic.player_manager import PlayerManager
+from logic.round_logic import RoundLogic
 from utils.conversion import first_or_none, replace_none
 
 
@@ -48,6 +49,10 @@ class GameLogic:
         if self.model.isStarted:
             return GameLogic.State.RUNNING
         return GameLogic.State.WAITROOM
+
+    def get_old_rounds(self, starting_from: int) -> List[RoundLogic]:
+        return [RoundLogic(self.db, x) for x in
+                self.db.session.query(GameRound).filter_by(game=self.model).filter(GameRound.roundNo >= starting_from)]
 
     def get_battles(self) -> List[BattleLogic]:
         return [BattleLogic(self.db, b) for b in self.cur_round.battles]
@@ -192,7 +197,6 @@ class GameLogic:
         model = self.get_player_battle(player)
         return None if model is None else BattleLogic(self.db, model)
 
-
     def can_attack(self, me: PlayerLogic, defender: PlayerLogic):
         if me.model == defender.model:
             # Logically, the rules don't forbid attacking self... But it's nonsense, right?
@@ -241,8 +245,6 @@ class GameLogic:
             # The round is either fully played, or has no offensive card yet
             return False
         return replace_none(card.get_defence_from(my_battle.offensiveCard), 0) > 0
-
-
 
     def play_card(self, card: CardLogic, player: PlayerLogic):
         if not self.can_play_card(card, player):

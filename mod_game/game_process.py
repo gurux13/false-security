@@ -10,7 +10,7 @@ from logic.game_logic import GameLogic
 from logic.game_manager import GameManager
 from logic.player_logic import PlayerLogic
 from logic.player_manager import PlayerManager
-from mod_game.game_state import UiGame, UiPlayer, UiCard, UiCardType
+from mod_game.game_state import UiGame, UiPlayer, UiCard, UiCardType, UiRound
 from mod_gameselect.controller import ExitForm
 from session import SessionHelper, SessionKeys
 from utils.conversion import map_opt
@@ -77,6 +77,9 @@ def get_state():
         game=ui_game
     )
 
+@wrapped_socketio('log', 'log')
+def log(starting_from):
+    return [x.to_ui() for x in get_game_manager().get_my_game().get_old_rounds(starting_from)]
 
 @wrapped_socketio('attack', 'attack')
 def attack(player_id):

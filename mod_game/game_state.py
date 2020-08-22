@@ -60,3 +60,8 @@ class UiGame:
     hand: List[UiCard]
     current_battles: List[UiBattle]
     round_no: int
+
+@dataclass
+class UiRound:
+    round_no: int
+    battles: List[UiBattle]
