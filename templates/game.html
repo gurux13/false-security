@@ -24,11 +24,40 @@
                 </div>
             </div>
 
-            <div class="table">
-                TABLE
+            <div class="center">
+                <div class="table">
+                    <div class="attack">
+                        <div class="attack_header">
+                            Атакующая карта:
+                        </div>
+
+                        <div class="card card_offence">
+
+                        </div>
+                    </div>
+                    <div class="defence">
+                        <div class="defence_header">Защитные карты:</div>
+                        <div class="defence_cards">
+                            <div class=" card card_defence"></div>
+                            <div class=" card card_defence"></div>
+                            <div class=" card card_defence"></div>
+                            <div class=" card card_defence"></div>
+                            <div class=" card card_defence"></div>
+                            <div class=" card card_defence"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="log">
+                    <div class="log_header">События в игре:</div>
+                    <div class="log_body">
+                        [[get_battle_list()]]
+                    </div>
+                </div>
             </div>
 
             <div  class="hand">
+<!--                <div v-for="card in get_my_hand()" :key="card.name" class="card" :class="'card_' + card.type">-->
                 <div v-for="card in get_my_hand()" :key="card.name" class="card" :class="'card_' + card.type">
                     [[card.name]]
                 </div>
@@ -47,6 +76,10 @@
         socket.on('state', function (data) {
             app.data = data;
         });
+        socket.on('log', function (data){
+            console.log("SOCKET ON LOG");
+            app.battles = data;
+        });
         socket.on('connect', function() {
             socket.emit('state');
         });
@@ -60,6 +93,7 @@
                 players: [],
                 ready: false,
                 data: "",
+                battles: [],
             },
             delimiters: ['[[', ']]'],
             methods:{
@@ -83,7 +117,14 @@
                     if(this.data){
                         return this.data.value.game.round_no;
                     }
-                }
+                },
+                get_battle_list: function () {
+                    console.log("getBATTLE");
+                    console.log(this);
+                    if (this.battles && this.battles.value){
+                        return this.battles.value.battles;
+                    }
+                },
             }
         });
 

@@ -1,10 +1,9 @@
 .window{
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   flex-direction: column;
   align-items: flex-start;
-  height: 500px;
-
+  height: 100vh;
 }
 
 .head {
@@ -15,7 +14,7 @@
   width: 100%
 }
 
-.head .players{
+.players{
   display: flex;
   flex-direction: row;
   justify-content: space-between;
@@ -23,10 +22,7 @@
 }
 
 .head .status{
-}
-
-.table{
-  width: 100%;
+  width: 200px;
 }
 
 .hand{
@@ -41,19 +37,88 @@
   display: flex;
   flex-direction: row;
   justify-content: space-around;
-  width: 150px;
-  height: 200px;
+  width: 120px;
+  height: 180px;
   padding: 5px;
   text-align: center;
   border-radius: 20px;
+  font-size: 1vw;
 }
 
-.card_0{
+.card_defence{
   background-color: lightgreen;
   border: 5px solid green;
 }
 
-.card_1{
+.card_offence{
   background-color: #face8d;
   border: 5px solid red;
+}
+
+.card_accident{
+  background-color: lightblue;
+  border: 5px solid blue;
+}
+
+.center{
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.table{
+  display: flex;
+  flex-grow: 1;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
+.attack{
+  display: flex;
+  flex-direction: column;
+}
+
+.attack_header{
+  height: 20px;
+  text-align: center;
+  background-color: #cccccc;
+}
+
+.defence{
+  display: flex;
+  flex-direction: column;
+}
+
+.defence_header{
+  height: 20px;
+  text-align: center;
+  background-color: #cccccc;
+}
+
+.defence_cards{
+  display: flex;
+  flex-flow: row wrap;
+  justify-content: space-around;
+}
+
+.log{
+  display: flex;
+  flex-direction: column;
+  align-self: flex-end;
+  width: 250px;
+  height: 300px;
+  text-align: center;
+  border-radius: 5px;
+  border: 2px solid black;
+}
+
+.log_header{
+  height: 20px;
+  text-align: left;
+  background-color: #cccccc;
+}
+
+.log_body{
+  overflow-y: scroll;
+  text-align: center;
 }
