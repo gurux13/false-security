@@ -125,17 +125,28 @@ class GameLogic:
         self.cur_round.isAccidentComplete = True
         self.start_battle(self.get_players()[0])
 
-    def complete_battle(self, battle: RoundBattle):
-        if battle.offensiveCard is None:
+    def calculate_battle_falsics(self, battle: BattleLogic):
+        btl_model = battle.model
+        if btl_model.offensiveCard.isCovid:
+            transfer_amount = btl_model.defendingPlayer.money // 2
+            btl_model.defendingPlayer.neighbourRight.money += transfer_amount
+            btl_model.defendingPlayer.money -= transfer_amount
+            return
+        btl_model.defendingPlayer.money -= battle.get_curdamage()
+
+    def complete_battle(self, battle: BattleLogic):
+        btl_model = battle.model
+        if btl_model.offensiveCard is None:
             raise UserError("Нельзя завершить битву без карты атаки!")
-        battle.isComplete = True
+        self.calculate_battle_falsics(battle)
+        btl_model.isComplete = True
         if self.cur_round.isAccidentComplete:
-            next_player = battle.offendingPlayer.neighbourRight
+            next_player = btl_model.offendingPlayer.neighbourRight
             if next_player != self.get_players()[0].model:
                 self.start_battle(PlayerLogic(self.db, next_player))
 
         if all(map(lambda b: b.model.isComplete, self.get_battles())):
-            if battle.offensiveCard.type.enumType == CardTypeEnum.ACCIDENT:
+            if btl_model.offensiveCard.type.enumType == CardTypeEnum.ACCIDENT:
                 print("Round", self.cur_round.roundNo, "has accident completed")
                 self.on_accident_played()
             else:
@@ -190,14 +201,14 @@ class GameLogic:
             self.db.session.delete(entry)
 
     def get_player_battle(self, player: PlayerLogic) -> RoundBattle:
-        # There can be at most one battle the player belongs to
+        # There can be at most one btl_model the player belongs to
         return first_or_none([x for x in
                               self.cur_round.battles
                               if (x.defendingPlayer == player.model or x.offendingPlayer == player.model)
                               and not x.isComplete])
 
     def get_player_battlelogic(self, player: PlayerLogic) -> BattleLogic:
-        # There can be at most one battle the player belongs to
+        # There can be at most one btl_model the player belongs to
         model = self.get_player_battle(player)
         return None if model is None else BattleLogic(self.db, model)
 
@@ -216,6 +227,8 @@ class GameLogic:
         return my_battle.defendingPlayer is None
 
     def attack(self, me: PlayerLogic, defender: PlayerLogic):
+        if defender is None:
+            raise UserError("Игрок не найден!")
         if not self.can_attack(me, defender):
             raise UserError("Сейчас нельзя атаковать этого игрока")
         cur_battle = self.get_player_battle(me)
@@ -258,9 +271,11 @@ class GameLogic:
             battle.offensiveCard = card.model
         else:
             BattleLogic(self.db, battle).add_defensive_card(card)
+        player.drop_card(card)
 
     def end_battle(self, player: PlayerLogic):
         battle = self.get_player_battle(player)
         if battle.defendingPlayer != player.model:
             raise UserError("Нельзя завершить раунд, если Вы не защищаетесь!")
-        self.complete_battle(battle)
+
+        self.complete_battle(BattleLogic(self.db, battle))

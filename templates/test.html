@@ -72,7 +72,9 @@
         SocketIO Method:<br/> <input type="text" v-model="sockmethod"><br/>
         SocketIO body:<br/> <textarea v-model="sockdata" cols="120" rows="8"></textarea><br/>
         <button v-on:click="send">Send</button>
-        <button v-on:click="clear">Clear output</button>
+        <button v-on:click="clear">Clear output</button> ||
+        <button v-on:click="state">State</button>
+        <button v-on:click="cards">Cards</button>
         <div id="response">
 
         </div>
@@ -90,7 +92,7 @@
         const app = new Vue({
             el: '#app',
             data: {
-                sockmethod: "state",
+                sockmethod: "cards",
                 sockdata: "",
                 status: "Not connected",
             },
@@ -104,7 +106,13 @@
                 },
                 clear: function () {
                     document.getElementById("response").innerHTML='';
-                }
+                },
+                state: function () {
+                    socket.emit('state');
+                },
+                cards: function () {
+                    socket.emit('cards');
+                },
             }
         });
         renderjson.set_show_to_level(5);

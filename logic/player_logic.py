@@ -32,3 +32,7 @@ class PlayerLogic:
     def add_cards(self, cards: List[CardLogic]):
         self.hand.extend((c.model.id for c in cards))
         self.updated_hand()
+
+    def drop_card(self, card: CardLogic):
+        self.hand.remove(card.model.id)
+        self.updated_hand()
