@@ -31,19 +31,20 @@
                             Атакующая карта:
                         </div>
 
-                        <div class="card card_offence">
+                        <div class="small_card small_card_offence">
 
                         </div>
                     </div>
                     <div class="defence">
                         <div class="defence_header">Защитные карты:</div>
                         <div class="defence_cards">
-                            <div class=" card card_defence"></div>
-                            <div class=" card card_defence"></div>
-                            <div class=" card card_defence"></div>
-                            <div class=" card card_defence"></div>
-                            <div class=" card card_defence"></div>
-                            <div class=" card card_defence"></div>
+                            <div class=" small_card small_card_defence"></div>
+                            <div class=" small_card small_card_defence"></div>
+                            <div class=" small_card small_card_defence"></div>
+                            <div class=" small_card small_card_defence"></div>
+                            <div class=" small_card small_card_defence"></div>
+                            <div class=" small_card small_card_defence"></div>
+                            <div class=" small_card small_card_defence"></div>
                         </div>
                     </div>
                 </div>
@@ -57,8 +58,9 @@
             </div>
 
             <div  class="hand">
-<!--                <div v-for="card in get_my_hand()" :key="card.name" class="card" :class="'card_' + card.type">-->
-                <div v-for="card in get_my_hand()" :key="card.name" class="card" :class="'card_' + card.type">
+                <div v-for="card in get_my_hand()"
+                     :key="card.name" class="card"
+                     v-bind:class="[card.type === 1 ?  'card_offence':'card_defence']">
                     [[card.name]]
                 </div>
             </div>
