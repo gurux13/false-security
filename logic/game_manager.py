@@ -53,13 +53,14 @@ class GameManager:
             raise UserError("Не удалось удалить игру. По идее, вы не должны видеть эту ошибку",
                             UserError.ErrorType.INVALID_GAME_DELETION)
 
-    def get_game(self, game_key: str) -> GameLogic:
+    def get_game(self, game_key: str, optional=False) -> GameLogic:
         game = Game.query.filter_by(uniqueCode=game_key).first()
-        if game is None:
-            # TODO: maybe remove the exception and make it Optional (everywhere)?
+        if game is None and not optional:
             raise UserError("К сожалению, такая игра не найдена. Проверьте уникальный код.",
                             UserError.ErrorType.INVALID_GAME)
+        if game is None:
+            return None
         return GameLogic(self.db, game)
 
-    def get_my_game(self) -> GameLogic:
-        return self.get_game(SessionHelper.get(SessionKeys.GAME_KEY))
+    def get_my_game(self, optional=False) -> GameLogic:
+        return self.get_game(SessionHelper.get(SessionKeys.GAME_KEY), optional)

@@ -66,7 +66,7 @@ def get_state():
                 on_defence=False,
                 neighbour_right=p.model.neighbourId,
                 can_attack=game.can_attack(player, p),
-                money=p.model.money,
+                money=p.get_money(),
             ) for p in players
         ],
         hand=map_opt(lambda c: make_ui(c, game, player), player.get_hand()),
@@ -80,7 +80,7 @@ def get_state():
     )
 
 def keep_alive():
-    game = get_game_manager().get_my_game()
+    game = get_game_manager().get_my_game(optional=True)
     if game is not None:
         game.keep_alive()
 

@@ -29,6 +29,7 @@ class Player(db.Model):
     game = db.relationship('Game', back_populates='players')
     name = db.Column(db.String(20), nullable=False)
     money = db.Column(db.Integer, nullable=False)
+    moneyAfterRound = db.Column(db.Integer, nullable=True)
     hand = db.Column(db.Text, nullable=True)
     neighbourId = db.Column(db.Integer, db.ForeignKey('player.id'), nullable=True)
     neighbourRight = db.relationship('Player', backref='neighbourLeft', remote_side='Player.id', uselist=False, post_update=True)

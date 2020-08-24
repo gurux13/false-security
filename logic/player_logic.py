@@ -36,3 +36,16 @@ class PlayerLogic:
     def drop_card(self, card: CardLogic):
         self.hand.remove(card.model.id)
         self.updated_hand()
+
+    def on_new_round(self):
+        self.model.moneyAfterRound = self.model.money
+
+    def on_round_completed(self):
+        self.model.money = self.model.moneyAfterRound
+
+    def change_money(self, delta: int):
+        self.model.moneyAfterRound += delta
+    def get_money(self):
+        if self.model.moneyAfterRound is None:
+            return self.model.money
+        return self.model.moneyAfterRound

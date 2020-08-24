@@ -129,10 +129,10 @@ class GameLogic:
         btl_model = battle.model
         if btl_model.offensiveCard.isCovid:
             transfer_amount = btl_model.defendingPlayer.money // 2
-            btl_model.defendingPlayer.neighbourRight.money += transfer_amount
-            btl_model.defendingPlayer.money -= transfer_amount
+            PlayerLogic(self.db, btl_model.defendingPlayer.neighbourRight).change_money(transfer_amount)
+            PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-transfer_amount)
             return
-        btl_model.defendingPlayer.money -= battle.get_curdamage()
+        PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-battle.get_curdamage())
 
     def complete_battle(self, battle: BattleLogic):
         btl_model = battle.model
@@ -151,6 +151,7 @@ class GameLogic:
                 self.on_accident_played()
             else:
                 print("Round", self.cur_round.roundNo, "is complete")
+                self.on_round_completed()
                 self.new_round()
 
     def play_accident(self):
@@ -176,6 +177,10 @@ class GameLogic:
         )
         self.db.session.add(the_round)
         self.cur_round = the_round
+
+        for player in self.get_players():
+            player.on_new_round()
+
         self.play_accident()
 
     def start(self):
@@ -279,3 +284,7 @@ class GameLogic:
             raise UserError("Нельзя завершить раунд, если Вы не защищаетесь!")
 
         self.complete_battle(BattleLogic(self.db, battle))
+
+    def on_round_completed(self):
+        for player in self.get_players():
+            player.on_round_completed()
