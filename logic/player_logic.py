@@ -24,7 +24,11 @@ class PlayerLogic:
     def get_hand(self) -> List[CardLogic]:
         if self.hand is None:
             return []
-        return [CardLogic(self.db, c) for c in Card.query.filter(Card.id.in_(self.hand))]
+        cards = Card.query.filter(Card.id.in_(self.hand))
+        card_dict = {}
+        for card in cards:
+            card_dict[card.id] = card
+        return [CardLogic(self.db, card_dict[card_id]) for card_id in self.hand]
 
     def updated_hand(self):
         self.model.hand = json.dumps(self.hand)

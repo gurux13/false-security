@@ -200,9 +200,7 @@ class GameLogic:
                    .order_by(DeckEntry.order)[:count]
 
     def deal(self, player, typ, count):
-        print('Dealing', count, 'cards of type', typ.enumType, 'to player', player.model.name)
         deck_entries = self.get_from_deck(typ, count)
-        print('Got', len(deck_entries), 'cards')
         player.add_cards([CardLogic(self.db, x.card) for x in deck_entries])
         for entry in deck_entries:
             self.db.session.delete(entry)
