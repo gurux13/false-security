@@ -16,7 +16,7 @@ from wtforms import StringField, SubmitField, IntegerField, BooleanField
 from wtforms.validators import DataRequired, InputRequired
 
 from db_models.game import Game, Player
-from logic.gameparams import GameParams, EndGameDeaths
+from logic.gameparams import GameParams, EndGameDeaths, DefCardDeal
 from globals import db
 
 import random
@@ -57,6 +57,8 @@ class CreateGameForm(GameForm):
     can_attack_anyone = BooleanField(validators=[])
     deck_size = IntegerField()
     num_rounds = IntegerField()
+    def_card_deal = IntegerField(validators=[InputRequired()])
+    def_card_deal_size = IntegerField()
 
 
 class ExitForm(FlaskForm):
@@ -107,10 +109,18 @@ def on_create(form):
         2: EndGameDeaths.OneDead,
         3: EndGameDeaths.AllButOneDead
     }
+    def_card_deal_map = {
+        0: DefCardDeal.DealFixed,
+        1: DefCardDeal.DealPlayerCount,
+        2: DefCardDeal.KeepSize,
+        3: DefCardDeal.DealAverageSpend,
+        4: DefCardDeal.RemainingPlusFixed,
+    }
     params = GameParams(form.b_falsics.data, form.b_defence.data,
                         form.b_offence.data, form.acc_prob.data / 100.0,
                         endgame_map[form.endgame.data], form.deck_size.data, form.num_rounds.data,
-                        form.only_admin_starts.data, form.can_attack_anyone.data)
+                        form.only_admin_starts.data, form.can_attack_anyone.data, def_card_deal_map[form.def_card_deal.data],
+                        form.def_card_deal_size.data)
     game = get_game_manager().create_game(params)
     # TODO: wipe the old player, if set in session
     player = get_player_manager().create_player(form.player_name.data, game)

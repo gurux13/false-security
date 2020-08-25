@@ -9,9 +9,18 @@ class EndGameDeaths(Enum):
     AllButOneDead = 2
 
 
+class DefCardDeal(Enum):
+    DealFixed = 1
+    DealPlayerCount = 2
+    KeepSize = 3
+    DealAverageSpend = 4
+    RemainingPlusFixed = 5
+
+
 class GameParams:
     def __init__(self, initial_falsics, initial_defence_cards, initial_offence_cards, accident_probability,
-                 end_game_deaths, deck_size, num_rounds, only_admin_starts, can_attack_anyone):
+                 end_game_deaths, deck_size, num_rounds, only_admin_starts, can_attack_anyone, def_card_deal,
+                 def_card_deal_size):
         self.initial_falsics = initial_falsics
         self.initial_defence_cards = initial_defence_cards
         self.initial_offence_cards = initial_offence_cards
@@ -21,11 +30,14 @@ class GameParams:
         self.num_rounds = num_rounds
         self.only_admin_starts = only_admin_starts
         self.can_attack_anyone = can_attack_anyone
+        self.def_card_deal = DefCardDeal(def_card_deal)
+        self.def_card_deal_size = def_card_deal_size
 
     def to_db(self):
         # Hack to serialize an enum
         tmp_obj = copy.deepcopy(self)
         tmp_obj.end_game_deaths = tmp_obj.end_game_deaths.value
+        tmp_obj.def_card_deal = tmp_obj.def_card_deal.value
         return json.dumps(tmp_obj.__dict__)
 
     @staticmethod

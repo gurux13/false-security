@@ -18,7 +18,7 @@ from db_models.game import Game
 from logic.battle_logic import BattleLogic
 from logic.card_logic import CardLogic
 from logic.card_manager import CardManager
-from logic.gameparams import GameParams
+from logic.gameparams import GameParams, DefCardDeal
 from logic.player_logic import PlayerLogic
 from logic.player_manager import PlayerManager
 from logic.round_logic import RoundLogic
@@ -285,6 +285,29 @@ class GameLogic:
 
         self.complete_battle(BattleLogic(self.db, battle))
 
+    def deal_roundcompleted(self, player: PlayerLogic, avg_spend: int):
+        self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE), len(self.model.players) - 1)
+        player_def_cards_count = len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
+        def_card_count = 0
+        if self.params.def_card_deal == DefCardDeal.DealFixed:
+            def_card_count = self.params.def_card_deal_size
+        elif self.params.def_card_deal == DefCardDeal.KeepSize:
+            def_card_count = self.params.initial_defence_cards - player_def_cards_count
+        elif self.params.def_card_deal == DefCardDeal.RemainingPlusFixed:
+            def_card_count = player_def_cards_count + self.params.def_card_deal_size
+        elif self.params.def_card_deal == DefCardDeal.DealPlayerCount:
+            def_card_count = len(self.model.players)
+        elif self.params.def_card_deal == DefCardDeal.DealAverageSpend:
+            def_card_count = avg_spend
+        def_card_count = max(0, def_card_count)
+        self.deal(player, self.card_manager.get_type(CardTypeEnum.DEFENCE), def_card_count)
+
     def on_round_completed(self):
         for player in self.get_players():
             player.on_round_completed()
+        avg_spend = sum(
+            len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
+            for player in self.get_players()
+        ) / len(self.get_players())
+        for player in self.get_players():
+            self.deal_roundcompleted(player, avg_spend)

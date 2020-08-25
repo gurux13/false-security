@@ -82,6 +82,23 @@
                                 </td>
                             </tr>
                             <tr>
+                                <td>Выдача карт защиты</td>
+                                <td><select name="def_card_deal" v-model="def_card_deal">
+                                    <option value="0">Фиксированное число</option>
+                                    <option value="1">По числу игроков</option>
+                                    <option value="2">Поддерживать кол-во карт</option>
+                                    <option value="3">Среднее число потраченных</option>
+                                    <option value="4">Число оставшихся + фиксированное</option>
+                                </select>
+                                    <transition name="fade">
+                                        <p v-if="def_card_deal==0 || def_card_deal==4">
+                                            Число карт: <input type="number" value="1" name="def_card_deal_size" min="0"
+                                                                  required>
+                                        </p>
+                                    </transition>
+                                </td>
+                            </tr>
+                            <tr>
                                 <td>Можно нападать на кого угодно</td>
                                 <td><input type="checkbox" checked name="can_attack_anyone"></td>
                             </tr>
@@ -110,6 +127,7 @@
                 game_key: "{{ g.game_key }}",
                 error_name: "{{ g.error_name }}",
                 error_game: "{{ g.error_game }}",
+                def_card_deal: 0,
             },
             delimiters: ['[[', ']]']
         });
