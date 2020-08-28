@@ -60,6 +60,7 @@ class UiGame:
     hand: List[UiCard]
     current_battles: List[UiBattle]
     round_no: int
+    is_complete: bool
 
 @dataclass
 class UiRound:

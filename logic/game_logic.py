@@ -59,10 +59,12 @@ class GameLogic:
                 self.db.session.query(GameRound).filter_by(game=self.model).filter(GameRound.roundNo >= starting_from)]
 
     def get_battles(self) -> List[BattleLogic]:
+        if self.model.isComplete:
+            return []
         return [BattleLogic(self.db, b) for b in self.cur_round.battles]
 
     def is_running(self):
-        return self.model.isStarted
+        return self.model.isStarted and not self.model.isComplete
 
     def is_complete(self):
         return self.model.isComplete
@@ -86,6 +88,8 @@ class GameLogic:
             return all_players
 
     def can_start(self, player: PlayerLogic):
+        if self.get_state() != GameLogic.State.WAITROOM:
+            return False
         if self.params.only_admin_starts:
             return player.model.isAdmin
         else:
@@ -116,7 +120,12 @@ class GameLogic:
             )
             self.db.session.add(de)
 
+    def assert_running(self):
+        if self.get_state() != GameLogic.State.RUNNING:
+            raise UserError("Невозможно выполнить действие, если игра не запущена")
+
     def start_battle(self, offendingPlayer: PlayerLogic):
+        self.assert_running()
         new_battle = RoundBattle(
             round=self.cur_round,
             offendingPlayer=None if offendingPlayer is None else offendingPlayer.model,
@@ -139,6 +148,7 @@ class GameLogic:
         PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-battle.get_curdamage())
 
     def complete_battle(self, battle: BattleLogic):
+        self.assert_running()
         btl_model = battle.model
         if btl_model.offensiveCard is None:
             raise UserError("Нельзя завершить битву без карты атаки!")
@@ -156,9 +166,11 @@ class GameLogic:
             else:
                 print("Round", self.cur_round.roundNo, "is complete")
                 self.on_round_completed()
-                self.new_round()
+                if not self.is_complete():
+                    self.new_round()
 
     def play_accident(self):
+        self.assert_running()
         if random.random() > self.params.accident_probability:
             self.on_accident_played()
             return
@@ -172,6 +184,7 @@ class GameLogic:
             rb.offensiveCard = card[0].card
 
     def new_round(self):
+        self.assert_running()
         round_no = 0 if self.cur_round is None else self.cur_round.roundNo + 1
         the_round = GameRound(
             game=self.model,
@@ -222,6 +235,8 @@ class GameLogic:
         return None if model is None else BattleLogic(self.db, model)
 
     def can_attack(self, me: PlayerLogic, defender: PlayerLogic):
+        if not self.is_running():
+            return False
         if me.model == defender.model:
             # Logically, the rules don't forbid attacking self... But it's nonsense, right?
             # We don't have tail loss here, but the player might want to get rid of defense cards?..
@@ -250,6 +265,8 @@ class GameLogic:
             battle.defendingPlayer = defender.model
 
     def can_play_card(self, card: CardLogic, player: PlayerLogic) -> bool:
+        if not self.is_running():
+            return False
         my_battle = self.get_player_battle(player)
         if my_battle is None:
             return False
@@ -285,6 +302,7 @@ class GameLogic:
         player.drop_card(card)
 
     def end_battle(self, player: PlayerLogic):
+        self.assert_running()
         battle = self.get_player_battle(player)
         if battle.defendingPlayer != player.model:
             raise UserError("Нельзя завершить раунд, если Вы не защищаетесь!")

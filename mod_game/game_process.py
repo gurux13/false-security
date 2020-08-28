@@ -49,8 +49,8 @@ def get_state():
         return GameState(redirect_to='/waitroom')
     player = pm.get_my_player()
     # TODO: What do we do with completed games?
-    if not game.is_running():
-        return GameState(redirect_to='/')
+    #if not game.is_running():
+    #    return GameState(redirect_to='/')
     players = game.get_players(False)
     round_number = 0 if game.cur_round is None else game.cur_round.roundNo
     ui_game = UiGame(
@@ -72,6 +72,7 @@ def get_state():
         hand=map_opt(lambda c: make_ui(c, game, player), player.get_hand()),
         current_battles=[battle.to_ui() for battle in game.get_battles()],
         round_no=round_number,
+        is_complete=game.is_complete(),
     )
 
     return GameState(
