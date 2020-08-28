@@ -40,7 +40,7 @@ def change_state(is_online: bool):
 def change_admin(is_online: bool, player: PlayerLogic):
     if not is_online and player.model.isAdmin:
         gm = GameManager(db)
-        new_adm = next((p.model for p in gm.get_my_game().get_players() if (not p.model.isAdmin and p.model.isOnline)), None)
+        new_adm = next((p.model for p in gm.get_my_game().get_players(True) if (not p.model.isAdmin and p.model.isOnline)), None)
         if new_adm is not None:
             new_adm.isAdmin = True
             player.model.isAdmin = False

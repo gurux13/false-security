@@ -82,7 +82,7 @@ def on_exit(form):
 
     game = get_game_manager()
     game.get_my_game().notify()
-    participants = game.get_my_game().get_players()
+    participants = game.get_my_game().get_players(False)
     if len(participants) == 0:
         game.delete_game(game.get_my_game())
 

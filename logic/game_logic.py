@@ -18,7 +18,7 @@ from db_models.game import Game
 from logic.battle_logic import BattleLogic
 from logic.card_logic import CardLogic
 from logic.card_manager import CardManager
-from logic.gameparams import GameParams, DefCardDeal
+from logic.gameparams import GameParams, DefCardDeal, EndGameDeaths
 from logic.player_logic import PlayerLogic
 from logic.player_manager import PlayerManager
 from logic.round_logic import RoundLogic
@@ -78,8 +78,12 @@ class GameLogic:
         self.db.session.commit()
         self.notify()
 
-    def get_players(self):
-        return [PlayerLogic(self.db, x, self) for x in self.model.players]
+    def get_players(self, only_live):
+        all_players = [PlayerLogic(self.db, x, self) for x in self.model.players]
+        if only_live:
+            return [p for p in all_players if p.is_alive()]
+        else:
+            return all_players
 
     def can_start(self, player: PlayerLogic):
         if self.params.only_admin_starts:
@@ -123,7 +127,7 @@ class GameLogic:
 
     def on_accident_played(self):
         self.cur_round.isAccidentComplete = True
-        self.start_battle(self.get_players()[0])
+        self.start_battle(self.get_players(True)[0])
 
     def calculate_battle_falsics(self, battle: BattleLogic):
         btl_model = battle.model
@@ -142,7 +146,7 @@ class GameLogic:
         btl_model.isComplete = True
         if self.cur_round.isAccidentComplete:
             next_player = btl_model.offendingPlayer.neighbourRight
-            if next_player != self.get_players()[0].model:
+            if next_player != self.get_players(True)[0].model:
                 self.start_battle(PlayerLogic(self.db, next_player))
 
         if all(map(lambda b: b.model.isComplete, self.get_battles())):
@@ -162,7 +166,7 @@ class GameLogic:
         if len(card) == 0:
             self.on_accident_played()
             return
-        for player in self.get_players():
+        for player in self.get_players(True):
             rb = self.start_battle(None)
             rb.defendingPlayer = player.model
             rb.offensiveCard = card[0].card
@@ -178,7 +182,7 @@ class GameLogic:
         self.db.session.add(the_round)
         self.cur_round = the_round
 
-        for player in self.get_players():
+        for player in self.get_players(True):
             player.on_new_round()
 
         self.play_accident()
@@ -187,7 +191,7 @@ class GameLogic:
         self.model.isStarted = True
         self.player_manager.seat_game_players(self)
         self.make_deck()
-        for player in self.get_players():
+        for player in self.get_players(False):
             self.initialize_player(player)
         self.new_round()
         self.db.session.commit()
@@ -233,6 +237,8 @@ class GameLogic:
 
     def attack(self, me: PlayerLogic, defender: PlayerLogic):
         if defender is None:
+            raise UserError("Игрок не найден!")
+        if defender.model.game != me.model.game:
             raise UserError("Игрок не найден!")
         if not self.can_attack(me, defender):
             raise UserError("Сейчас нельзя атаковать этого игрока")
@@ -303,11 +309,29 @@ class GameLogic:
         self.deal(player, self.card_manager.get_type(CardTypeEnum.DEFENCE), def_card_count)
 
     def on_round_completed(self):
-        for player in self.get_players():
+        for player in self.get_players(True):
             player.on_round_completed()
         avg_spend = sum(
             len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
-            for player in self.get_players()
-        ) / len(self.get_players())
-        for player in self.get_players():
+            for player in self.get_players(True)
+        ) / len(self.get_players(True))
+        for player in self.get_players(True):
             self.deal_roundcompleted(player, avg_spend)
+        self.complete_game_if_needed()
+
+    def should_complete_game(self):
+        n_players = len(self.get_players(False))
+        n_live_players = len(self.get_players(True))
+        if self.params.end_game_deaths == EndGameDeaths.OneDead and n_players != n_live_players:
+            return True
+        if self.params.end_game_deaths == EndGameDeaths.AllButOneDead and n_live_players == 1:
+            return True
+        if self.params.num_rounds is not None and self.cur_round is not None:
+            return self.cur_round.roundNo + 1 >= self.params.num_rounds
+        if self.params.deck_size is not None:
+            return not any(self.model.deck)
+        return False
+
+    def complete_game_if_needed(self):
+        if self.should_complete_game():
+            self.model.isComplete = True

@@ -51,7 +51,7 @@ class PlayerManager:
         return self.get_player(SessionHelper.get(SessionKeys.PLAYER_ID))
 
     def seat_game_players(self, game: 'GameLogic'):
-        all_players = game.get_players()
+        all_players = game.get_players(False)
         neighbours = all_players[1:] + [all_players[0]]
         for player, neighbour in zip(all_players, neighbours):
             player.model.neighbourRight = neighbour.model

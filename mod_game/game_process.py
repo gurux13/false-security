@@ -51,8 +51,8 @@ def get_state():
     # TODO: What do we do with completed games?
     if not game.is_running():
         return GameState(redirect_to='/')
-    players = game.get_players()
-    round_number = game.model.roundsCompleted
+    players = game.get_players(False)
+    round_number = 0 if game.cur_round is None else game.cur_round.roundNo
     ui_game = UiGame(
         game_name=game.model.uniqueCode,
         self_player=player.model.id,

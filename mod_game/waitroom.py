@@ -46,7 +46,7 @@ def get_state():
         in_waitroom=True,
         game_name=game.model.uniqueCode,
         current_player=pm.get_my_player().model.name,
-        players=[{'name': x.model.name, 'is_admin': x.model.isAdmin, 'is_online': x.model.isOnline} for x in game.get_players()],
+        players=[{'name': x.model.name, 'is_admin': x.model.isAdmin, 'is_online': x.model.isOnline} for x in game.get_players(False)],
         can_start=game.can_start(pm.get_my_player()),
         game_link='?k=' + game.model.uniqueCode,
     )
