@@ -9,18 +9,22 @@
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
 
     <div id="app">
-        <div class="window">
+        <div v-if="!is_game_loaded">Loading...</div>
+        <div class="window" v-else>
             <div class="head">
-                <div v-for="player in get_players_list()" :key="player.name" class="players">
-                    <div>
+                <div v-for="player in players_list" :key="player.id" class="players">
+                    <div :class="{
+                        player: true,
+                        is_offline: !player.is_online
+                    }">
                         Игрок: [[player.name]]<br>
                         Бюджет: [[player.money]]
                     </div>
                 </div>
                 <div class="status">
-                    Игра: [[get_game_name()]]<br>
-                    Номер раунда: [[get_round_no()]]<br>
-                    Карт в колоде: [[deck_count]]<br>
+                    Игра: [[game_name]]<br>
+                    Номер раунда: [[round_no]]<br>
+<!--                    Карт в колоде: [[deck_count]]<br>-->
                 </div>
             </div>
 
@@ -52,84 +56,98 @@
                 <div class="log">
                     <div class="log_header">События в игре:</div>
                     <div class="log_body">
-                        [[get_battle_list()]]
+<!--                        [[get_battle_list()]]-->
                     </div>
                 </div>
             </div>
 
             <div  class="hand">
-                <div v-for="card in get_my_hand()"
-                     :key="card.name" class="card"
-                     v-bind:class="[card.type === 1 ?  'card_offence':'card_defence']">
+                <div v-for="card in hand"
+                     :key="card.id"
+                     :class="{
+                        card: true,
+                        card_offence: card.type,
+                        card_defence: !card.type,
+                        card_gray: !card.can_play
+                     }" @click="choose_card(card.id)">
                     [[card.name]]
                 </div>
+            <button @click="send_selected_card">Отправить</button>
             </div>
         </div>
     </div>
-
     <script>
-        var onevent = socket.onevent;
-        socket.onevent = function (packet) {
-            var args = packet.data || [];
-            onevent.call(this, packet);    // original call
-            packet.data = ["*"].concat(args);
-            onevent.call(this, packet);      // additional call to catch-all
-        };
-        socket.on('state', function (data) {
-            app.data = data;
-        });
-        socket.on('log', function (data){
-            console.log("SOCKET ON LOG");
-            app.battles = data;
-        });
-        socket.on('connect', function() {
-            socket.emit('state');
-        });
-        socket.on('upd', function () {
-            socket.emit('state');
-        });
+        new Vue({
+          el: '#app',
+          delimiters: ['[[', ']]'],
+          data: {
+             selected_card: -1,
+             is_game_loaded: false,
+             game_name: '',
+             round_no: 0,
+             hand: [],
+             players_list: []
+          },
+          created() {
+            socket.on('log', (data) => {
+               console.log(data)
+            })
 
-        const app = new Vue({
-            el: '#app',
-            data: {
-                players: [],
-                ready: false,
-                data: "",
-                battles: [],
+            socket.on('upd', function () {
+                socket.emit('state');
+            })
+
+            socket.on('play', () => {
+               socket.emit('state')
+            })
+
+            socket.on('state', (data) => {
+               const game_data = data.value.game
+               this.game_name = game_data.game_name
+               this.round_no = game_data.round_no
+               this.selected_card = -1
+
+               this.players_list = []
+               this.hand = []
+
+               for (card of game_data.hand) {
+                  const { id, can_play, name, text } = card
+                  this.hand.push({
+                     id,
+                     can_play,
+                     name,
+                     text,
+                  })
+               }
+
+               for (player of game_data.players) {
+                  const { id, name, money, is_online } = player
+                  this.players_list.push({
+                     id, name, money, is_online
+                  })
+               }
+
+               console.log(game_data)
+               this.is_game_loaded = true
+            })
+
+            socket.on('connect', function() {
+                socket.emit('state')
+            })
+          },
+          methods:{
+            choose_card(id) {
+              this.selected_card = id
             },
-            delimiters: ['[[', ']]'],
-            methods:{
-                get_game_name: function () {
-                    if ( this.data ){
-                        return this.data.value.game.game_name;
-                    }
-                },
-                get_players_list: function(){
-                    console.log(this);
-                    if ( this.data ){
-                        return this.data.value.game.players;
-                        }
-                },
-                get_my_hand: function () {
-                    if ( this.data ){
-                        return this.data.value.game.hand;
-                    }
-                },
-                get_round_no: function () {
-                    if(this.data){
-                        return this.data.value.game.round_no;
-                    }
-                },
-                get_battle_list: function () {
-                    console.log("getBATTLE");
-                    console.log(this);
-                    if (this.battles && this.battles.value){
-                        return this.battles.value.battles;
-                    }
-                },
+            send_selected_card () {
+              if (this.selected_card == -1) {
+                alert('You cant play this card')
+                return
+              }
+              socket.emit('play', this.selected_card)
+              socket.emit('state')
             }
-        });
-
-
+          }
+        })
     </script>
 {% endblock %}
