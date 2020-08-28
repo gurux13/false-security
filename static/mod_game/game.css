@@ -50,26 +50,31 @@
   text-align: center;
   border-radius: 20px;
   font-size: 1vw;
+  border: 5px solid transparent;
 }
 
 .card_defence{
   background-color: lightgreen;
-  border: 5px solid green;
+  border-color: green;
 }
 
 .card_offence{
   background-color: #face8d;
-  border: 5px solid red;
+  border-color: red;
 }
 
 .card_accident{
   background-color: lightblue;
-  border: 5px solid blue;
+  border-color:  blue;
 }
 
 .card_gray{
   background-color: #c0c0c0;
-  border: 5px solid #808080;
+  border-color: #808080;
+}
+
+.card_selected{
+  border-width: 10px;
 }
 
 .center{
