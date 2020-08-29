@@ -7,7 +7,6 @@
     <script src="../static/vue.js"></script>
     <script src="../static/renderjson.js"></script>
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
-    <script>socket.emit('state')</script>
 
     <div id="app">
         <div v-if="!is_game_loaded">Loading...</div>
@@ -16,8 +15,9 @@
                 <div v-for="player in players_list" :key="player.id" class="players">
                     <div :class="{
                         player: true,
-                        is_offline: !player.is_online
-                    }">
+                        is_offline: !player.is_online,
+                        is_selected: player.is_selected,
+                    }"@click="select_user_to_attack(player)">
                         Игрок: [[player.name]]<br>
                         Бюджет: [[player.money]]
                     </div>
@@ -71,8 +71,7 @@
                         card_defence: !card.type,
                         card_gray: !card.can_play,
                         card_selected: card.is_selected
-                     }" @click="choose_card(card.index, 1)">
-<!--                    TODO!!! get 0 or 1 from data-->
+                     }" @click="choose_card(card.index)">
                     [[card.name]][[card]]
                 </div>
             <button @click="send_selected_card">Отправить</button>
@@ -89,95 +88,121 @@
              game_name: '',
              round_no: 0,
              hand: [],
-             players_list: []
+             players_list: [],
+             selected_player: -1,
+             cards: []
           },
           created() {
             socket.on('log', (data) => {
-               console.log(data)
-            })
+               console.log(data);
+            });
 
             socket.on('upd', function () {
-                console.log('here I emit state');
+                //console.log('here I emit state');
                 socket.emit('state');
-            })
+            });
 
-            socket.on('play', () => {
-               socket.emit('state')
-            })
+            socket.on('play', (data) => {
+               if (!data.ok){
+                   alert(data.message);
+               }
+
+            });
 
             socket.on('state', (data) => {
-               const game_data = data.value.game
-               this.game_name = game_data.game_name
-               this.round_no = game_data.round_no
-               this.selected_card = []
+              const game_data = data.value.game;
+              this.game_name = game_data.game_name;
+              this.round_no = game_data.round_no;
+              this.selected_card = [];
+              this.players_list = [];
+              this.hand = [];
 
-               this.players_list = []
-               this.hand = []
-
-               for (i in game_data.hand) {
-                  const { id, can_play, name, text, type } = game_data.hand[i]
-                  this.hand.push({
-                     index: i,
-                     id,
-                     can_play,
-                     name,
-                     text,
-                     type,
-                     is_selected: false,
-                  })
-               }
+              for (i in game_data.hand) {
+                const { id, can_play, name, text, type } = game_data.hand[i];
+                this.hand.push({
+                   index: i,
+                   id,
+                   can_play,
+                   name,
+                   text,
+                   type,
+                   is_selected: false,
+                });
+              }
 
                for (player of game_data.players) {
-                  const { id, name, money, is_online } = player
+                  const { id, name, money, is_online } = player;
                   this.players_list.push({
-                     id, name, money, is_online
-                  })
+                     id, name, money, is_online,
+                     is_selected: false
+                  });
                }
 
-               console.log(game_data)
-               this.is_game_loaded = true
-            })
+               console.log(game_data);
+               this.is_game_loaded = true;
+            });
 
             socket.on('connect', function() {
-                socket.emit('state')
-            })
+                socket.emit('state');
+            });
+
+            socket.emit('state');
+            socket.emit('subscribe');
+
           },
           methods:{
-            get_data() {
-              socket.emit('state')
+
+            select_user_to_attack(player){
+              player.is_selected = true;
+              console.log(player);
+              socket.emit('attack', player.id);
             },
 
-            choose_card(index, type) {
+            choose_card(index) {
             //console.log(index)
-            console.log(this.hand[index].type, type, index)
-              if (this.hand[index].type != type) {
-                alert('You can not choose this card')
-                return
+              console.log(this.hand[index].type, index);
+              if (!this.hand[index].can_play) {
+                alert('You can not choose this card');
+                return;
               }
+
+              type = -1;
+
+              for (let i = 0; i < this.hand.length; i++){
+                console.log(this.hand[i].can_play, this.hand[i].type)
+                if (this.hand[i].can_play){
+
+                  type = this.hand[i].type;
+                  break;
+                }
+              }
+
+              console.log('MY TYPE IS',type);
+
               if (type == 1 ){
-                this.hand.forEach(card => card.is_selected = false)
-                this.selected_card = [this.hand[index].index]
-                this.hand[index].is_selected = true
+                this.hand.forEach(card => card.is_selected = false);
+                this.selected_card = [parseInt(this.hand[index].id)];
+                this.hand[index].is_selected = true;
               }
               else if (this.selected_card.some(i => index == i )){
                 this.hand[index].is_selected = false;
-                this.$delete(this.selected_card, this.selected_card.indexOf(index))
+                this.$delete(this.selected_card, this.selected_card.indexOf(index));
               }
               else{
-                this.hand[index].is_selected = true
-                this.selected_card.push(this.hand[index].index)
+                this.hand[index].is_selected = true;
+                this.selected_card.push(parseInt(this.hand[index].id));
               }
             },
 
             send_selected_card () {
+            // TODO understand is it attack or defence. If it is defence check, can we play anything or not
               if (this.selected_card.length == 0) {
-                alert('You must choose card')
-                return
+                alert('You must choose card');
+                return;
               }
+              //console.log('SendCard', this.selected_card.map(index => this.hand[index].id));
+              socket.emit('play', this.selected_card);
 
-              console.log(this.selected_card.map(index => this.hand[index].id))
-             // TODO socket.emit('play', this.selected_card)
-             // socket.emit('state')
             }
           }
         })

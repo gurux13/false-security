@@ -24,6 +24,11 @@
 .player {
   border: solid 1px;
 }
+
+.player.is_selected{
+  border-color: blue;
+}
+
 .player.is_offline {
   border-color: red;
 }
