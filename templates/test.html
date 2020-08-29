@@ -63,12 +63,16 @@
         pre.renderjson {
             margin: 0;
         }
+        .subscribed {
+            color: darkgreen;
+        }
     </style>
 
     <script src="../static/vue.js"></script>
     <script src="../static/renderjson.js"></script>
     <div id="app">
-        Status: <b>[[ status ]]</b><br/>
+        Status: <b>[[ status ]]</b>
+        <b class="subscribed" v-if="subscribed">Subscribed</b><button v-if="!subscribed" v-on:click="subscribe">Subscribe!</button><br/>
         SocketIO Method:<br/> <input type="text" v-model="sockmethod"><br/>
         SocketIO body:<br/> <textarea v-model="sockdata" cols="120" rows="8"></textarea><br/>
         <button v-on:click="send">Send</button>
@@ -95,6 +99,7 @@
                 sockmethod: "cards",
                 sockdata: "",
                 status: "Not connected",
+                subscribed: false,
             },
             delimiters: ['[[', ']]'],
             methods: {
@@ -113,18 +118,29 @@
                 cards: function () {
                     socket.emit('cards');
                 },
+                subscribe: function () {
+                    socket.emit('subscribe');
+                }
             }
         });
         renderjson.set_show_to_level(5);
         renderjson.set_icons('+', '-');
+        socket.on('subscribe', function(data) {
+            if (data.ok) {
+                app.subscribed = true;
+            }
+        })
         socket.on('*', function (evt, data) {
+            console.log("Got event ", evt);
             holder = document.createElement('div');
             holder.className = 'holder';
             holder.innerHTML = "<div class='caption'>" + evt + "</div>";
             document.getElementById("response").appendChild(holder);
-            holder.appendChild(
-                renderjson(data)
-            );
+            if (data) {
+                holder.appendChild(
+                    renderjson(data)
+                );
+            }
         });
         socket.on('connect', function () {
             app.status = "Connected"

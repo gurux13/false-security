@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for, render_template
+from flask import Blueprint, redirect, url_for, render_template, g
 from flask_socketio import SocketIO, emit, join_room
 from dataclasses import dataclass
 
@@ -35,16 +35,18 @@ def make_ui(card: CardLogic, game: GameLogic, player: PlayerLogic) -> UiCard:
     rv.can_play = game.can_play_card(card, player)
     return rv
 
+@wrapped_socketio("subscribe", "subscribe")
+def subscribe():
+    join_room(g.game.model.uniqueCode)
 
 @wrapped_socketio('state', 'state')
 def get_state():
     keep_alive()
-    gm = GameManager(db)
-    pm = PlayerManager(db)
-    if not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
-        return GameState(redirect_to='/')
-    game = gm.get_my_game()
 
+    pm = PlayerManager(db)
+    if g.game is None or not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
+        return GameState(redirect_to='/')
+    game = g.game
     if game.is_waitroom():
         return GameState(redirect_to='/waitroom')
     player = pm.get_my_player()
@@ -80,56 +82,54 @@ def get_state():
         game=ui_game
     )
 
+def assert_has_game():
+    if g.game is None:
+        raise UserError("Игра не найдена")
+
 def keep_alive():
-    game = get_game_manager().get_my_game(optional=True)
-    if game is not None:
-        game.keep_alive()
+    if g.game is not None:
+        g.game.keep_alive()
 
 @wrapped_socketio('log', 'log')
 def log(starting_from):
+    assert_has_game()
     keep_alive()
-    return [x.to_ui() for x in get_game_manager().get_my_game().get_old_rounds(starting_from)]
+    return [x.to_ui() for x in g.game.get_old_rounds(starting_from)]
 
 @wrapped_socketio('attack', 'attack')
 def attack(player_id):
-    print("Attacking", player_id)
+    assert_has_game()
     keep_alive()
-    get_game_manager() \
-        .get_my_game() \
-        .attack(
+    g.game.attack(
         get_player_manager().get_my_player(),
         get_player_manager().get_player(player_id)
     )
 
 
 @wrapped_socketio('play', 'play')
-def play_card(card_id):
-    print("Playing card", card_id)
+def play_card(card_ids):
+    assert_has_game()
     keep_alive()
-    get_game_manager() \
-        .get_my_game() \
-        .play_card(
-        get_card_manager().get_card(card_id),
-        get_player_manager().get_my_player()
-    )
+    player = get_player_manager().get_my_player()
+    for card in card_ids:
+        g.game.play_card(get_card_manager().get_card(card), player)
     return True
 
 
 @wrapped_socketio('done_def', 'done_def')
 def done_defending():
+    assert_has_game()
     keep_alive()
-    get_game_manager().get_my_game().end_battle(get_player_manager().get_my_player())
+    g.game.end_battle(get_player_manager().get_my_player())
 
 
 @wrapped_socketio('card', 'card')
 def get_card(card_id):
-    keep_alive()
     return get_card_manager().get_card(card_id).to_ui()
 
 
 @wrapped_socketio('cards', 'cards')
 def get_cards():
-    keep_alive()
     return [c.to_ui() for c in get_card_manager().get_all_cards()]
 
 
@@ -151,7 +151,6 @@ def get_card_manager():
 @mod_game_process.route('/game')
 def game():
     set_current_player()
-    keep_alive()
     try:
         game = get_game_manager().get_my_game()
         player = get_player_manager().get_my_player()

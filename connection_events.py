@@ -1,3 +1,4 @@
+from flask import g
 from flask_socketio import SocketIO, emit
 
 from logic.game_manager import GameManager
@@ -6,6 +7,7 @@ from logic.player_logic import PlayerLogic
 from globals import socketio, db
 from session import SessionHelper, SessionKeys
 from utils.response import Response
+from utils.socketio_helper import commit_and_notify_if_dirty
 
 
 @socketio.on('disconnect')
@@ -25,10 +27,13 @@ def change_state(is_online: bool):
         if player is None:
             return
         try:
+            gm = GameManager(db)
+            g.game = gm.get_my_game(optional=True)
+            g.game.set_dirty()
             player.set_online(is_online)
             change_admin(is_online, player)
             print("made player online", player.model.name, is_online)
-            db.session.commit()
+            commit_and_notify_if_dirty()
             db.session.remove()
         except Exception as e:
             # emit('waitroom', Response.Error("Не удалось сменить статус").as_dicts())

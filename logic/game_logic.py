@@ -39,13 +39,21 @@ class GameLogic:
         self.card_manager = CardManager(self.db)
         self.player_manager = PlayerManager(self.db)
         self.cur_round: GameRound = next(iter(self.model.rounds), None)
+        self.is_dirty_ = False
 
+    def is_dirty(self):
+        return self.is_dirty_
+    
+    def set_dirty(self):
+        self.is_dirty_ = True
+        
     def keep_alive(self):
         self.model.lastActionAt = datetime.now()
 
     def notify(self):
         print("Notifying everyone in room", self.model.uniqueCode)
         socketio.emit('upd', room=self.model.uniqueCode)
+        self.is_dirty_ = False
 
     def get_state(self) -> State:
         if self.model.isComplete:
@@ -77,8 +85,7 @@ class GameLogic:
             raise UserError("Невозможно присоединиться к запущенной игре")
         if is_admin:
             player.make_admin()
-        self.db.session.commit()
-        self.notify()
+        self.set_dirty()
 
     def get_players(self, only_live):
         all_players = [PlayerLogic(self.db, x, self) for x in self.model.players]
@@ -99,6 +106,7 @@ class GameLogic:
         player.model.money = self.params.initial_falsics
         self.deal(player, self.card_manager.get_type(CardTypeEnum.DEFENCE), self.params.initial_defence_cards)
         self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE), self.params.initial_offence_cards)
+        self.set_dirty()
 
     def make_deck(self):
         deck_size = self.params.deck_size
@@ -119,6 +127,7 @@ class GameLogic:
                 order=random.randint(0, 2 ** 31),
             )
             self.db.session.add(de)
+        self.set_dirty()
 
     def assert_running(self):
         if self.get_state() != GameLogic.State.RUNNING:
@@ -132,11 +141,13 @@ class GameLogic:
             isComplete=False,
         )
         self.db.session.add(new_battle)
+        self.set_dirty()
         return new_battle
 
     def on_accident_played(self):
         self.cur_round.isAccidentComplete = True
         self.start_battle(self.get_players(True)[0])
+        self.set_dirty()
 
     def calculate_battle_falsics(self, battle: BattleLogic):
         btl_model = battle.model
@@ -149,6 +160,7 @@ class GameLogic:
 
     def complete_battle(self, battle: BattleLogic):
         self.assert_running()
+        self.set_dirty()
         btl_model = battle.model
         if btl_model.offensiveCard is None:
             raise UserError("Нельзя завершить битву без карты атаки!")
@@ -171,6 +183,7 @@ class GameLogic:
 
     def play_accident(self):
         self.assert_running()
+        self.set_dirty()
         if random.random() > self.params.accident_probability:
             self.on_accident_played()
             return
@@ -185,6 +198,7 @@ class GameLogic:
 
     def new_round(self):
         self.assert_running()
+        self.set_dirty()
         round_no = 0 if self.cur_round is None else self.cur_round.roundNo + 1
         the_round = GameRound(
             game=self.model,
@@ -201,14 +215,13 @@ class GameLogic:
         self.play_accident()
 
     def start(self):
+        self.set_dirty()
         self.model.isStarted = True
         self.player_manager.seat_game_players(self)
         self.make_deck()
         for player in self.get_players(False):
             self.initialize_player(player)
         self.new_round()
-        self.db.session.commit()
-        self.notify()
 
     def get_from_deck(self, typ: CardType, count: int):
         return self.db.session.query(DeckEntry) \
@@ -217,6 +230,7 @@ class GameLogic:
                    .order_by(DeckEntry.order)[:count]
 
     def deal(self, player, typ, count):
+        self.set_dirty()
         deck_entries = self.get_from_deck(typ, count)
         player.add_cards([CardLogic(self.db, x.card) for x in deck_entries])
         for entry in deck_entries:
@@ -257,6 +271,7 @@ class GameLogic:
             raise UserError("Игрок не найден!")
         if not self.can_attack(me, defender):
             raise UserError("Сейчас нельзя атаковать этого игрока")
+        self.set_dirty()
         cur_battle = self.get_player_battle(me)
         if cur_battle is not None:
             cur_battle.defendingPlayer = defender.model
@@ -294,6 +309,7 @@ class GameLogic:
     def play_card(self, card: CardLogic, player: PlayerLogic):
         if not self.can_play_card(card, player):
             raise UserError("Сейчас нельзя сыграть эту карту")
+        self.set_dirty()
         battle = self.get_player_battle(player)
         if battle.offendingPlayer == player.model:
             battle.offensiveCard = card.model
@@ -303,6 +319,7 @@ class GameLogic:
 
     def end_battle(self, player: PlayerLogic):
         self.assert_running()
+        self.set_dirty()
         battle = self.get_player_battle(player)
         if battle.defendingPlayer != player.model:
             raise UserError("Нельзя завершить раунд, если Вы не защищаетесь!")
@@ -352,4 +369,5 @@ class GameLogic:
 
     def complete_game_if_needed(self):
         if self.should_complete_game():
+            self.set_dirty()
             self.model.isComplete = True
