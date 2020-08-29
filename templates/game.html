@@ -7,6 +7,7 @@
     <script src="../static/vue.js"></script>
     <script src="../static/renderjson.js"></script>
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
+    <script>socket.emit('state')</script>
 
     <div id="app">
         <div v-if="!is_game_loaded">Loading...</div>
@@ -63,14 +64,16 @@
 
             <div  class="hand">
                 <div v-for="card in hand"
-                     :key="card.id"
+                     :key="card.index"
                      :class="{
                         card: true,
                         card_offence: card.type,
                         card_defence: !card.type,
-                        card_gray: !card.can_play
-                     }" @click="choose_card(card.id)">
-                    [[card.name]]
+                        card_gray: !card.can_play,
+                        card_selected: card.is_selected
+                     }" @click="choose_card(card.index, 1)">
+<!--                    TODO!!! get 0 or 1 from data-->
+                    [[card.name]][[card]]
                 </div>
             <button @click="send_selected_card">Отправить</button>
             </div>
@@ -94,6 +97,7 @@
             })
 
             socket.on('upd', function () {
+                console.log('here I emit state');
                 socket.emit('state');
             })
 
@@ -105,18 +109,21 @@
                const game_data = data.value.game
                this.game_name = game_data.game_name
                this.round_no = game_data.round_no
-               this.selected_card = -1
+               this.selected_card = []
 
                this.players_list = []
                this.hand = []
 
-               for (card of game_data.hand) {
-                  const { id, can_play, name, text } = card
+               for (i in game_data.hand) {
+                  const { id, can_play, name, text, type } = game_data.hand[i]
                   this.hand.push({
+                     index: i,
                      id,
                      can_play,
                      name,
                      text,
+                     type,
+                     is_selected: false,
                   })
                }
 
@@ -136,16 +143,41 @@
             })
           },
           methods:{
-            choose_card(id) {
-              this.selected_card = id
+            get_data() {
+              socket.emit('state')
             },
-            send_selected_card () {
-              if (this.selected_card == -1) {
-                alert('You cant play this card')
+
+            choose_card(index, type) {
+            //console.log(index)
+            console.log(this.hand[index].type, type, index)
+              if (this.hand[index].type != type) {
+                alert('You can not choose this card')
                 return
               }
-              socket.emit('play', this.selected_card)
-              socket.emit('state')
+              if (type == 1 ){
+                this.hand.forEach(card => card.is_selected = false)
+                this.selected_card = [this.hand[index].index]
+                this.hand[index].is_selected = true
+              }
+              else if (this.selected_card.some(i => index == i )){
+                this.hand[index].is_selected = false;
+                this.$delete(this.selected_card, this.selected_card.indexOf(index))
+              }
+              else{
+                this.hand[index].is_selected = true
+                this.selected_card.push(this.hand[index].index)
+              }
+            },
+
+            send_selected_card () {
+              if (this.selected_card.length == 0) {
+                alert('You must choose card')
+                return
+              }
+
+              console.log(this.selected_card.map(index => this.hand[index].id))
+             // TODO socket.emit('play', this.selected_card)
+             // socket.emit('state')
             }
           }
         })
