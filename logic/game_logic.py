@@ -142,6 +142,8 @@ class GameLogic:
         )
         self.db.session.add(new_battle)
         self.set_dirty()
+        if not self.params.can_attack_anyone:
+            self.attack(offendingPlayer, PlayerLogic(self.db, offendingPlayer.model.neighbourRight, game=self))
         return new_battle
 
     def on_accident_played(self):
@@ -286,6 +288,8 @@ class GameLogic:
         if my_battle is None:
             return False
         if my_battle.isComplete:
+            return False
+        if my_battle.defendingPlayer is None:
             return False
         # Can't play a card we don't have
         if not any(map(lambda x: x.model == card.model, player.get_hand())):
