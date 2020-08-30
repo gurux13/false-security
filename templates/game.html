@@ -9,7 +9,7 @@
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
 
     <div id="app">
-        <div v-if="!is_game_loaded">Loading...</div>
+        <div v-if="!is_game_loaded || !is_cards_loaded">Loading...</div>
         <div class="window" v-else>
             <div class="head">
                 <div v-for="player in players_list" :key="player.id" class="players">
@@ -36,8 +36,13 @@
                             Атакующая карта:
                         </div>
 
-                        <div class="small_card small_card_offence">
-
+                        <div :class="{
+                            small_card: true,
+                            small_card_offence: !accident,
+                            small_card_accident: accident
+                        }">
+                        [[attacking_card_name]]<br>
+                        Урон: [[attacking_card_damage]]
                         </div>
                     </div>
                     <div class="defence">
@@ -85,17 +90,43 @@
           data: {
              selected_card: -1,
              is_game_loaded: false,
+             is_cards_loaded: false,
              game_name: '',
              round_no: 0,
              hand: [],
              players_list: [],
              selected_player: -1,
              cards: [],
-
+             current_battles: [],
+             attacking_card: -1,
+             attacking_card_name: '',
+             attacking_card_damage: -1,
+             attacking_card_against: [],
           },
           created() {
             socket.on('log', (data) => {
                console.log(data);
+            });
+
+            socket.on('cards', (data) => {
+              const cards = data.value;
+              this.cards = [];
+
+              for (i in cards) {
+                const { id, name, text, type, def_against, off_against, damage } = cards[i];
+                this.cards.push({
+                   id,
+                   name,
+                   text,
+                   type,
+                   def_against,
+                   off_against,
+                   damage,
+                });
+              }
+
+              console.log('cards', this.cards);
+              this.is_cards_loaded = true;
             });
 
             socket.on('upd', function () {
@@ -118,6 +149,8 @@
               this.hand = [];
               this.self_player = game_data.self_player;
               this.current_battles = [];
+              this.accident = 0;
+              this.attacking_card = -1;
 
               for (i in game_data.hand) {
                 const { id, can_play, name, text, type } = game_data.hand[i];
@@ -136,8 +169,23 @@
                 this.current_battles.push({
                   offender: game_data.current_battles[i].offender,
                   defender: game_data.current_battles[i].defender,
+                  offensive_card : game_data.current_battles[i].offensive_card,
                 });
               }
+
+              console.log('battles', this.current_battles);
+              if(! this.current_battles.findIndex(item => !!item.offender) >= 0){
+                this.accident = 1;
+
+              }
+              this.attacking_card = this.current_battles[0].offensive_card;
+              console.log(this.attacking_card, this.cards)
+              this.attacking_card_name = this.cards[this.attacking_card-1].name;
+              this.attacking_card_damage = this.cards[this.attacking_card-1].damage;
+              //TODO get names of other cards
+              this.attacking_card_against = this.cards[this.attacking_card-1].off_against;
+              console.log('Against', this.attacking_card_against);
+
 
                for (player of game_data.players) {
                   const { id, name, money, is_online } = player;
@@ -155,8 +203,10 @@
                 socket.emit('state');
             });
 
+            socket.emit('cards');
             socket.emit('state');
             socket.emit('subscribe');
+
 
           },
           methods:{
