@@ -90,7 +90,8 @@
              hand: [],
              players_list: [],
              selected_player: -1,
-             cards: []
+             cards: [],
+
           },
           created() {
             socket.on('log', (data) => {
@@ -98,7 +99,6 @@
             });
 
             socket.on('upd', function () {
-                //console.log('here I emit state');
                 socket.emit('state');
             });
 
@@ -116,6 +116,8 @@
               this.selected_card = [];
               this.players_list = [];
               this.hand = [];
+              this.self_player = game_data.self_player;
+              this.current_battles = [];
 
               for (i in game_data.hand) {
                 const { id, can_play, name, text, type } = game_data.hand[i];
@@ -127,6 +129,13 @@
                    text,
                    type,
                    is_selected: false,
+                });
+              }
+
+              for (i in game_data.current_battles){
+                this.current_battles.push({
+                  offender: game_data.current_battles[i].offender,
+                  defender: game_data.current_battles[i].defender,
                 });
               }
 
@@ -159,25 +168,15 @@
             },
 
             choose_card(index) {
-            //console.log(index)
-              console.log(this.hand[index].type, index);
               if (!this.hand[index].can_play) {
                 alert('You can not choose this card');
                 return;
               }
-
-              type = -1;
-
-              for (let i = 0; i < this.hand.length; i++){
-                console.log(this.hand[i].can_play, this.hand[i].type)
-                if (this.hand[i].can_play){
-
-                  type = this.hand[i].type;
-                  break;
-                }
+              if (this.current_battles[this.current_battles.length - 1].offender == this.self_player){
+                type = 1;
+              } else{
+                type = 0;
               }
-
-              console.log('MY TYPE IS',type);
 
               if (type == 1 ){
                 this.hand.forEach(card => card.is_selected = false);
@@ -195,14 +194,27 @@
             },
 
             send_selected_card () {
-            // TODO understand is it attack or defence. If it is defence check, can we play anything or not
-              if (this.selected_card.length == 0) {
+            //if we play attack, we must choose a card
+              if (this.current_battles[this.current_battles.length - 1].offender == this.self_player){
+                type = 1;
+              } else{
+                type = 0;
+              }
+
+            // if attack, gamer has to choose card
+              if (this.selected_card.length == 0 && type == 1) {
                 alert('You must choose card');
                 return;
               }
-              //console.log('SendCard', this.selected_card.map(index => this.hand[index].id));
+              else if (this.selected_card.length == 0 && type == 0){
+                if (!confirm('Вы хотите осуществить пустой ход? Это приведет к потере фолзиков')) {
+                  return
+                }
+              }
               socket.emit('play', this.selected_card);
-
+              if (type == 0){
+                socket.emit('done_def');
+              }
             }
           }
         })
