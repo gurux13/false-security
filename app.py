@@ -27,6 +27,10 @@ print('starting...')
 def hello_world():
     return render_template('test_io.html')
 
+@app.route('/instruction')
+def rules():
+   return render_template('instruction.html')
+
 
 if __name__ == '__main__':
     # Registering socketio listeners

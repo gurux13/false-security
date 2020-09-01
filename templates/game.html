@@ -9,7 +9,7 @@
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
 
     <div id="app">
-        <div v-if="!is_game_loaded || !is_cards_loaded">Loading...</div>
+        <div v-if="!is_game_loaded">Loading...</div>
         <div class="window" v-else>
             <div class="head">
                 <div v-for="player in players_list" :key="player.id" class="players">
@@ -46,6 +46,7 @@
                         </div>
                     </div>
                     <div class="defence">
+                        [[create_defending_set()]]
                         <div class="defence_header">Защитные карты:</div>
                         <div class="defence_cards">
                             <div class=" small_card small_card_defence"></div>
@@ -90,7 +91,6 @@
           data: {
              selected_card: -1,
              is_game_loaded: false,
-             is_cards_loaded: false,
              game_name: '',
              round_no: 0,
              hand: [],
@@ -110,23 +110,23 @@
 
             socket.on('cards', (data) => {
               const cards = data.value;
-              this.cards = [];
+              this.cards = {};
+
+              socket.emit('state');
+              socket.emit('subscribe');
 
               for (i in cards) {
                 const { id, name, text, type, def_against, off_against, damage } = cards[i];
-                this.cards.push({
-                   id,
+                this.cards[id] = {
                    name,
                    text,
                    type,
                    def_against,
                    off_against,
                    damage,
-                });
+                };
               }
-
-              console.log('cards', this.cards);
-              this.is_cards_loaded = true;
+              console.log('cards are ready', this.cards);
             });
 
             socket.on('upd', function () {
@@ -180,17 +180,17 @@
               }
               this.attacking_card = this.current_battles[0].offensive_card;
               console.log(this.attacking_card, this.cards)
-              this.attacking_card_name = this.cards[this.attacking_card-1].name;
-              this.attacking_card_damage = this.cards[this.attacking_card-1].damage;
+              this.attacking_card_name = this.cards[this.attacking_card].name;
+              this.attacking_card_damage = this.cards[this.attacking_card].damage;
               //TODO get names of other cards
-              this.attacking_card_against = this.cards[this.attacking_card-1].off_against;
+              this.attacking_card_against = this.cards[this.attacking_card].off_against;
               console.log('Against', this.attacking_card_against);
 
 
                for (player of game_data.players) {
-                  const { id, name, money, is_online } = player;
+                  const { id, name, money, is_online, can_attack } = player;
                   this.players_list.push({
-                     id, name, money, is_online,
+                     id, name, money, is_online, can_attack,
                      is_selected: false
                   });
                }
@@ -200,21 +200,39 @@
             });
 
             socket.on('connect', function() {
-                socket.emit('state');
+               // socket.emit('state');
             });
 
             socket.emit('cards');
-            socket.emit('state');
-            socket.emit('subscribe');
+
 
 
           },
           methods:{
 
             select_user_to_attack(player){
+              if (player.can_attack == true ){
+                alert("Вы не можете атаковать этого игрока. Выберите другого");
+                return;
+              }
+              if (this.accident){
+                alert("Сейчас играет карта случайности. Выберите карту для защиты");
+                return;
+              }
               player.is_selected = true;
               console.log(player);
               socket.emit('attack', player.id);
+            },
+
+            create_defending_set(){
+              defending_set = []
+              if (this.accident){
+                for (battle of this.current_battles){
+                  defending_set.push({defensive_cards:battle.defensive_cards, defender:battle.defender});
+                };
+              } else {
+              }
+              console.log("DEFDEFDEF", defending_set);
             },
 
             choose_card(index) {
