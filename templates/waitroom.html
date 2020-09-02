@@ -59,6 +59,7 @@
         });
         socket.on('connect', function () {
             socket.emit('waitroom');
+            //socket.emit('subscribe');
         });
         socket.on('upd', function () {
             socket.emit('waitroom');

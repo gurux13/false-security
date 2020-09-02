@@ -36,7 +36,8 @@
                             Атакующая карта:
                         </div>
 
-                        <div :class="{
+                        <div v-if = "attacking_card_damage !== -1"
+                                :class="{
                             small_card: true,
                             small_card_offence: !accident,
                             small_card_accident: accident
@@ -46,16 +47,15 @@
                         </div>
                     </div>
                     <div class="defence">
-                        [[create_defending_set()]]
+<!--                        [[create_defending_set()]]-->
                         <div class="defence_header">Защитные карты:</div>
                         <div class="defence_cards">
-                            <div class=" small_card small_card_defence"></div>
-                            <div class=" small_card small_card_defence"></div>
-                            <div class=" small_card small_card_defence"></div>
-                            <div class=" small_card small_card_defence"></div>
-                            <div class=" small_card small_card_defence"></div>
-                            <div class=" small_card small_card_defence"></div>
-                            <div class=" small_card small_card_defence"></div>
+<!--                            [[defending_set]]-->
+<!--                            <div v-for="card in defending_set"-->
+<!--                                 :class=" small_card small_card_defence">-->
+<!--&lt;!&ndash;                                [[defender]]:<br>[[defensive_cards]]&ndash;&gt;-->
+<!--                            </div>-->
+
                         </div>
                     </div>
                 </div>
@@ -102,6 +102,7 @@
              attacking_card_name: '',
              attacking_card_damage: -1,
              attacking_card_against: [],
+             defending_set: {},
           },
           created() {
             socket.on('log', (data) => {
@@ -174,25 +175,29 @@
               }
 
               console.log('battles', this.current_battles);
-              if(! this.current_battles.findIndex(item => !!item.offender) >= 0){
+              if(! (this.current_battles.findIndex(item => !!item.offender) >= 0)){
                 this.accident = 1;
 
               }
+              //console.log('BATTLES', this.current_battles);
               this.attacking_card = this.current_battles[0].offensive_card;
-              console.log(this.attacking_card, this.cards)
-              this.attacking_card_name = this.cards[this.attacking_card].name;
-              this.attacking_card_damage = this.cards[this.attacking_card].damage;
-              //TODO get names of other cards
-              this.attacking_card_against = this.cards[this.attacking_card].off_against;
-              console.log('Against', this.attacking_card_against);
-
+              //console.log('CARDS',this.attacking_card, this.cards)
+              if (this.cards[this.attacking_card]){
+                this.attacking_card_name = this.cards[this.attacking_card].name;
+                this.attacking_card_damage = this.cards[this.attacking_card].damage;
+                //TODO get names of other cards
+                this.attacking_card_against = this.cards[this.attacking_card].off_against;
+                console.log('Against', this.attacking_card_against);
+              }
 
                for (player of game_data.players) {
                   const { id, name, money, is_online, can_attack } = player;
                   this.players_list.push({
                      id, name, money, is_online, can_attack,
-                     is_selected: false
+                     is_selected: this.current_battles.some(battle => (
+                     !battle.is_complete && battle.defender === id && battle.offender === this.self_player))
                   });
+
                }
 
                console.log(game_data);
@@ -211,12 +216,13 @@
           methods:{
 
             select_user_to_attack(player){
-              if (player.can_attack == true ){
+              if (player.can_attack == false ){
                 alert("Вы не можете атаковать этого игрока. Выберите другого");
                 return;
               }
               if (this.accident){
                 alert("Сейчас играет карта случайности. Выберите карту для защиты");
+                alert(this.accident);
                 return;
               }
               player.is_selected = true;
@@ -225,14 +231,26 @@
             },
 
             create_defending_set(){
-              defending_set = []
+              defending_set = [];
               if (this.accident){
+                console.log(this.current_battles);
                 for (battle of this.current_battles){
-                  defending_set.push({defensive_cards:battle.defensive_cards, defender:battle.defender});
+                  defender = this.players_list.filter(obj => {
+                    return obj.id === battle.defender;
+                  })[0];
+                  if (defender){
+                    name = defender.name;
+                    card_list = battle.defensive_cards;
+                    defending_set.push({'name':name, 'card_list':card_list});
+                  }
+                  //console.log('defender', defender);
                 };
               } else {
+                defending_set.push();
               }
               console.log("DEFDEFDEF", defending_set);
+              this.defending_set = defending_set;
+              return defending_set;
             },
 
             choose_card(index) {
@@ -282,6 +300,7 @@
               socket.emit('play', this.selected_card);
               if (type == 0){
                 socket.emit('done_def');
+                this.attacking_card = -1;
               }
             }
           }

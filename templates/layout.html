@@ -20,7 +20,7 @@
         <div class="container">
             <div class="my-navbar">
                 <div class="col-md-4">
-                   Ложное чувство безопасности
+                   Ложное чувство безопасности (<a href = "instruction">правила</a>)
                 </div>
                 {%- if g.current_player -%}
                     <div class="game-name">Игра <a href="{{ url_for('gameselect.index') + "?key=" + g.current_game.model.uniqueCode }}">{{ g.current_game.model.uniqueCode }}</a></div>
@@ -28,7 +28,6 @@
                     {{ form.csrf_token }}
                     <div  class="col-md-4">
                         Вы вошли как <span class="self-name">{{ g.current_player.model.name }}</span>
-    <!--                    How to get player's name?-->
                             <span>
                                 <button type="submit" value="exit" name="action">Выход</button>
                             </span>
