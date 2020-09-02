@@ -1,4 +1,4 @@
-from flask import Blueprint, redirect, url_for, render_template
+from flask import Blueprint, redirect, url_for, render_template, g
 from flask_socketio import SocketIO, emit, join_room
 from dataclasses import dataclass
 
@@ -55,19 +55,21 @@ def get_state():
 @wrapped_socketio('waitroom', 'waitroom')
 def waitroom():
     result = get_state()
-    join_room(result.game_name)
+    if result.game_name is not None:
+        join_room(result.game_name)
     return result
 
-@wrapped_socketio('start')
+@wrapped_socketio('start', 'start')
 def start_game():
     gm = get_game_manager()
     pm = get_player_manager()
-    game = gm.get_my_game()
+    game = g.game
     if not game.is_waitroom():
         raise UserError("Игра не может быть начата без комнаты ожидания!")
     if not game.can_start(pm.get_my_player()):
         raise HackAttemptError("Попытка начать игру игроком, который не может этого делать!")
-    gm.get_my_game().start()
+    game.start()
+    return True
 
 @Memoize
 def get_game_manager():
