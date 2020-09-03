@@ -4,7 +4,6 @@
     <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/waitroom.css") }}">
 {% endblock %}
 {% block content %}
-    <script src="../static/vue.js"></script>
     <div class="waitroom-container">
         <div class="waitroom-main">
             <div id="app">
@@ -17,13 +16,19 @@
                             [[ player.name ]]
                         </div>
                     </div>
-                    Отправьте ссылку игрокам: <a :href="link">[[link]]</a><br/>
+                    Нажмите, чтобы скопировать ссылку: <gamelink :link="link" :display_link="link"> </gamelink>
+                    <br/>
                     <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
                 </div>
             </div>
         </div>
     </div>
     <script>
+        function copyLinkToClipboard() {
+            copyToClipboard(app.link);
+            snackbar("Скопировано в буфер обмена");
+            return false;
+        };
         const app = new Vue({
             el: '#app',
             data: {
