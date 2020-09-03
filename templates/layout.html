@@ -2,46 +2,60 @@
 <html lang="ru">
 <head>
     <script src="../static/vue.js"></script>
-    <script src="../static/socket.io.js" ></script>
+    <script src="../static/socket.io.js"></script>
     <script src="{{ url_for('static', filename='common.js') }}"></script>
 
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
     {% block extrahead %}{% endblock %}
     <script>
-//        var socket = io();
+        //        var socket = io();
         var socket = io({transports: ['websocket'], upgrade: false});
 
     </script>
     <meta charset="UTF-8">
     <title>{% block title %}Ложное чувство безопасности{% endblock %}</title>
-<!--    <title>Ложное чувство безопасности</title>-->
+    <!--    <title>Ложное чувство безопасности</title>-->
 </head>
 <body>
-    <div id="snackbar"></div>
-    <nav class="navbar navbar-default">
-        <div class="container">
-            <div class="my-navbar">
-                <div class="col-md-4">
-                   Ложное чувство безопасности (<a href = "instruction">правила</a>)
+<div id="snackbar"></div>
+<nav class="navbar navbar-default">
+    <div class="container">
+
+        <div class="my-navbar">
+            <div class="col-md-4">
+                Ложное чувство безопасности (<a href="instruction">правила</a>)
+            </div>
+            {%- if g.current_player -%}
+                <div class="game-name" id="layout-app">Игра
+                    <gamelink :link="link" display_link="{{ g.current_game.model.uniqueCode }}">
                 </div>
-                {%- if g.current_player -%}
-                    <div class="game-name">Игра <a href="{{ url_for('gameselect.index') + "?key=" + g.current_game.model.uniqueCode }}">{{ g.current_game.model.uniqueCode }}</a></div>
                 <form method="post" action="/logout">
                     {{ form.csrf_token }}
-                    <div  class="col-md-4">
+                    <div class="col-md-4">
                         Вы вошли как <span class="self-name">{{ g.current_player.model.name }}</span>
-                            <span>
+                        <span>
                                 <button type="submit" value="exit" name="action">Выход</button>
                             </span>
                     </div>
                 </form>
-                {%- endif %}
-            </div>
+                <script>
+                    const layout_app = new Vue({
+                        el: '#layout-app',
+                        data: {
+                            link: "{{ url_for('gameselect.index') + "?k=" + g.current_game.model.uniqueCode }}"
+                        },
+                        delimiters: ['[[', ']]'],
+                        methods: {}
+                    });
+                </script>
+            {%- endif %}
         </div>
-    </nav>
-    <div class="content">
-{% block content %}{% endblock %}
     </div>
+</nav>
+
+<div class="content">
+    {% block content %}{% endblock %}
+</div>
 <div class="footer footer-height">
     Разработано в 2020. Nuff said.
 </div>

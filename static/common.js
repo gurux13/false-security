@@ -31,7 +31,8 @@ Vue.component('gamelink', {
     `,
         methods: {
             copyLink: function () {
-                copyToClipboard(this.link);
+                const full_link = window.location.href.replace(/\/[^\/]*$/, '').toString() + this.link;
+                copyToClipboard(full_link);
                 snackbar("Ссылка скопирована");
             }
         },

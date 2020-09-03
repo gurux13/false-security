@@ -16,7 +16,7 @@
                             [[ player.name ]]
                         </div>
                     </div>
-                    Нажмите, чтобы скопировать ссылку: <gamelink :link="link" :display_link="link"> </gamelink>
+                    Нажмите <gamelink :link="link" display_link="здесь"></gamelink>, чтобы скопировать ссылку на игру, и отправьте её другим игрокам.
                     <br/>
                     <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
                 </div>
@@ -57,7 +57,7 @@
                     app.players = data.value.players;//.map((p) => ({name: p, is_admin: p == data.value.admin_player}));
                     app.show_start = data.value.can_start;
                     app.admin_player = data.value.admin_player;
-                    app.link = (window.location.href.replace(/\/[^\/]*$/, '') + data.value.game_link).toString();
+                    app.link = data.value.game_link;
                     app.ready = true;
                 }
             }
