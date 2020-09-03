@@ -56,6 +56,8 @@
   border-radius: 20px;
   font-size: 1em;
   border: 5px solid transparent;
+  hyphens: auto;
+
 }
 
 .card_defence{
