@@ -77,15 +77,17 @@ def on_join(form):
 
 
 def on_exit(form):
-    player = get_player_manager()
-    player.delete_player(player.get_my_player())
+    pm = get_player_manager()
+    player = pm.get_my_player()
+    if player is None:
+        return redirect('/')
 
-    game = get_game_manager()
-    game.get_my_game().notify()
-    participants = game.get_my_game().get_players(False)
-    if len(participants) == 0:
-        game.delete_game(game.get_my_game())
+    pm.delete_player(player)
 
+    game = get_game_manager().get_my_game()
+    game.notify()
+    if not any(game.get_players(False)):
+        get_game_manager().delete_game(game)
     return redirect('/')
 
 
