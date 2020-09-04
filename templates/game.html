@@ -43,7 +43,11 @@
                             small_card_accident: accident
                         }">
                         [[attacking_card_name]]<br>
-                        Урон: [[attacking_card_damage]]
+                        Урон: [[attacking_card_damage]]<br>
+                        Вас могут защитить:
+                            <div class="against" v-for="elem in attacking_card_against">
+                                [[elem.name]] +[[elem.value]]<br>
+                            </div>
                         </div>
                     </div>
                     <div class="defence">
@@ -127,6 +131,7 @@
                    damage,
                 };
               }
+
               //console.log('cards are ready', this.cards);
             });
 
@@ -188,13 +193,18 @@
                 }
               }
 
+                //GET ATTACKING CARD INFO
               if(this.battles_in_progress[0]){
                 this.attacking_card = this.battles_in_progress[0].offensive_card;
                 if (this.cards[this.attacking_card]){
                   this.attacking_card_name = this.cards[this.attacking_card].name;
                   this.attacking_card_damage = this.cards[this.attacking_card].damage;
-                  //TODO get names of other cards
-                  this.attacking_card_against = this.cards[this.attacking_card].off_against;
+                  for (card in this.cards[this.attacking_card].off_against){
+                     card_info = this.cards[this.attacking_card].off_against[card];
+                     this.attacking_card_against.push(
+                       {'name':this.cards[card_info.other_card].name, 'value':card_info.value}
+                     );
+                  }
                 } else{
                   this.attacking_card = -1;
                 }
