@@ -17,8 +17,9 @@ class BattleLogic:
     def get_defensive_cards(self):
         if self.model.defensiveCards is None:
             return []
-        return [CardLogic(self.db, card) for card in [self.db.session.query(Card).filter_by(id=cardId).first() for cardId in
-                                                      json.loads(self.model.defensiveCards)]]
+        return [CardLogic(self.db, card) for card in
+                [self.db.session.query(Card).filter_by(id=cardId).first() for cardId in
+                 json.loads(self.model.defensiveCards)]]
 
     def add_defensive_card(self, card: CardLogic):
         lst = []
@@ -47,4 +48,5 @@ class BattleLogic:
             defensive_cards=None if self.model.defensiveCards is None else json.loads(self.model.defensiveCards),
             damage_remains=self.get_curdamage(),
             is_complete=self.model.isComplete,
+            creation_order=self.model.creationOrder,
         )

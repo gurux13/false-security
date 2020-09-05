@@ -19,3 +19,5 @@ class RoundBattle(db.Model):
 
     defensiveCards = db.Column(db.Text, nullable=True)
     isComplete = db.Column(db.Boolean, default=False)
+
+    creationOrder = db.Column(db.Integer, nullable=False)

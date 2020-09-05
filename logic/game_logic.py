@@ -135,10 +135,14 @@ class GameLogic:
 
     def start_battle(self, offendingPlayer: PlayerLogic):
         self.assert_running()
+        new_battle_no = 0
+        if any(self.cur_round.battles):
+            new_battle_no = max(map(lambda x: x.creationOrder, self.cur_round.battles)) + 1
         new_battle = RoundBattle(
             round=self.cur_round,
             offendingPlayer=None if offendingPlayer is None else offendingPlayer.model,
             isComplete=False,
+            creationOrder=new_battle_no
         )
         self.db.session.add(new_battle)
         self.set_dirty()

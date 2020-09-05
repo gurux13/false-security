@@ -50,6 +50,7 @@ class UiBattle:
     defensive_cards: List[int]
     damage_remains: int
     is_complete: bool
+    creation_order: int
 
 # Game references other objects directly, and other objects reference each other by IDs
 @dataclass

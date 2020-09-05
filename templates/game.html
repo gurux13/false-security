@@ -25,7 +25,6 @@
                             <span class="budget">[[player.money]]</span> <span class="falsic"></span>
                         </div>
                     </div>
-
                 </div>
 
 
@@ -43,11 +42,7 @@
                         <!--                        [[create_defending_set()]]-->
                         <div class="defence_cards">
                             <!--                            [[defending_set]]-->
-                            <div v-for="card in defending_set"
-                                 class=" small_card small_card_defence">
-                                [[card.name]]:<br>[[card.card_list]]
-                            </div>
-
+                            <card v-for="card in defending_set" :cards="cards" type="def" cls="small_card" :card_id="card"></card>
                         </div>
                     </div>
                 </div>
@@ -109,8 +104,6 @@
                     for (i of cards) {
                         this.cards[i.id] = i;
                     }
-
-                    //console.log('cards are ready', this.cards);
                 });
 
                 socket.on('upd', function () {
@@ -150,15 +143,7 @@
                             is_selected: false,
                         });
                     }
-
-                    for (i in game_data.current_battles) {
-                        this.current_battles.push({
-                            offender: game_data.current_battles[i].offender,
-                            defender: game_data.current_battles[i].defender,
-                            offensive_card: game_data.current_battles[i].offensive_card,
-                            is_complete: game_data.current_battles[i].is_complete,
-                        });
-                    }
+                    this.current_battles = game_data.current_battles;
 
                     //console.log('battles', this.current_battles);
                     if (!(this.current_battles.findIndex(item => !!item.offender) >= 0)) {
@@ -173,11 +158,11 @@
                     }
 
                     //GET ATTACKING CARD INFO
-                    if (this.battles_in_progress[0]) {
-                        this.attacking_card_id = this.battles_in_progress[0].offensive_card;
-                    } else {
-                        this.attacking_card_id = -1;
+                    my_battle = this.get_my_latest_battle_with_cards();
+                    if (my_battle) {
+                        this.attacking_card_id = my_battle.offensive_card;
                     }
+
 
                     for (player of game_data.players) {
                         const {id, name, money, is_online, can_attack} = player;
@@ -217,7 +202,7 @@
                 },
 
                 get_battles_in_progress() {
-                    battles_in_progress = [];
+                    let battles_in_progress = [];
                     for (battle of this.current_battles) {
                         if (battle.is_complete === false) {
                             battles_in_progress.push(battle);
@@ -225,6 +210,17 @@
                     }
                     console.log('in progpress from get battles', battles_in_progress);
                     return battles_in_progress;
+                },
+                get_my_latest_battle_with_cards() {
+                    let my_battle = undefined;
+                    for (battle of this.current_battles) {
+                        if (battle.defender === this.self_player || battle.offender == this.self_player && battle.offensive_card) {
+                            if (my_battle == undefined || my_battle.creation_order < battle.creation_order) {
+                                my_battle = battle;
+                            }
+                        }
+                    }
+                    return my_battle;
                 },
 
                 select_user_to_attack(player) {
@@ -245,29 +241,13 @@
                 create_defending_set() {
                     battles_in_progress = this.get_battles_in_progress();
                     defending_set = [];
-                    if (this.accident) {
-                        //console.log(this.current_battles);
-                        console.log("IN PROGRESS", battles_in_progress);
-                        for (battle of battles_in_progress) {
-                            console.log('BATTLE', battle);
-                            if (battle.defensive_cards) {
-                                if (battle.defensive_cards.length > 0) {
-                                    defender = this.players_list.filter(obj => {
-                                        return obj.id === battle.defender;
-                                    })[0];
-                                    if (defender) {
-                                        name = defender.name;
-                                        card_list = battle.defensive_cards;
-                                        defending_set.push({'name': name, 'card_list': card_list});
-                                    }
-                                }
-                            }
-                        }
-                        ;
-                    } else {
-                        //defending_set.push();
+                    const battle = this.get_my_latest_battle_with_cards();
+                                            console.log("BATTLE", battle);
+
+                    if (battle && battle.defensive_cards) {
+                        defending_set.push(battle.defensive_cards);
                     }
-                    //console.log("DEFDEFDEF", defending_set);
+                    console.log("DEF SET", defending_set);
                     this.defending_set = defending_set;
                     return defending_set;
                 },
