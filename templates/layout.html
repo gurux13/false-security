@@ -27,7 +27,8 @@
             </div>
             {%- if g.current_player -%}
                 <div class="game-name" id="layout-app">Игра
-                    <gamelink :link="link" display_link="{{ g.current_game.model.uniqueCode }}">
+                    <gamelink :link="link" display_link="{{ g.current_game.model.uniqueCode }}"></gamelink>
+                    Раунд <span id="round-no">0</span>
                 </div>
                 <form method="post" action="/logout">
                     {{ form.csrf_token }}

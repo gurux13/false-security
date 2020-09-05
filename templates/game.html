@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {{ super() }}
 {% block extrahead %}
-<link rel="stylesheet" href="{{ url_for("static", filename="mod_game/game.css") }}">
+    <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/game.css") }}">
 {% endblock %}
 {% block content %}
     <script src="../static/vue.js"></script>
@@ -11,50 +11,49 @@
     <div id="app">
         <div v-if="!is_game_loaded">Loading...</div>
         <div class="window" v-else>
-            <div class="head">
-                <div v-for="player in players_list" :key="player.id" class="players">
-                    <div :class="{
+            <div class="window-row">
+                <div class="window-cell">
+                    <div class="players">
+                        <div class="table-icon blue smaller">🧍</div>
+                        <div v-for="player in players_list" :key="player.id" :class="{
                         player: true,
                         is_offline: !player.is_online,
                         is_selected: player.is_selected,
-                    }"@click="select_user_to_attack(player)">
-                        Игрок: [[player.name]]<br>
-                        Бюджет: [[player.money]]
-                    </div>
-                </div>
-                <div class="status">
-                    Игра: [[game_name]]<br>
-                    Номер раунда: [[round_no]]<br>
-<!--                    Карт в колоде: [[deck_count]]<br>-->
-                </div>
-            </div>
-
-            <div class="center">
-                <div class="table">
-                    <div class="attack">
-                        <div class="attack_header">
-                            Атакующая карта:
+                        can_attack: player.can_attack,
+                    }" @click="select_user_to_attack(player)">
+                            <span class="player-name">[[player.name]]</span><br>
+                            <span class="budget">[[player.money]]</span> <span class="falsic"></span>
                         </div>
+                    </div>
 
-                        <div v-if = "attacking_card !== -1"
-                                :class="{
+                </div>
+
+
+                <div class="table window-cell">
+
+                    <div class="attack">
+                        <div class="table-icon darkred">⚔</div>
+                        <div v-if="attacking_card !== -1"
+                             :class="{
                             small_card: true,
                             small_card_offence: !accident,
                             small_card_accident: accident
                         }">
-                        [[attacking_card_name]]<br>
-                        Урон: [[attacking_card_damage]]<br>
-                        Вас могут защитить:
+                            <p>
+                                <b>[[attacking_card_name]]</b>
+                                [[attacking_card_damage]]&nbsp;<span class="falsic"></span></p>
                             <div class="against" v-for="elem in attacking_card_against">
-                                [[elem.name]] +[[elem.value]]<br>
+                                [[elem.name]] -[[elem.value]]<br/>
                             </div>
                         </div>
+
                     </div>
+                    <!--<div class="separator"></div>-->
                     <div class="defence">
-<!--                        [[create_defending_set()]]-->
-                        <div class="defence_header">Защитные карты:</div>
+                        <div class="table-icon darkgreen">⛨</div>
+                        <!--                        [[create_defending_set()]]-->
                         <div class="defence_cards">
-<!--                            [[defending_set]]-->
+                            <!--                            [[defending_set]]-->
                             <div v-for="card in defending_set"
                                  class=" small_card small_card_defence">
                                 [[card.name]]:<br>[[card.card_list]]
@@ -64,296 +63,295 @@
                     </div>
                 </div>
 
-                <div class="log">
+                <div class="log window-cell">
                     <div class="log_header">События в игре:</div>
                     <div class="log_body">
-<!--                        [[get_battle_list()]]-->
+                        <!--                        [[get_battle_list()]]-->
                     </div>
                 </div>
             </div>
-
-            <div  class="hand">
-                <div v-for="card in hand"
-                     :key="card.index"
-                     :class="{
+            <div class="window-row">
+                <div class="hand">
+                    <div v-for="card in hand"
+                         :key="card.index"
+                         :class="{
                         card: true,
                         card_offence: card.type,
                         card_defence: !card.type,
                         card_gray: !card.can_play,
                         card_selected: card.is_selected
                      }" @click="choose_card(card.index)">
-                    [[card.name]][[card]]
+                        [[card.name]][[card]]
+                    </div>
+                    <button @click="send_selected_card">Отправить</button>
                 </div>
-            <button @click="send_selected_card">Отправить</button>
             </div>
         </div>
     </div>
     <script>
         new Vue({
-          el: '#app',
-          delimiters: ['[[', ']]'],
-          data: {
-             selected_card: -1,
-             is_game_loaded: false,
-             game_name: '',
-             round_no: 0,
-             hand: [],
-             players_list: [],
-             selected_player: -1,
-             cards: [],
-             current_battles: [],
-             attacking_card: -1,
-             attacking_card_name: '',
-             attacking_card_damage: -1,
-             attacking_card_against: [],
-             defending_set: [],
-          },
-          created() {
-            socket.on('log', (data) => {
-               console.log(data);
-            });
-
-            socket.on('cards', (data) => {
-              const cards = data.value;
-              this.cards = {};
-
-              socket.emit('state');
-              socket.emit('subscribe');
-
-              for (i in cards) {
-                const { id, name, text, type, def_against, off_against, damage } = cards[i];
-                this.cards[id] = {
-                   name,
-                   text,
-                   type,
-                   def_against,
-                   off_against,
-                   damage,
-                };
-              }
-
-              //console.log('cards are ready', this.cards);
-            });
-
-            socket.on('upd', function () {
-                socket.emit('state');
-            });
-
-            socket.on('play', (data) => {
-               if (!data.ok){
-                   alert(data.message);
-               }
-
-            });
-
-            socket.on('state', (data) => {
-              const game_data = data.value.game;
-              this.game_name = game_data.game_name;
-              this.round_no = game_data.round_no;
-              this.selected_card = [];
-              this.players_list = [];
-              this.hand = [];
-              this.self_player = game_data.self_player;
-              this.current_battles = [];
-              this.accident = 0;
-              this.attacking_card = -1;
-              this.battles_in_progress = []
-
-              for (i in game_data.hand) {
-                const { id, can_play, name, text, type } = game_data.hand[i];
-                this.hand.push({
-                   index: i,
-                   id,
-                   can_play,
-                   name,
-                   text,
-                   type,
-                   is_selected: false,
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data: {
+                selected_card: -1,
+                is_game_loaded: false,
+                game_name: '',
+                round_no: 0,
+                hand: [],
+                players_list: [],
+                selected_player: -1,
+                cards: [],
+                current_battles: [],
+                attacking_card: -1,
+                attacking_card_name: '',
+                attacking_card_damage: -1,
+                attacking_card_against: [],
+                defending_set: [],
+            },
+            created() {
+                socket.on('log', (data) => {
+                    console.log(data);
                 });
-              }
 
-              for (i in game_data.current_battles){
-                this.current_battles.push({
-                  offender: game_data.current_battles[i].offender,
-                  defender: game_data.current_battles[i].defender,
-                  offensive_card : game_data.current_battles[i].offensive_card,
-                  is_complete: game_data.current_battles[i].is_complete,
-                });
-              }
+                socket.on('cards', (data) => {
+                    const cards = data.value;
+                    this.cards = {};
 
-              //console.log('battles', this.current_battles);
-              if(! (this.current_battles.findIndex(item => !!item.offender) >= 0)){
-                this.accident = 1;
+                    socket.emit('state');
+                    socket.emit('subscribe');
 
-              }
-
-              for (battle of this.current_battles){
-                if (battle.is_complete === false){
-                  this.battles_in_progress.push(battle);
-                }
-              }
-
-                //GET ATTACKING CARD INFO
-              if(this.battles_in_progress[0]){
-                this.attacking_card = this.battles_in_progress[0].offensive_card;
-                if (this.cards[this.attacking_card]){
-                  this.attacking_card_name = this.cards[this.attacking_card].name;
-                  this.attacking_card_damage = this.cards[this.attacking_card].damage;
-                  for (card in this.cards[this.attacking_card].off_against){
-                     card_info = this.cards[this.attacking_card].off_against[card];
-                     this.attacking_card_against.push(
-                       {'name':this.cards[card_info.other_card].name, 'value':card_info.value}
-                     );
-                  }
-                } else{
-                  this.attacking_card = -1;
-                }
-              }
-
-               for (player of game_data.players) {
-                  const { id, name, money, is_online, can_attack } = player;
-                  this.players_list.push({
-                     id, name, money, is_online, can_attack,
-                     is_selected: this.current_battles.some(battle => (
-                     !battle.is_complete && battle.defender === id && battle.offender === this.self_player))
-                  });
-
-               }
-               this.create_defending_set();
-               console.log(game_data);
-               this.is_game_loaded = true;
-            });
-
-            socket.on('connect', function() {
-               // socket.emit('state');
-            });
-
-            socket.emit('cards');
-
-
-
-          },
-          methods:{
-            get_card_supplement(card){
-              card_description = {}
-              if (card.type === 0){
-                //defence
-
-              } else if (card.type === 1){
-                //offence
-
-              } else{
-                //accident
-
-              }
-            },
-
-            get_battles_in_progress(){
-              battles_in_progress = [];
-              for (battle of this.current_battles){
-                if (battle.is_complete === false){
-                  battles_in_progress.push(battle);
-                }
-              }
-              console.log('in progpress from get battles', battles_in_progress);
-              return battles_in_progress;
-            },
-
-            select_user_to_attack(player){
-              if (player.can_attack == false ){
-                alert("Вы не можете атаковать этого игрока. Выберите другого");
-                return;
-              }
-              if (this.accident){
-                alert("Сейчас играет карта случайности. Выберите карту для защиты");
-                alert(this.accident);
-                return;
-              }
-              player.is_selected = true;
-              //console.log(player);
-              socket.emit('attack', player.id);
-            },
-
-            create_defending_set(){
-              battles_in_progress = this.get_battles_in_progress();
-              defending_set = [];
-              if (this.accident){
-                //console.log(this.current_battles);
-                console.log("IN PROGRESS", battles_in_progress);
-                for (battle of battles_in_progress){
-                  console.log('BATTLE', battle);
-                  if (battle.defensive_cards){
-                    if (battle.defensive_cards.length > 0){
-                      defender = this.players_list.filter(obj => {
-                        return obj.id === battle.defender;
-                      })[0];
-                      if (defender  ){
-                        name = defender.name;
-                        card_list = battle.defensive_cards;
-                        defending_set.push({'name':name, 'card_list':card_list});
-                      }
+                    for (i in cards) {
+                        const {id, name, text, type, def_against, off_against, damage} = cards[i];
+                        this.cards[id] = {
+                            name,
+                            text,
+                            type,
+                            def_against,
+                            off_against,
+                            damage,
+                        };
                     }
-                  }
-                };
-              } else {
-                //defending_set.push();
-              }
-              //console.log("DEFDEFDEF", defending_set);
-              this.defending_set = defending_set;
-              return defending_set;
+
+                    //console.log('cards are ready', this.cards);
+                });
+
+                socket.on('upd', function () {
+                    socket.emit('state');
+                });
+
+                socket.on('play', (data) => {
+                    if (!data.ok) {
+                        alert(data.message);
+                    }
+
+                });
+
+                socket.on('state', (data) => {
+                    const game_data = data.value.game;
+                    this.game_name = game_data.game_name;
+                    this.round_no = game_data.round_no;
+                    document.getElementById('round-no').innerText = game_data.round_no;
+                    this.selected_card = [];
+                    this.players_list = [];
+                    this.hand = [];
+                    this.self_player = game_data.self_player;
+                    this.current_battles = [];
+                    this.accident = 0;
+                    this.attacking_card = -1;
+                    this.battles_in_progress = []
+
+                    for (i in game_data.hand) {
+                        const {id, can_play, name, text, type} = game_data.hand[i];
+                        this.hand.push({
+                            index: i,
+                            id,
+                            can_play,
+                            name,
+                            text,
+                            type,
+                            is_selected: false,
+                        });
+                    }
+
+                    for (i in game_data.current_battles) {
+                        this.current_battles.push({
+                            offender: game_data.current_battles[i].offender,
+                            defender: game_data.current_battles[i].defender,
+                            offensive_card: game_data.current_battles[i].offensive_card,
+                            is_complete: game_data.current_battles[i].is_complete,
+                        });
+                    }
+
+                    //console.log('battles', this.current_battles);
+                    if (!(this.current_battles.findIndex(item => !!item.offender) >= 0)) {
+                        this.accident = 1;
+
+                    }
+
+                    for (battle of this.current_battles) {
+                        if (battle.is_complete === false) {
+                            this.battles_in_progress.push(battle);
+                        }
+                    }
+
+                    //GET ATTACKING CARD INFO
+                    if (this.battles_in_progress[0]) {
+                        this.attacking_card = this.battles_in_progress[0].offensive_card;
+                        if (this.cards[this.attacking_card]) {
+                            this.attacking_card_name = this.cards[this.attacking_card].name;
+                            this.attacking_card_damage = this.cards[this.attacking_card].damage;
+                            for (card in this.cards[this.attacking_card].off_against) {
+                                card_info = this.cards[this.attacking_card].off_against[card];
+                                this.attacking_card_against.push(
+                                    {'name': this.cards[card_info.other_card].name, 'value': card_info.value}
+                                );
+                            }
+                        } else {
+                            this.attacking_card = -1;
+                        }
+                    }
+
+                    for (player of game_data.players) {
+                        const {id, name, money, is_online, can_attack} = player;
+                        this.players_list.push({
+                            id, name, money, is_online, can_attack,
+                            is_selected: this.current_battles.some(battle => (
+                                !battle.is_complete && battle.defender === id && battle.offender === this.self_player))
+                        });
+
+                    }
+                    this.create_defending_set();
+                    console.log(game_data);
+                    this.is_game_loaded = true;
+                });
+
+                socket.on('connect', function () {
+                    // socket.emit('state');
+                });
+
+                socket.emit('cards');
+
+
             },
+            methods: {
+                get_card_supplement(card) {
+                    card_description = {}
+                    if (card.type === 0) {
+                        //defence
 
-            choose_card(index) {
-              if (!this.hand[index].can_play) {
-                alert('You can not choose this card');
-                return;
-              }
-              if (this.current_battles[this.current_battles.length - 1].offender == this.self_player){
-                type = 1;
-              } else{
-                type = 0;
-              }
+                    } else if (card.type === 1) {
+                        //offence
 
-              if (type == 1 ){
-                this.hand.forEach(card => card.is_selected = false);
-                this.selected_card = [parseInt(this.hand[index].id)];
-                this.hand[index].is_selected = true;
-              }
-              else if (this.selected_card.some(i => index == i )){
-                this.hand[index].is_selected = false;
-                this.$delete(this.selected_card, this.selected_card.indexOf(index));
-              }
-              else{
-                this.hand[index].is_selected = true;
-                this.selected_card.push(parseInt(this.hand[index].id));
-              }
-            },
+                    } else {
+                        //accident
 
-            send_selected_card () {
-            //if we play attack, we must choose a card
-              if (this.current_battles[this.current_battles.length - 1].offender == this.self_player){
-                type = 1;
-              } else{
-                type = 0;
-              }
+                    }
+                },
 
-            // if attack, gamer has to choose card
-              if (this.selected_card.length == 0 && type == 1) {
-                alert('You must choose card');
-                return;
-              }
-              else if (this.selected_card.length == 0 && type == 0){
-                if (!confirm('Вы хотите осуществить пустой ход? Это приведет к потере фолзиков')) {
-                  return
+                get_battles_in_progress() {
+                    battles_in_progress = [];
+                    for (battle of this.current_battles) {
+                        if (battle.is_complete === false) {
+                            battles_in_progress.push(battle);
+                        }
+                    }
+                    console.log('in progpress from get battles', battles_in_progress);
+                    return battles_in_progress;
+                },
+
+                select_user_to_attack(player) {
+                    if (player.can_attack == false) {
+                        alert("Вы не можете атаковать этого игрока. Выберите другого");
+                        return;
+                    }
+                    if (this.accident) {
+                        alert("Сейчас играет карта случайности. Выберите карту для защиты");
+                        alert(this.accident);
+                        return;
+                    }
+                    player.is_selected = true;
+                    //console.log(player);
+                    socket.emit('attack', player.id);
+                },
+
+                create_defending_set() {
+                    battles_in_progress = this.get_battles_in_progress();
+                    defending_set = [];
+                    if (this.accident) {
+                        //console.log(this.current_battles);
+                        console.log("IN PROGRESS", battles_in_progress);
+                        for (battle of battles_in_progress) {
+                            console.log('BATTLE', battle);
+                            if (battle.defensive_cards) {
+                                if (battle.defensive_cards.length > 0) {
+                                    defender = this.players_list.filter(obj => {
+                                        return obj.id === battle.defender;
+                                    })[0];
+                                    if (defender) {
+                                        name = defender.name;
+                                        card_list = battle.defensive_cards;
+                                        defending_set.push({'name': name, 'card_list': card_list});
+                                    }
+                                }
+                            }
+                        }
+                        ;
+                    } else {
+                        //defending_set.push();
+                    }
+                    //console.log("DEFDEFDEF", defending_set);
+                    this.defending_set = defending_set;
+                    return defending_set;
+                },
+
+                choose_card(index) {
+                    if (!this.hand[index].can_play) {
+                        alert('You can not choose this card');
+                        return;
+                    }
+                    if (this.current_battles[this.current_battles.length - 1].offender == this.self_player) {
+                        type = 1;
+                    } else {
+                        type = 0;
+                    }
+
+                    if (type == 1) {
+                        this.hand.forEach(card => card.is_selected = false);
+                        this.selected_card = [parseInt(this.hand[index].id)];
+                        this.hand[index].is_selected = true;
+                    } else if (this.selected_card.some(i => index == i)) {
+                        this.hand[index].is_selected = false;
+                        this.$delete(this.selected_card, this.selected_card.indexOf(index));
+                    } else {
+                        this.hand[index].is_selected = true;
+                        this.selected_card.push(parseInt(this.hand[index].id));
+                    }
+                },
+
+                send_selected_card() {
+                    //if we play attack, we must choose a card
+                    if (this.current_battles[this.current_battles.length - 1].offender == this.self_player) {
+                        type = 1;
+                    } else {
+                        type = 0;
+                    }
+
+                    // if attack, gamer has to choose card
+                    if (this.selected_card.length == 0 && type == 1) {
+                        alert('You must choose card');
+                        return;
+                    } else if (this.selected_card.length == 0 && type == 0) {
+                        if (!confirm('Вы хотите осуществить пустой ход? Это приведет к потере фолзиков')) {
+                            return
+                        }
+                    }
+                    socket.emit('play', this.selected_card);
+                    if (type == 0) {
+                        socket.emit('done_def');
+                        this.attacking_card = -1;
+                    }
                 }
-              }
-              socket.emit('play', this.selected_card);
-              if (type == 0){
-                socket.emit('done_def');
-                this.attacking_card = -1;
-              }
             }
-          }
         })
     </script>
 {% endblock %}

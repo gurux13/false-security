@@ -1,11 +1,16 @@
 .window{
-  display: flex;
   justify-content: space-around;
-  flex-direction: column;
-  align-items: flex-start;
-  height: 100vh;
-}
 
+  text-align: justify;
+}
+.window-row {
+  display:flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+.is_offline .player-name:after {
+  content: " ☒";
+}
 .head {
   display: flex;
   flex-direction: row;
@@ -13,24 +18,50 @@
   align-items: flex-start;
   width: 100%
 }
-
+.budget {
+  font-family: monospace;
+  font-size: 1.2em;
+}
 .players{
-  display: flex;
+  /*display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: flex-start;*/
+  padding-top: 10px;
+  min-width: 90px;
 }
 
+.blue {
+  color:blue;
+}
+
+.darkred {
+  color: darkred;
+}
+.darkgreen {
+  color: darkgreen;
+}
+.players .table-icon {
+  margin-bottom: 9px;
+}
 .player {
   border: solid 1px;
+  border-radius: 4px;
+  padding: 6px;
+  margin-bottom: 4px;
 }
 
 .player.is_selected{
+  background-color: #86dcFF;
   border-color: blue;
 }
 
 .player.is_offline {
   border-color: red;
+  background-color: #ffAAAA;
+}
+.player.can_attack {
+  cursor: url("/static/cursors/sword.cur"), default;
 }
 
 .head .status{
@@ -39,10 +70,8 @@
 
 .hand{
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: flex-end;
   width: 100%;
+  justify-content: space-around;
 }
 
 .card{
@@ -84,16 +113,16 @@
 }
 
 .center{
-  display: flex;
-  flex-direction: row;
-  width: 100%;
+
+}
+
+.window-cell {
+  padding: 10px;
 }
 
 .table{
-  display: flex;
-  flex-grow: 1;
-  flex-direction: row;
-  justify-content: space-around;
+  width: 70%;
+
 }
 
 .against{
@@ -101,38 +130,42 @@
   flex-direction: column;
 }
 
-.attack{
+.table {
   display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  height: 200px;
 }
 
-.attack_header{
-  height: 20px;
+.attack{
+  justify-content: space-between;
+
+
+}
+.table-icon {
+  font-size:3em;
   text-align: center;
-  background-color: #cccccc;
+
+  bottom: 0%;
+  width: 100%;
+}
+.smaller {
+  font-size: 2.2em !important;
 }
 
 .defence{
-  display: flex;
-  flex-direction: column;
   justify-content: space-between;
-  height: 400px;
+  flex: 1;
 }
-
-.defence_header{
-  height: 20px;
-  text-align: center;
-  background-color: #cccccc;
+.separator {
+  border-left: 1px solid black;
+  width: 2px;
+  margin: 10px;
+  height: 100%;
 }
 
 .defence_cards{
   display: flex;
   flex-flow: row wrap;
   justify-content: space-around;
-  width: 650px;
-  height: 360px;
+
 }
 
 .small_card{
@@ -165,9 +198,6 @@
 
 
 .log{
-  display: flex;
-  flex-direction: column;
-  align-self: flex-start;
   width: 250px;
   height: 300px;
   text-align: center;
