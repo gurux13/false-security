@@ -33,19 +33,8 @@
 
                     <div class="attack">
                         <div class="table-icon darkred">⚔</div>
-                        <div v-if="attacking_card !== -1"
-                             :class="{
-                            small_card: true,
-                            small_card_offence: !accident,
-                            small_card_accident: accident
-                        }">
-                            <p>
-                                <b>[[attacking_card_name]]</b>
-                                [[attacking_card_damage]]&nbsp;<span class="falsic"></span></p>
-                            <div class="against" v-for="elem in attacking_card_against">
-                                [[elem.name]] -[[elem.value]]<br/>
-                            </div>
-                        </div>
+                        <card v-if="attacking_card_id" :card_id="attacking_card_id" :cards="cards" :type="accident ? 'acc' : 'off'"
+                             cls="small_card"></card>
 
                     </div>
                     <!--<div class="separator"></div>-->
@@ -102,10 +91,7 @@
                 selected_player: -1,
                 cards: [],
                 current_battles: [],
-                attacking_card: -1,
-                attacking_card_name: '',
-                attacking_card_damage: -1,
-                attacking_card_against: [],
+                attacking_card: undefined,
                 defending_set: [],
             },
             created() {
@@ -120,16 +106,8 @@
                     socket.emit('state');
                     socket.emit('subscribe');
 
-                    for (i in cards) {
-                        const {id, name, text, type, def_against, off_against, damage} = cards[i];
-                        this.cards[id] = {
-                            name,
-                            text,
-                            type,
-                            def_against,
-                            off_against,
-                            damage,
-                        };
+                    for (i of cards) {
+                        this.cards[i.id] = i;
                     }
 
                     //console.log('cards are ready', this.cards);
@@ -157,7 +135,7 @@
                     this.self_player = game_data.self_player;
                     this.current_battles = [];
                     this.accident = 0;
-                    this.attacking_card = -1;
+                    this.attacking_card_id = -1;
                     this.battles_in_progress = []
 
                     for (i in game_data.hand) {
@@ -196,19 +174,9 @@
 
                     //GET ATTACKING CARD INFO
                     if (this.battles_in_progress[0]) {
-                        this.attacking_card = this.battles_in_progress[0].offensive_card;
-                        if (this.cards[this.attacking_card]) {
-                            this.attacking_card_name = this.cards[this.attacking_card].name;
-                            this.attacking_card_damage = this.cards[this.attacking_card].damage;
-                            for (card in this.cards[this.attacking_card].off_against) {
-                                card_info = this.cards[this.attacking_card].off_against[card];
-                                this.attacking_card_against.push(
-                                    {'name': this.cards[card_info.other_card].name, 'value': card_info.value}
-                                );
-                            }
-                        } else {
-                            this.attacking_card = -1;
-                        }
+                        this.attacking_card_id = this.battles_in_progress[0].offensive_card;
+                    } else {
+                        this.attacking_card_id = -1;
                     }
 
                     for (player of game_data.players) {
