@@ -203,6 +203,7 @@
   text-align: center;
   border-radius: 5px;
   border: 2px solid black;
+  flex-flow: row wrap;
 }
 
 .log_header{
@@ -212,6 +213,25 @@
 }
 
 .log_body{
-  overflow-y: scroll;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow-y: auto;
+  text-align: flex-start;
+}
+
+.log_record{
+  text-align: left;
+}
+
+.green_text{
+  color: green;
+}
+
+.red_text{
+  color:red;
+}
+
+.blue_text{
+  color:blue;
 }
