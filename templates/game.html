@@ -66,7 +66,32 @@
                 <div class="log window-cell">
                     <div class="log_header">События в игре:</div>
                     <div class="log_body">
-                        <!--                        [[get_battle_list()]]-->
+                        <div class="log_record" v-for="record in smooth_log">
+                            <div v-if="record.accident">
+                                <div v-if="record.defensive_cards">
+                                    Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
+                                    случайности <span class="blue_text">[[record.offensive_card]]</span>
+                                    картами <span class="green_text">[[record.defensive_cards]]</span>
+                                </div>
+                                <div v-else>
+                                    Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
+                                    карты случайности <span class="blue_text">[[record.offensive_card]]</span>
+                                </div>
+                            </div>
+                            <div v-else>
+                                <div v-if="record.defensive_cards">
+                                    Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
+                                    <span class="red_text">[[record.offensive_card]]</span> игрока
+                                    <span class="red_text">[[record.offender]]</span>
+                                    картами <span class="green_text">[[record.defensive_cards]]</span>
+                                </div>
+                                <div>
+                                    Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
+                                    карты <span class="red_text">[[record.offensive_card]]</span> игрока
+                                    <span class="red_text">[[record.offender]]</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -107,10 +132,26 @@
                 attacking_card_damage: -1,
                 attacking_card_against: [],
                 defending_set: [],
+                smooth_log: [],
             },
             created() {
                 socket.on('log', (data) => {
-                    console.log(data);
+                    const log = data.value;
+                    this.smooth_log = [];
+                    for (round in log){
+                        for (battle in log[round].battles){
+                            offender = this.get_username_by_id(log[round].battles[battle].offender);
+                            accident = (typeof offender === 'undefined') ? true : false;
+
+                            this.smooth_log.push({
+                                'defender': this.get_username_by_id(log[round].battles[battle].defender),
+                                'offender': offender,
+                                'defensive_cards': log[round].battles[battle].defensive_cards,
+                                'offensive_card': log[round].battles[battle].offensive_card,
+                                'accident': accident,
+                            });
+                        }
+                    }
                 });
 
                 socket.on('cards', (data) => {
@@ -119,6 +160,7 @@
 
                     socket.emit('state');
                     socket.emit('subscribe');
+                    socket.emit('log', 0);
 
                     for (i in cards) {
                         const {id, name, text, type, def_against, off_against, damage} = cards[i];
@@ -234,6 +276,17 @@
 
             },
             methods: {
+                get_username_by_id(id){
+                    player = this.players_list.filter(obj =>{
+                        return obj.id === id
+                    });
+                    if (player && player.length > 0){
+                        return player[0].name;
+                    }else{
+                        return undefined;
+                    }
+                },
+
                 get_card_supplement(card) {
                     card_description = {}
                     if (card.type === 0) {
