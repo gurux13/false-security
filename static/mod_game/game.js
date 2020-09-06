@@ -21,31 +21,12 @@ Vue.component('card', {
     props: [
         'cards',
         'card_id',
-        'type',
         'cls',
         'tiny',
         'vs',
     ],
-    data: function () {
-        let type_cls = "";
-        switch (this.type) {
-            case 'off':
-                type_cls = 'card_offence';
-                break;
-            case 'acc':
-                type_cls = 'card_accident';
-                break;
-            case 'def':
-                type_cls = 'card_defence';
-                break;
-        }
-        return {
-            css_cls: type_cls + ' ' + this.cls + ' card'
-        }
-    },
     computed: {
         card: function () {
-            console.log("MASTER CARD", this.card_id);
             return this.cards[this.card_id];
         },
         def_value: function () {
@@ -57,6 +38,23 @@ Vue.component('card', {
                 return this.def_value;
             }
             return this.card.damage;
+        },
+        css_cls: function () {
+            let type_cls = "";
+            const thecard = this.cards[this.card_id];
+            console.log("My card:", thecard);
+            switch (thecard.type) {
+                case 1:
+                    type_cls = 'card_offence';
+                    break;
+                case 2:
+                    type_cls = 'card_accident';
+                    break;
+                case 0:
+                    type_cls = 'card_defence';
+                    break;
+            }
+            return type_cls + ' ' + this.cls + ' card'
         }
     },
     methods: {

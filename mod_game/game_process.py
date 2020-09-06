@@ -50,6 +50,8 @@ def get_state():
     if game.is_waitroom():
         return GameState(redirect_to='/waitroom')
     player = pm.get_my_player()
+    if player is None:
+        return GameState(redirect_to='/')
     # TODO: What do we do with completed games?
     #if not game.is_running():
     #    return GameState(redirect_to='/')
