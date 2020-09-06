@@ -42,7 +42,7 @@
                         <!--                        [[create_defending_set()]]-->
                         <div class="defence_cards">
                             <!--                            [[defending_set]]-->
-                            <card v-for="card in defending_set" :cards="cards" type="def" cls="small_card" :card_id="card"></card>
+                            <card v-for="card in defending_set" :cards="cards" type="def" cls="def_table_card" :card_id="card" tiny="true" :vs="attacking_card_id"></card>
                         </div>
                     </div>
                 </div>

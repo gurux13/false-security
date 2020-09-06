@@ -164,17 +164,24 @@
 
 .defence_cards{
   display: flex;
-  flex-flow: row wrap;
+  flex-flow: column wrap;
   justify-content: space-around;
-
+  align-items: center;
 }
 
 .small_card{
-  flex-direction: column;
-  justify-content: space-around;
   width: 150px;
   height: 200px;
   padding: 4px;
+  text-align: center;
+  border-radius: 20px;
+  font-size: 0.8em;
+  hyphens: auto;
+}
+
+.def_table_card {
+  width: 150px;
+  height: 70px;
   text-align: center;
   border-radius: 20px;
   font-size: 0.8em;
@@ -234,6 +241,10 @@
   height: 100%;
   overflow-y: auto;
   text-align: flex-start;
+}
+
+.versus {
+  font-weight: bold;
 }
 
 .log_record{
