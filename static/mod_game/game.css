@@ -1,264 +1,305 @@
-.window{
-  justify-content: space-around;
+.window {
+    justify-content: space-around;
 
-  text-align: justify;
+    text-align: justify;
 }
+
 .window-row {
-  display:flex;
-  flex-direction: row;
-  justify-content: space-around;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
 }
+
 .is_offline .player-name:after {
-  content: " ☒";
+    content: " ☒";
 }
+
 .head {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;
-  width: 100%
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%
 }
+
 .budget {
-  font-family: monospace;
-  font-size: 1.2em;
+    font-family: monospace;
+    font-size: 1.2em;
 }
-.players{
-  /*display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  align-items: flex-start;*/
-  padding-top: 10px;
-  min-width: 90px;
+
+.players {
+    /*display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;*/
+    padding-top: 10px;
+    min-width: 90px;
 }
 
 .blue {
-  color:blue;
+    color: blue;
 }
 
 .darkred {
-  color: darkred;
-}
-.darkgreen {
-  color: darkgreen;
-}
-.players .table-icon {
-  margin-bottom: 9px;
-}
-.player {
-  border: solid 1px;
-  border-radius: 4px;
-  padding: 6px;
-  margin-bottom: 4px;
+    color: darkred;
 }
 
-.player.is_selected{
-  background-color: #86dcFF;
-  border-color: blue;
+.darkgreen {
+    color: darkgreen;
+}
+
+.players .table-icon {
+    margin-bottom: 9px;
+}
+
+.player {
+    border: solid 1px;
+    border-radius: 4px;
+    padding: 6px;
+    margin-bottom: 4px;
+}
+
+.player.is_selected {
+    background-color: #86dcFF;
+    border-color: blue;
 }
 
 .player.is_offline {
-  border-color: red;
-  background-color: #ffAAAA;
+    border-color: red;
+    background-color: #ffAAAA;
 }
+
 .player.can_attack {
-  cursor: url("/static/cursors/sword.cur"), default;
+    cursor: url("/static/cursors/sword.cur"), default;
+    -webkit-animation: colorchange 3s linear infinite;
+    -o-animation: colorchange 3s linear infinite;
+    animation: colorchange 3s linear infinite;
 }
 
-.head .status{
-  width: 200px;
+.head .status {
+    width: 200px;
 }
 
-.hand{
-  display: flex;
-  width: 100%;
-  justify-content: space-around;
+.hand {
+    display: flex;
+    width: 100%;
+    justify-content: space-around;
 }
 
-.card{
-  flex-direction: row;
-  justify-content: space-around;
-  width: 120px;
-  height: 180px;
-  padding: 5px;
-  text-align: center;
-  border-radius: 20px;
-  font-size: 1em;
-  border: 5px solid transparent;
-  hyphens: auto;
-  position: relative;
-  margin-bottom: 4px;
+.card {
+    flex-direction: row;
+    justify-content: space-around;
+    width: 120px;
+    height: 180px;
+    padding: 5px;
+    text-align: center;
+    border-radius: 20px;
+    font-size: 1em;
+    border: 5px solid transparent;
+    hyphens: auto;
+    position: relative;
+    margin-bottom: 4px;
 }
 
-.card_defence{
-  background-color: lightgreen;
-  border-color: green;
+.card_defence {
+    background-color: lightgreen;
+    border-color: green;
 }
 
-.card_offence{
-  background-color: #face8d;
-  border-color: red;
+.card_offence {
+    background-color: #face8d;
+    border-color: red;
 }
 
-.card_accident{
-  background-color: lightblue;
-  border-color:  blue;
+.card_accident {
+    background-color: lightblue;
+    border-color: blue;
 }
 
-.card_gray{
-  border-color: #808080;
+.card_gray {
+    border-color: #808080;
 }
 
-.card_selected{
-  border-width: 10px;
+.card_selected {
+    border-width: 10px;
 }
 
-.center{
+.center {
 
 }
 
 .window-cell {
-  padding: 10px;
-  padding-bottom: 0;
-}
-
-.table{
-  width: 70%;
-
-}
-
-.against{
-  display: flex;
-  flex-direction: column;
+    padding: 10px;
+    padding-bottom: 0;
 }
 
 .table {
-  display: flex;
-}
-
-.attack{
-  justify-content: space-between;
-
+    width: 70%;
 
 }
+
+.against {
+    display: flex;
+    flex-direction: column;
+}
+
+.table {
+    display: flex;
+}
+
+.attack {
+    justify-content: space-between;
+
+
+}
+
 .table-icon {
-  font-size:3em;
-  text-align: center;
+    font-size: 3em;
+    text-align: center;
 
-  bottom: 0%;
-  width: 100%;
+    bottom: 0%;
+    width: 100%;
 }
+
 .smaller {
-  font-size: 2.2em !important;
+    font-size: 2.2em !important;
 }
 
-.defence{
-  justify-content: space-between;
-  flex: 1;
+.defence {
+    justify-content: space-between;
+    flex: 1;
 }
+
 .separator {
-  border-left: 1px solid black;
-  width: 2px;
-  margin: 10px;
-  height: 100%;
+    border-left: 1px solid black;
+    width: 2px;
+    margin: 10px;
+    height: 100%;
 }
 
-.defence_cards{
-  display: flex;
-  flex-flow: column wrap;
-  justify-content: space-around;
-  align-items: center;
+.defence_cards {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-around;
+    align-items: center;
 }
 
-.small_card{
-  width: 150px;
-  height: 200px;
-  padding: 4px;
-  text-align: center;
-  border-radius: 20px;
-  font-size: 0.8em;
-  hyphens: auto;
+.small_card {
+    width: 150px;
+    height: 200px;
+    padding: 4px;
+    text-align: center;
+    border-radius: 20px;
+    font-size: 0.8em;
+    hyphens: auto;
 }
 
 .def_table_card {
-  width: 150px;
-  height: 70px;
-  text-align: center;
-  border-radius: 20px;
-  font-size: 0.8em;
-  hyphens: auto;
+    width: 150px;
+    height: 70px;
+    text-align: center;
+    border-radius: 20px;
+    font-size: 0.8em;
+    hyphens: auto;
 }
 
-.small_card_defence{
-  background-color: lightgreen;
-  border: 4px solid green;
+.small_card_defence {
+    background-color: lightgreen;
+    border: 4px solid green;
 }
 
-.small_card_offence{
-  background-color: #face8d;
-  border: 4px solid red;
+.small_card_offence {
+    background-color: #face8d;
+    border: 4px solid red;
 }
 
-.small_card_accident{
-  background-color: lightblue;
-  border: 4px solid blue;
+.small_card_accident {
+    background-color: lightblue;
+    border: 4px solid blue;
 }
 
 .card_falsics {
-  float: right;
-  clear: both;
-  right: 5px;
-  position: relative;
-  padding:5px;
-  margin-top:-4px;
-  margin-right: -4px;
-  background-color: white;
-  font-weight: bold;
-  border-radius: 30px;
-  bottom: 0px;
-  position: absolute;
-  font-size: 1.2em;
+    float: right;
+    clear: both;
+    right: 5px;
+    position: relative;
+    padding: 5px;
+    margin-top: -4px;
+    margin-right: -4px;
+    background-color: white;
+    font-weight: bold;
+    border-radius: 30px;
+    bottom: 0px;
+    position: absolute;
+    font-size: 1.2em;
 }
 
 
-.log{
-  width: 250px;
-  height: 300px;
-  text-align: center;
-  border-radius: 5px;
-  border: 2px solid black;
-  flex-flow: row wrap;
+.log {
+    width: 250px;
+    height: 300px;
+    text-align: center;
+    border-radius: 5px;
+    border: 2px solid black;
+    flex-flow: row wrap;
 }
 
-.log_header{
-  height: 20px;
-  text-align: left;
-  background-color: #cccccc;
+.log_header {
+    height: 20px;
+    text-align: left;
+    background-color: #cccccc;
 }
 
-.log_body{
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow-y: auto;
-  text-align: flex-start;
+.log_body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow-y: auto;
+    text-align: flex-start;
 }
 
 .versus {
-  font-weight: bold;
+    font-weight: bold;
 }
 
-.log_record{
-  text-align: left;
+.log_record {
+    text-align: left;
 }
 
-.green_text{
-  color: green;
+.green_text {
+    color: green;
 }
 
-.red_text{
-  color:red;
+.red_text {
+    color: red;
 }
 
-.blue_text{
-  color:blue;
+.blue_text {
+    color: blue;
 }
+
+@keyframes colorchange {
+    0% {
+        background: white;
+    }
+    50% {
+        background: lightblue;
+    }
+    100% {
+        background: white;
+    }
+}
+@-webkit-keyframes colorchange {
+    0% {
+        background: white;
+    }
+    50% {
+        background: lightblue;
+    }
+    100% {
+        background: white;
+    }
+}
+
+
+
