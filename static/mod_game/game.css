@@ -162,7 +162,7 @@
 }
 
 .smaller {
-    font-size: 2.2em !important;
+  font-size: 2.2em !important;
 }
 
 .defence {
@@ -250,12 +250,12 @@
     background-color: #cccccc;
 }
 
-.log_body {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    overflow-y: auto;
-    text-align: flex-start;
+.log_body{
+  display: flex;
+  flex-direction: column;
+  height: 90%;
+  overflow-y: auto;
+  text-align: flex-start;
 }
 
 .versus {

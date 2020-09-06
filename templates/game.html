@@ -55,11 +55,11 @@
                                 <div v-if="record.defensive_cards">
                                     Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
                                     случайности <span class="blue_text">[[record.offensive_card]]</span>
-                                    картами <span class="green_text">[[record.defensive_cards]]</span>
+                                    с помощью <span class="green_text">[[record.defensive_cards]]</span><br>
                                 </div>
                                 <div v-else>
                                     Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
-                                    карты случайности <span class="blue_text">[[record.offensive_card]]</span>
+                                    карты случайности <span class="blue_text">[[record.offensive_card]]</span><br>
                                 </div>
                             </div>
                             <div v-else>
@@ -67,12 +67,12 @@
                                     Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
                                     <span class="red_text">[[record.offensive_card]]</span> игрока
                                     <span class="red_text">[[record.offender]]</span>
-                                    картами <span class="green_text">[[record.defensive_cards]]</span>
+                                    с помощью <span class="green_text">[[record.defensive_cards]]</span><br>
                                 </div>
                                 <div>
                                     Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
                                     карты <span class="red_text">[[record.offensive_card]]</span> игрока
-                                    <span class="red_text">[[record.offender]]</span>
+                                    <span class="red_text">[[record.offender]]</span><br>
                                 </div>
                             </div>
                         </div>
@@ -131,16 +131,30 @@
                         for (battle in log[round].battles){
                             offender = this.get_username_by_id(log[round].battles[battle].offender);
                             accident = (typeof offender === 'undefined') ? true : false;
+                            if (this.cards[log[round].battles[battle].offensive_card]){
+                                offensive_card = this.cards[log[round].battles[battle].offensive_card].name;
+                            }else{
+                                offensive_card = '';
+                            }
+
+                            defensive_cards = "";
+                            if (log[round].battles[battle].defensive_cards){
+                                for (card of log[round].battles[battle].defensive_cards){
+                                    defensive_cards += this.cards[card].name + ', ';
+                                }
+                                defensive_cards = defensive_cards.substring(0, defensive_cards.length - 2);
+                            }
 
                             this.smooth_log.push({
                                 'defender': this.get_username_by_id(log[round].battles[battle].defender),
                                 'offender': offender,
-                                'defensive_cards': log[round].battles[battle].defensive_cards,
-                                'offensive_card': log[round].battles[battle].offensive_card,
+                                'defensive_cards': defensive_cards,
+                                'offensive_card': offensive_card,
                                 'accident': accident,
                             });
                         }
                     }
+                    console.log('LOG', this.smooth_log);
                 });
 
                 socket.on('cards', (data) => {
@@ -158,6 +172,7 @@
 
                 socket.on('upd', function () {
                     socket.emit('state');
+                    socket.emit('log',0);
                 });
 
                 socket.on('play', (data) => {
@@ -262,13 +277,15 @@
                 },
 
                 get_card_supplement(card) {
+                    return this.cards[card];
                     card_description = {}
-                    if (card.type === 0) {
+                    if (this.cards[card].type === 0) {
                         //defence
 
-                    } else if (card.type === 1) {
+                    } else if (this.cards[card].type === 1) {
                         //offence
-
+                        console.log(1);
+                        return this.cards[card].def_against.filter((x) => x.other_card == card)[0].value.off_against;
                     } else {
                         //accident
 
