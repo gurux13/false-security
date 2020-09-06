@@ -66,10 +66,15 @@ class GameLogic:
         return [RoundLogic(self.db, x) for x in
                 self.db.session.query(GameRound).filter_by(game=self.model).filter(GameRound.roundNo >= starting_from)]
 
-    def get_battles(self) -> List[BattleLogic]:
+    def get_battles(self, includePrevRound = False) -> List[BattleLogic]:
         if self.model.isComplete:
             return []
-        return [BattleLogic(self.db, b) for b in self.cur_round.battles]
+        extra = []
+        if includePrevRound:
+            prev_round = self.db.session.query(GameRound).filter(GameRound.game == self.model).filter(GameRound.roundNo == self.cur_round.roundNo - 1).all()
+            if (len(prev_round) != 0):
+                extra = prev_round[0].battles
+        return [BattleLogic(self.db, b) for b in extra + self.cur_round.battles]
 
     def is_running(self):
         return self.model.isStarted and not self.model.isComplete

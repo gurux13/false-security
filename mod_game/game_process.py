@@ -72,7 +72,7 @@ def get_state():
             ) for p in players
         ],
         hand=map_opt(lambda c: make_ui(c, game, player), player.get_hand()),
-        current_battles=[battle.to_ui() for battle in game.get_battles()],
+        current_battles=[battle.to_ui() for battle in game.get_battles(True)],
         round_no=round_number,
         is_complete=game.is_complete(),
     )

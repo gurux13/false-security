@@ -43,12 +43,14 @@ Vue.component('card', {
     },
     computed: {
         card: function () {
+            console.log("MASTER CARD", this.card_id);
             return this.cards[this.card_id];
         },
 
     },
     methods: {
         get_card: function(card_id) {
+            console.log("GET CARD", card_id);
             return this.cards[card_id];
         }
     },

@@ -49,4 +49,5 @@ class BattleLogic:
             damage_remains=self.get_curdamage(),
             is_complete=self.model.isComplete,
             creation_order=self.model.creationOrder,
+            round_no=self.model.round.roundNo,
         )

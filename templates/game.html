@@ -267,8 +267,8 @@
                 get_my_latest_battle_with_cards() {
                     let my_battle = undefined;
                     for (battle of this.current_battles) {
-                        if (battle.defender === this.self_player || battle.offender == this.self_player && battle.offensive_card) {
-                            if (my_battle == undefined || my_battle.creation_order < battle.creation_order) {
+                        if ((battle.defender === this.self_player || battle.offender == this.self_player) && battle.offensive_card) {
+                            if (my_battle == undefined || (my_battle.round_no < battle.round_no  || (my_battle.round_no == battle.round_no && my_battle.creation_order < battle.creation_order))) {
                                 my_battle = battle;
                             }
                         }
@@ -298,7 +298,7 @@
                                             console.log("BATTLE", battle);
 
                     if (battle && battle.defensive_cards) {
-                        defending_set.push(battle.defensive_cards);
+                        defending_set.push(...battle.defensive_cards);
                     }
                     console.log("DEF SET", defending_set);
                     this.defending_set = defending_set;
