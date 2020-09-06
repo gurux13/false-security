@@ -24,7 +24,7 @@ Vue.component('card', {
         'type',
         'cls',
     ],
-    data: function() {
+    data: function () {
         let type_cls = "";
         switch (this.type) {
             case 'off':
@@ -49,17 +49,19 @@ Vue.component('card', {
 
     },
     methods: {
-        get_card: function(card_id) {
+        get_card: function (card_id) {
             console.log("GET CARD", card_id);
             return this.cards[card_id];
         }
     },
     template: `
     <div :class="css_cls">
+        <div class="card_falsics">
+            {{card.damage}}<span class="falsic"></span>
+        </div>
         <p>
-            <b>{{card.name}}</b>
-            {{card.damage}}&nbsp;<span class="falsic"></span></p>
-        <div v-if="card.off_against">
+            <b>{{card.name}}</b></p>
+                    <div v-if="card.off_against">
             <div class="against" v-for="elem in card.off_against" :key="elem.id">
                 {{get_card(elem.other_card).name}} -{{elem.value}}<br/>
             </div>

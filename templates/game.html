@@ -80,6 +80,11 @@
                 </div>
             </div>
             <div class="window-row">
+                <div class="versus">
+                    <span class="red_text">[[defender]]</span> нападает на <span class="green_text">[[offender]]</span>. Урон [[cur_damage]]<span class="falsic"></span>.
+                </div>
+            </div>
+            <div class="window-row">
                 <div class="hand">
                     <div v-for="card in hand"
                          :key="card.index"
@@ -114,6 +119,9 @@
                 attacking_card: undefined,
                 defending_set: [],
                 smooth_log: [],
+                offender: "Атакер",
+                defender: "Защитник",
+                cur_damage: 0,
             },
             created() {
                 socket.on('log', (data) => {
@@ -166,12 +174,16 @@
                     document.getElementById('round-no').innerText = game_data.round_no;
                     this.selected_card = [];
                     this.players_list = [];
+                    this.players_set = {};
                     this.hand = [];
                     this.self_player = game_data.self_player;
                     this.current_battles = [];
                     this.accident = 0;
                     this.attacking_card_id = -1;
                     this.battles_in_progress = []
+                    this.offender = '';
+                    this.defender = '';
+                    this.cur_damage = 0;
 
                     for (i in game_data.hand) {
                         const {id, can_play, name, text, type} = game_data.hand[i];
@@ -199,11 +211,6 @@
                         }
                     }
 
-                    //GET ATTACKING CARD INFO
-                    my_battle = this.get_my_latest_battle_with_cards();
-                    if (my_battle) {
-                        this.attacking_card_id = my_battle.offensive_card;
-                    }
 
 
                     for (player of game_data.players) {
@@ -213,7 +220,15 @@
                             is_selected: this.current_battles.some(battle => (
                                 !battle.is_complete && battle.defender === id && battle.offender === this.self_player))
                         });
-
+                        this.players_set[player.id] = player;
+                    }
+                    //GET ATTACKING CARD INFO
+                    my_battle = this.get_my_latest_battle_with_cards();
+                    if (my_battle) {
+                        this.attacking_card_id = my_battle.offensive_card;
+                        this.offender = this.players_set[my_battle.offender].name;
+                        this.defender = this.players_set[my_battle.defender].name;
+                        this.cur_damage = my_battle.damage_remains;
                     }
                     this.create_defending_set();
                     console.log(game_data);
@@ -265,6 +280,10 @@
                     return battles_in_progress;
                 },
                 get_my_latest_battle_with_cards() {
+                    const in_progress = this.get_battles_in_progress();
+                    if (in_progress.length == 1 && in_progress[0].defender != null) {
+                        return in_progress;
+                    }
                     let my_battle = undefined;
                     for (battle of this.current_battles) {
                         if ((battle.defender === this.self_player || battle.offender == this.self_player) && battle.offensive_card) {
