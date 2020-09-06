@@ -34,7 +34,7 @@ Vue.component('card', {
             return this.card.def_against.filter((x) => x.other_card == this.vs)[0].value;
         },
         dmg_value: function () {
-            if (this.type == 'def') {
+            if (this.card.type == 0) {
                 return this.def_value;
             }
             return this.card.damage;

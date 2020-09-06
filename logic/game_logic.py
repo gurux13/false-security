@@ -202,6 +202,7 @@ class GameLogic:
         if len(card) == 0:
             self.on_accident_played()
             return
+        self.db.session.delete(card[0])
         for player in self.get_players(True):
             rb = self.start_battle(None)
             rb.defendingPlayer = player.model
