@@ -360,6 +360,9 @@ class GameLogic:
     def on_round_completed(self):
         for player in self.get_players(True):
             player.on_round_completed()
+        num_alive_players = len(self.get_players(True))
+        if num_alive_players == 0:
+            num_alive_players = 1 #doesn't matter, the game is over anyway
         avg_spend = sum(
             len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
             for player in self.get_players(True)
@@ -371,9 +374,11 @@ class GameLogic:
     def should_complete_game(self):
         n_players = len(self.get_players(False))
         n_live_players = len(self.get_players(True))
+        if n_live_players == 0:
+            return True  # Graveyard
         if self.params.end_game_deaths == EndGameDeaths.OneDead and n_players != n_live_players:
             return True
-        if self.params.end_game_deaths == EndGameDeaths.AllButOneDead and n_live_players == 1:
+        if self.params.end_game_deaths == EndGameDeaths.AllButOneDead and n_live_players <= 1:
             return True
         if self.params.num_rounds is not None and self.cur_round is not None:
             return self.cur_round.roundNo + 1 >= self.params.num_rounds
