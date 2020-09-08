@@ -206,6 +206,7 @@
 
                     console.log('GAMEDATA', game_data);
                     this.hand = game_data.hand;
+                    this.hand.sort((x, y) => y.type - x.type);
                     this.current_battles = game_data.current_battles;
 
                     if (!(this.current_battles.some(item => !!item.offender))) {
