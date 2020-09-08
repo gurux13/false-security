@@ -49,7 +49,7 @@
 
                 <div class="log window-cell">
                     <div class="log_header">События в игре:</div>
-                    <div class="log_body">
+                    <div class="log_body auto_scroll_down">
                         <div class="log_record" v-for="record in smooth_log">
                             <div v-if="record.accident">
                                 <div v-if="record.defensive_cards" class="marker">
@@ -125,6 +125,11 @@
                 defender: "Защитник",
                 cur_damage: 0,
             },
+            updated(){
+                let container = this.$el.querySelector(".auto_scroll_down");
+                container.scrollTop = container.scrollHeight;
+                console.log('AUTOSCROLL',container, container.scrollHeight);
+            },
             created() {
                 socket.on('log', (data) => {
                     const log = data.value;
@@ -154,9 +159,11 @@
                                     'offensive_card': offensive_card,
                                     'accident': accident,
                                 });
+
                             }
                         }
                     }
+
                 });
 
                 socket.on('cards', (data) => {
