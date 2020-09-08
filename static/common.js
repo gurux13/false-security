@@ -11,13 +11,22 @@ function copyToClipboard(text) {
 function snackbar(text) {
     // Get the snackbar DIV
     let x = document.getElementById("snackbar");
-    x.innerText = text;
-    // Add the "show" class to DIV
-    x.className = "show";
+    x.className = x.className.replace("show", "");
+    const key = Math.random();
+    x.snack_id = key;
+
+    setTimeout(function () {
+        x.innerText = text;
+        // Add the "show" class to DIV
+        x.className = "show";
+    }, 10);
+
 
     // After 3 seconds, remove the show class from DIV
     setTimeout(function () {
-        x.className = x.className.replace("show", "");
+        if (x.snack_id == key) {
+            x.className = x.className.replace("show", "");
+        }
     }, 3000);
 }
 

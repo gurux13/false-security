@@ -89,8 +89,6 @@
 .card {
     flex-direction: row;
     justify-content: space-around;
-    width: 120px;
-    height: 180px;
     padding: 5px;
     text-align: center;
     border-radius: 20px;
@@ -101,6 +99,12 @@
     margin-bottom: 4px;
 }
 
+.hand .card {
+    width: 200px;
+    font-size: 0.9em;
+    min-height: 200px   ;
+}
+
 .card_defence {
     background-color: lightgreen;
     border-color: green;
@@ -109,6 +113,18 @@
 .card_offence {
     background-color: #face8d;
     border-color: red;
+}
+
+.card_money {
+    background-color: #FFFFAA;
+    border-color: darkorange;
+}
+
+.card_inactive {
+    opacity: 50%;
+}
+.card_active {
+    cursor: pointer;
 }
 
 .card_accident {

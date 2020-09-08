@@ -32,8 +32,9 @@
 
                     <div class="attack">
                         <div class="table-icon darkred">⚔</div>
-                        <card v-if="attacking_card_id" :card_id="attacking_card_id" :cards="cards" :type="accident ? 'acc' : 'off'"
-                             cls="small_card"></card>
+                        <card v-if="attacking_card_id" :card_id="attacking_card_id" :cards="cards"
+                              :type="accident ? 'acc' : 'off'"
+                              cls="small_card"></card>
 
                     </div>
                     <!--<div class="separator"></div>-->
@@ -42,7 +43,8 @@
                         <!--                        [[create_defending_set()]]-->
                         <div class="defence_cards">
                             <!--                            [[defending_set]]-->
-                            <card v-for="card in defending_set" :cards="cards" type="def" cls="def_table_card" :card_id="card" tiny="true" :vs="attacking_card_id"></card>
+                            <card v-for="card in defending_set" :cards="cards" type="def" cls="def_table_card"
+                                  :card_id="card" tiny="true" :vs="attacking_card_id"></card>
                         </div>
                     </div>
                 </div>
@@ -58,11 +60,12 @@
                                     с помощью <span class="green_text">[[record.defensive_cards]]</span><br><br>
                                 </div>
                                 <div v-else class="marker">
-                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
+                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от
+                                    атаки
                                     карты случайности <span class="blue_text">[[record.offensive_card]]</span><br><br>
                                 </div>
                             </div>
-                            <div v-else >
+                            <div v-else>
                                 <div v-if="record.defensive_cards" class="marker">
                                     ⚔ Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
                                     <span class="red_text">[[record.offensive_card]]</span> игрока
@@ -70,7 +73,8 @@
                                     с помощью <span class="green_text">[[record.defensive_cards]]</span><br><br>
                                 </div>
                                 <div v-else class="marker">
-                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
+                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от
+                                    атаки
                                     карты <span class="red_text">[[record.offensive_card]]</span> игрока
                                     <span class="red_text">[[record.offender]]</span><br><br>
                                 </div>
@@ -81,26 +85,17 @@
             </div>
             <div class="window-row">
                 <div class="versus">
-                    <span class="red_text">[[offender]]</span> нападает на <span class="green_text">[[defender]]</span>. Урон [[cur_damage]]<span class="falsic"></span>.
+                    <span class="red_text">[[offender]]</span> нападает на <span class="green_text">[[defender]]</span>.
+                    Урон [[cur_damage]]<span class="falsic"></span>.
                 </div>
             </div>
             <div class="window-row">
-<!--                <div class="hand">-->
-<!--                    <card v-for="card in hand" :cards="cards" type="def" cls="defence_card" :card_id="card.id" tiny="false" :vs="attacking_card_id"></card>-->
-<!--                        </div>-->
-                    <div v-for="card in hand"
-                         :key="card.index"
-                         :class="{
-                        card: true,
-                        card_offence: card.type,
-                        card_defence: !card.type,
-                        card_gray: !card.can_play,
-                        card_selected: card.is_selected
-                     }" @click="choose_card(card.index)">
-                        [[card.name]][[card]]
-                    </div>
-                    <button @click="send_selected_card">Отправить</button>
+                <div class="hand">
+                    <card v-for="card in hand" :cards="cards" :card_id="card.id" tiny="" :cls="(card.can_play ? 'card_active' : 'card_inactive')" :can_play="card.can_play"
+                          @clicked="card_clicked"></card>
+                    <card v-if="on_defence" can_play="true" :cards="cards" :card_id="-1" tiny="" cls="card_active" @clicked="card_clicked" :cur_damage="cur_damage"></card>
                 </div>
+
             </div>
         </div>
     </div>
@@ -125,33 +120,33 @@
                 defender: "Защитник",
                 cur_damage: 0,
             },
-            updated(){
+            updated() {
                 let container = this.$el.querySelector(".auto_scroll_down");
                 container.scrollTop = container.scrollHeight;
-                console.log('AUTOSCROLL',container, container.scrollHeight);
+                console.log('AUTOSCROLL', container, container.scrollHeight);
             },
             created() {
                 socket.on('log', (data) => {
                     const log = data.value;
                     this.smooth_log = [];
-                    for (round in log){
-                        for (battle of log[round].battles){
+                    for (round in log) {
+                        for (battle of log[round].battles) {
                             offender = this.get_username_by_id(battle.offender);
                             accident = (typeof offender === 'undefined') ? true : false;
-                            if (this.cards[battle.offensive_card]){
+                            if (this.cards[battle.offensive_card]) {
                                 offensive_card = this.cards[battle.offensive_card].name;
-                            }else{
+                            } else {
                                 offensive_card = '';
                             }
 
                             defensive_cards = "";
-                            if (battle.defensive_cards){
-                                for (card of battle.defensive_cards){
+                            if (battle.defensive_cards) {
+                                for (card of battle.defensive_cards) {
                                     defensive_cards += this.cards[card].name + ', ';
                                 }
                                 defensive_cards = defensive_cards.substring(0, defensive_cards.length - 2);
                             }
-                            if (battle.is_complete === true){
+                            if (battle.is_complete === true) {
                                 this.smooth_log.push({
                                     'defender': this.get_username_by_id(battle.defender),
                                     'offender': offender,
@@ -181,14 +176,13 @@
 
                 socket.on('upd', function () {
                     socket.emit('state');
-                    socket.emit('log',0);
+                    socket.emit('log', 0);
                 });
 
                 socket.on('play', (data) => {
                     if (!data.ok) {
-                        alert(data.message);
+                        snackbar(data.message);
                     }
-
                 });
 
                 socket.on('state', (data) => {
@@ -203,36 +197,19 @@
                     this.self_player = game_data.self_player;
                     this.current_battles = [];
                     this.accident = 0;
-                    this.attacking_card_id = -1;
+                    this.attacking_card_id = undefined;
                     this.battles_in_progress = []
                     this.offender = '';
                     this.defender = '';
+                    this.on_defence = false;
                     this.cur_damage = 0;
 
                     console.log('GAMEDATA', game_data);
-
-                    for (i in game_data.hand) {
-                        const {id, can_play, name, text, type} = game_data.hand[i];
-                        /*if (game_data.hand[i].type === 0){
-
-                        }else{
-                        }*/
-                        this.hand.push({
-                            index: i,
-                            id,
-                            can_play,
-                            name,
-                            text,
-                            type,
-                            is_selected: false,
-                        });
-                    }
-
+                    this.hand = game_data.hand;
                     this.current_battles = game_data.current_battles;
 
-                    if (!(this.current_battles.findIndex(item => !!item.offender) >= 0)) {
+                    if (!(this.current_battles.some(item => !!item.offender))) {
                         this.accident = 1;
-
                     }
 
                     for (battle of this.current_battles) {
@@ -264,6 +241,7 @@
                         }
                         this.cur_damage = my_battle.damage_remains;
                     }
+                    this.on_defence = my_battle && my_battle.defender === this.self_player && !my_battle.is_complete && my_battle.offensive_card;
                     this.create_defending_set();
                     console.log(game_data);
                     this.is_game_loaded = true;
@@ -278,13 +256,20 @@
 
             },
             methods: {
-                get_username_by_id(id){
-                    player = this.players_list.filter(obj =>{
+                card_clicked(id) {
+                    if (id == -1) {
+                        socket.emit('done_def');
+                    } else {
+                        socket.emit('play', [id]);
+                    }
+                },
+                get_username_by_id(id) {
+                    player = this.players_list.filter(obj => {
                         return obj.id === id
                     });
-                    if (player && player.length > 0){
+                    if (player && player.length > 0) {
                         return player[0].name;
-                    }else{
+                    } else {
                         return undefined;
                     }
                 },
@@ -322,7 +307,7 @@
                     let my_battle = undefined;
                     for (battle of this.current_battles) {
                         if ((battle.defender === this.self_player || battle.offender == this.self_player) && battle.offensive_card) {
-                            if (my_battle == undefined || (my_battle.round_no < battle.round_no  || (my_battle.round_no == battle.round_no && my_battle.creation_order < battle.creation_order))) {
+                            if (my_battle == undefined || (my_battle.round_no < battle.round_no || (my_battle.round_no == battle.round_no && my_battle.creation_order < battle.creation_order))) {
                                 my_battle = battle;
                             }
                         }
@@ -349,7 +334,7 @@
                     battles_in_progress = this.get_battles_in_progress();
                     defending_set = [];
                     const battle = this.get_my_latest_battle_with_cards();
-                                            //console.log("BATTLE", battle);
+                    //console.log("BATTLE", battle);
 
                     if (battle && battle.defensive_cards) {
                         defending_set.push(...battle.defensive_cards);
@@ -403,7 +388,6 @@
                     socket.emit('play', this.selected_card);
                     if (type == 0) {
                         socket.emit('done_def');
-                        this.attacking_card = -1;
                     }
                 }
             }
