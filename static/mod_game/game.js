@@ -30,7 +30,7 @@ Vue.component('card', {
             return this.cards[this.card_id];
         },
         def_value: function () {
-            console.log("DEF AGAINST", this.card.def_against);
+            console.log("DEF AGAINST", this.card.def_against,);
             return this.card.def_against.filter((x) => x.other_card == this.vs)[0].value;
         },
         dmg_value: function () {

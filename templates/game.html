@@ -52,27 +52,27 @@
                     <div class="log_body">
                         <div class="log_record" v-for="record in smooth_log">
                             <div v-if="record.accident">
-                                <div v-if="record.defensive_cards">
-                                    Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
+                                <div v-if="record.defensive_cards" class="marker">
+                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
                                     случайности <span class="blue_text">[[record.offensive_card]]</span>
-                                    с помощью <span class="green_text">[[record.defensive_cards]]</span><br>
+                                    с помощью <span class="green_text">[[record.defensive_cards]]</span><br><br>
                                 </div>
-                                <div v-else>
-                                    Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
-                                    карты случайности <span class="blue_text">[[record.offensive_card]]</span><br>
+                                <div v-else class="marker">
+                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
+                                    карты случайности <span class="blue_text">[[record.offensive_card]]</span><br><br>
                                 </div>
                             </div>
-                            <div v-else>
-                                <div v-if="record.defensive_cards">
-                                    Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
+                            <div v-else >
+                                <div v-if="record.defensive_cards" class="marker">
+                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
                                     <span class="red_text">[[record.offensive_card]]</span> игрока
                                     <span class="red_text">[[record.offender]]</span>
-                                    с помощью <span class="green_text">[[record.defensive_cards]]</span><br>
+                                    с помощью <span class="green_text">[[record.defensive_cards]]</span><br><br>
                                 </div>
-                                <div>
-                                    Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
+                                <div v-else class="marker">
+                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от атаки
                                     карты <span class="red_text">[[record.offensive_card]]</span> игрока
-                                    <span class="red_text">[[record.offender]]</span><br>
+                                    <span class="red_text">[[record.offender]]</span><br><br>
                                 </div>
                             </div>
                         </div>
@@ -85,7 +85,9 @@
                 </div>
             </div>
             <div class="window-row">
-                <div class="hand">
+<!--                <div class="hand">-->
+<!--                    <card v-for="card in hand" :cards="cards" type="def" cls="defence_card" :card_id="card.id" tiny="false" :vs="attacking_card_id"></card>-->
+<!--                        </div>-->
                     <div v-for="card in hand"
                          :key="card.index"
                          :class="{
@@ -128,33 +130,33 @@
                     const log = data.value;
                     this.smooth_log = [];
                     for (round in log){
-                        for (battle in log[round].battles){
-                            offender = this.get_username_by_id(log[round].battles[battle].offender);
+                        for (battle of log[round].battles){
+                            offender = this.get_username_by_id(battle.offender);
                             accident = (typeof offender === 'undefined') ? true : false;
-                            if (this.cards[log[round].battles[battle].offensive_card]){
-                                offensive_card = this.cards[log[round].battles[battle].offensive_card].name;
+                            if (this.cards[battle.offensive_card]){
+                                offensive_card = this.cards[battle.offensive_card].name;
                             }else{
                                 offensive_card = '';
                             }
 
                             defensive_cards = "";
-                            if (log[round].battles[battle].defensive_cards){
-                                for (card of log[round].battles[battle].defensive_cards){
+                            if (battle.defensive_cards){
+                                for (card of battle.defensive_cards){
                                     defensive_cards += this.cards[card].name + ', ';
                                 }
                                 defensive_cards = defensive_cards.substring(0, defensive_cards.length - 2);
                             }
-
-                            this.smooth_log.push({
-                                'defender': this.get_username_by_id(log[round].battles[battle].defender),
-                                'offender': offender,
-                                'defensive_cards': defensive_cards,
-                                'offensive_card': offensive_card,
-                                'accident': accident,
-                            });
+                            if (battle.is_complete === true){
+                                this.smooth_log.push({
+                                    'defender': this.get_username_by_id(battle.defender),
+                                    'offender': offender,
+                                    'defensive_cards': defensive_cards,
+                                    'offensive_card': offensive_card,
+                                    'accident': accident,
+                                });
+                            }
                         }
                     }
-                    console.log('LOG', this.smooth_log);
                 });
 
                 socket.on('cards', (data) => {
@@ -200,8 +202,14 @@
                     this.defender = '';
                     this.cur_damage = 0;
 
+                    console.log('GAMEDATA', game_data);
+
                     for (i in game_data.hand) {
                         const {id, can_play, name, text, type} = game_data.hand[i];
+                        /*if (game_data.hand[i].type === 0){
+
+                        }else{
+                        }*/
                         this.hand.push({
                             index: i,
                             id,
@@ -212,9 +220,9 @@
                             is_selected: false,
                         });
                     }
+
                     this.current_battles = game_data.current_battles;
 
-                    //console.log('battles', this.current_battles);
                     if (!(this.current_battles.findIndex(item => !!item.offender) >= 0)) {
                         this.accident = 1;
 
@@ -225,8 +233,6 @@
                             this.battles_in_progress.push(battle);
                         }
                     }
-
-
 
                     for (player of game_data.players) {
                         const {id, name, money, is_online, can_attack} = player;
@@ -284,7 +290,7 @@
 
                     } else if (this.cards[card].type === 1) {
                         //offence
-                        console.log(1);
+                        //console.log(1);
                         return this.cards[card].def_against.filter((x) => x.other_card == card)[0].value.off_against;
                     } else {
                         //accident
@@ -299,7 +305,6 @@
                             battles_in_progress.push(battle);
                         }
                     }
-                    console.log('in progpress from get battles', battles_in_progress);
                     return battles_in_progress;
                 },
                 get_my_latest_battle_with_cards() {
@@ -337,12 +342,12 @@
                     battles_in_progress = this.get_battles_in_progress();
                     defending_set = [];
                     const battle = this.get_my_latest_battle_with_cards();
-                                            console.log("BATTLE", battle);
+                                            //console.log("BATTLE", battle);
 
                     if (battle && battle.defensive_cards) {
                         defending_set.push(...battle.defensive_cards);
                     }
-                    console.log("DEF SET", defending_set);
+                    //console.log("DEF SET", defending_set);
                     this.defending_set = defending_set;
                     return defending_set;
                 },
