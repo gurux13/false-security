@@ -7,6 +7,7 @@
     <script src="../static/vue.js"></script>
     <script src="../static/renderjson.js"></script>
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
+    <script src="{{ url_for('static', filename='mod_game/log.js') }}"></script>
 
     <div id="app">
         <div v-if="!is_game_loaded">Loading...</div>
@@ -48,40 +49,7 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="log window-cell">
-                    <div class="log_header">События в игре:</div>
-                    <div class="log_body auto_scroll_down">
-                        <div class="log_record" v-for="record in smooth_log">
-                            <div v-if="record.accident">
-                                <div v-if="record.defensive_cards" class="marker">
-                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
-                                    случайности <span class="blue_text">[[record.offensive_card]]</span>
-                                    с помощью <span class="green_text">[[record.defensive_cards]]</span><br><br>
-                                </div>
-                                <div v-else class="marker">
-                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от
-                                    атаки
-                                    карты случайности <span class="blue_text">[[record.offensive_card]]</span><br><br>
-                                </div>
-                            </div>
-                            <div v-else>
-                                <div v-if="record.defensive_cards" class="marker">
-                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> отбился от атаки карты
-                                    <span class="red_text">[[record.offensive_card]]</span> игрока
-                                    <span class="red_text">[[record.offender]]</span>
-                                    с помощью <span class="green_text">[[record.defensive_cards]]</span><br><br>
-                                </div>
-                                <div v-else class="marker">
-                                    ⚔ Игрок <span class="green_text">[[record.defender]]</span> не смог отбиться от
-                                    атаки
-                                    карты <span class="red_text">[[record.offensive_card]]</span> игрока
-                                    <span class="red_text">[[record.offender]]</span><br><br>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <log :smooth_log="this.smooth_log"></log>
             </div>
             <div class="window-row">
                 <div class="versus">
