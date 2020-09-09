@@ -153,3 +153,13 @@ def game():
     except UserError:
         return redirect(url_for('gameselect.index'))
     return render_template('game.html', form=ExitForm())
+
+@mod_game_process.route('/endgame')
+def endgame():
+    set_current_player()
+    try:
+        game = get_game_manager().get_my_game()
+        player = get_player_manager().get_my_player()
+    except UserError:
+        return redirect(url_for('gameselect.index'))
+    return render_template('endgame.html', form=ExitForm())

@@ -1,0 +1,68 @@
+.window {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+    flex-direction: row;
+}
+
+.center {
+  text-align: center;
+  //border: 3px solid black;
+}
+
+.table_cont{
+  height: 400px;
+  overflow: auto;
+}
+
+.players {
+  text-align: center;
+  display: table;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  border-collapse: collapse;
+  height: 400px;
+  overflow: scroll;
+  table-layout: fixed;
+}
+
+#players td, #players th {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+#players tr:nth-child(even){background-color: #f2f2f2;}
+
+#players tr:hover {background-color: #ddd;}
+
+#players th {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  text-align: left;
+  background-color: #006400;
+  color: white;
+  position: sticky; top: 0;
+  text-align: center;
+}
+
+.log {
+    width: 650px;
+    height: 200px;
+    text-align: center;
+    border-radius: 5px;
+    border: 2px solid black;
+    flex-flow: row wrap;
+}
+
+.log_header {
+    height: 20px;
+    text-align: left;
+    background-color: #cccccc;
+}
+
+.log_body{
+  display: flex;
+  flex-direction: column;
+  height: 90%;
+  overflow-y: auto;
+  text-align: flex-start;
+}

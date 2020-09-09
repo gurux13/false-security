@@ -1,0 +1,161 @@
+{% extends 'layout.html' %}
+{{ super() }}
+{% block extrahead %}
+    <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/endgame.css") }}">
+{% endblock %}
+{% block content %}
+    <script src="../static/vue.js"></script>
+    <script src="../static/renderjson.js"></script>
+    <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
+    <script src="{{ url_for('static', filename='mod_game/log.js') }}"></script>
+
+<div id="app">
+    <h1 class="center">ИГРА ОКОНЧЕНА!</h1>
+        <div class="window">
+            <div>
+                <h2 class="center">Таблица участников:</h2>
+                <div class="table_cont">
+                    <table id="players">
+                      <tr>
+                        <th>Игрок</th>
+                        <th>Оставшиеся фолзики</th>
+                      </tr>
+
+                      <tr>
+                        <td>Игрок1</td>
+                        <td>90</td>
+                      </tr>
+                      <tr>
+                        <td>Игрок2</td>
+                        <td>80</td>
+                      </tr>
+                      <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                        <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                        <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                        <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                        <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                        <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                        <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                        <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                       </tr>
+                        <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                        </tr>
+                        <tr>
+                        <td>Игрок3</td>
+                        <td>70</td>
+                      </tr>
+                    </table>
+                </div>
+
+            </div>
+            <div>
+                <h2 class="center">Лог битвы:</h2>
+                <log class="center" > </log>
+                <img class="canter" src="{{ url_for('static', filename='mod_game/keyboard.png') }}" width="250px">
+            </div>
+        </div>
+    </div>
+    <script>
+        new Vue({
+            el: '#app',
+            delimiters: ['[[', ']]'],
+            data: {
+                is_game_loaded: false,
+                game_name: '',
+                round_no: 0,
+                players_list: [],
+                cards: [],
+                log: [],
+            },
+            created() {
+                socket.emit('log',0);
+                socket.emit('cards');
+                socket.emit('state');
+                socket.on('log', (data) => {
+                    this.log = data.value;
+                });
+
+                socket.on('cards', (data) => {
+                    const cards = data.value;
+                    this.cards = {};
+                    console.log('Cards');
+
+                    for (i of cards) {
+                        this.cards[i.id] = i;
+                    }
+                });
+
+                socket.on('state', (data) => {
+                //this.is_game_loaded = true;
+                  /*  console.log('state', data);
+                    const game_data = data.value.game;
+                    this.game_name = game_data.game_name;
+                    this.round_no = game_data.round_no;
+                    document.getElementById('round-no').innerText = game_data.round_no;
+                    this.players_list = [];
+                    this.players_set = {};
+                    this.self_player = game_data.self_player;
+
+
+                    for (player of game_data.players) {
+                        const {id, name, money, is_online, can_attack} = player;
+                        this.players_list.push({
+                            id, name, money, is_online, can_attack,
+                            is_selected: this.current_battles.some(battle => (
+                                !battle.is_complete && battle.defender === id && battle.offender === this.self_player))
+                        });
+                        this.players_set[player.id] = player;
+                    }
+
+                    this.is_game_loaded = true;*/
+                });
+
+                socket.on('connect', function () {
+                     socket.emit('state');
+                });
+
+
+            },
+            methods: {
+
+                get_username_by_id(id) {
+                    player = this.players_list.filter(obj => {
+                        return obj.id === id
+                    });
+                    if (player && player.length > 0) {
+                        return player[0].name;
+                    } else {
+                        return undefined;
+                    }
+                },
+            }
+        })
+    </script>
+{% endblock %}
