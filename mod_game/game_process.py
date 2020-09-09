@@ -6,7 +6,7 @@ from Exceptions.user_error import UserError
 from globals import db
 from logic.card_logic import CardLogic
 from logic.card_manager import CardManager
-from logic.game_logic import GameLogic
+from logic.game_logic import GameLogic, game2redirect
 from logic.game_manager import GameManager
 from logic.player_logic import PlayerLogic
 from logic.player_manager import PlayerManager
@@ -44,17 +44,11 @@ def get_state():
     keep_alive()
 
     pm = PlayerManager(db)
-    if g.game is None or not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
-        return GameState(redirect_to='/')
     game = g.game
-    if game.is_waitroom():
-        return GameState(redirect_to='/waitroom')
+    redirect_url = game2redirect(game)
+    if redirect_url is not None and redirect_url != '/game':
+        return GameState(redirect_to=redirect_url)
     player = pm.get_my_player()
-    if player is None:
-        return GameState(redirect_to='/')
-    # TODO: What do we do with completed games?
-    #if not game.is_running():
-    #    return GameState(redirect_to='/')
     players = game.get_players(False)
     round_number = 0 if game.cur_round is None else game.cur_round.roundNo
     ui_game = UiGame(

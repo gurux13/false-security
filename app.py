@@ -37,6 +37,10 @@ def rules():
 
 if __name__ == '__main__':
     # Registering socketio listeners
+    import mod_game.waitroom
+    import mod_game.game_state
+    import connection_events
+
     from mod_gameselect.controller import mod_gameselect
 
     app.register_blueprint(mod_gameselect)

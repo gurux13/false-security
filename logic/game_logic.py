@@ -2,7 +2,7 @@ import json
 from datetime import datetime
 from enum import Enum
 import random
-from typing import List
+from typing import List, Optional
 
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
@@ -13,7 +13,7 @@ from db_models.cardtype import CardTypeEnum, CardType
 from db_models.deckentry import DeckEntry
 from db_models.gameround import GameRound
 from db_models.roundbattle import RoundBattle
-from globals import socketio
+from globals import socketio, db
 from db_models.game import Game
 from logic.battle_logic import BattleLogic
 from logic.card_logic import CardLogic
@@ -22,6 +22,7 @@ from logic.gameparams import GameParams, DefCardDeal, EndGameDeaths
 from logic.player_logic import PlayerLogic
 from logic.player_manager import PlayerManager
 from logic.round_logic import RoundLogic
+from session import SessionHelper, SessionKeys
 from utils.conversion import first_or_none, replace_none
 
 
@@ -157,8 +158,11 @@ class GameLogic:
 
     def on_accident_played(self):
         self.cur_round.isAccidentComplete = True
-        self.start_battle(self.get_players(True)[0])
+        self.complete_game_if_needed()
+        if not self.is_complete():
+            self.start_battle(self.get_players(True)[0])
         self.set_dirty()
+
 
     def calculate_battle_falsics(self, battle: BattleLogic):
         btl_model = battle.model
@@ -366,7 +370,7 @@ class GameLogic:
         avg_spend = sum(
             len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
             for player in self.get_players(True)
-        ) / len(self.get_players(True))
+        ) / num_alive_players
         for player in self.get_players(True):
             self.deal_roundcompleted(player, avg_spend)
         self.complete_game_if_needed()
@@ -390,3 +394,20 @@ class GameLogic:
         if self.should_complete_game():
             self.set_dirty()
             self.model.isComplete = True
+
+
+def game2redirect(game: GameLogic) -> Optional[str]:
+    if not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
+        return '/'
+    if game is None:
+        return '/'
+    if game.get_state() == GameLogic.State.WAITROOM:
+        return '/waitroom'
+    if game.get_state() == GameLogic.State.RUNNING:
+        return '/game'
+    if game.get_state() == GameLogic.State.FINISHED:
+        return '/gameover'
+    player = PlayerManager(db).get_my_player()
+    if player is None or player.model.game != game.model:
+        return '/'
+    return None
