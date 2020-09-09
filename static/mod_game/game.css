@@ -196,8 +196,9 @@
 .defence_cards {
     display: flex;
     flex-flow: column wrap;
-    justify-content: space-around;
+    justify-content: space-between;
     align-items: center;
+    height: 220px;
 }
 
 .small_card {
@@ -217,6 +218,8 @@
     border-radius: 20px;
     font-size: 0.8em;
     hyphens: auto;
+    margin-left: 10px;
+    margin-right: 10px;
 }
 
 .small_card_defence {
