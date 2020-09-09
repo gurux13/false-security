@@ -52,9 +52,12 @@
                 <log :smooth_log="this.smooth_log"></log>
             </div>
             <div class="window-row">
-                <div class="versus">
+                <div class="versus" v-if="defender">
                     <span class="red_text">[[offender]]</span> нападает на <span class="green_text">[[defender]]</span>.
                     Урон [[cur_damage]]<span class="falsic"></span>.
+                </div>
+                <div class="versus" v-if="!defender">
+                    <span class="red_text">[[offender]]</span> думает, на кого напасть.
                 </div>
             </div>
             <div class="window-row">
@@ -209,6 +212,15 @@
                             this.defender = this.players_set[my_battle.defender].name;
                         }
                         this.cur_damage = my_battle.damage_remains;
+                    } else {
+                        if (this.battles_in_progress.length === 1) {
+                            if (this.battles_in_progress[0].offender) {
+                                this.offender = this.players_set[this.battles_in_progress[0].offender].name;
+                            }
+                            if (this.battles_in_progress[0].defender) {
+                                this.defender = this.players_set[this.battles_in_progress[0].defender].name;
+                            }
+                        }
                     }
                     this.on_defence = my_battle && my_battle.defender === this.self_player && !my_battle.is_complete && my_battle.offensive_card;
                     this.create_defending_set();
@@ -270,13 +282,13 @@
                 },
                 get_my_latest_battle_with_cards() {
                     const in_progress = this.get_battles_in_progress();
-                    if (in_progress.length == 1 && in_progress[0].defender != null) {
+                    if (in_progress.length == 1 && in_progress[0].defender != null && in_progress[0].offender != null) {
                         return in_progress[0];
                     }
                     let my_battle = undefined;
                     for (battle of this.current_battles) {
-                        if ((battle.defender === this.self_player || battle.offender == this.self_player) && battle.offensive_card) {
-                            if (my_battle == undefined || (my_battle.round_no < battle.round_no || (my_battle.round_no == battle.round_no && my_battle.creation_order < battle.creation_order))) {
+                        if (!battle.is_complete && (battle.defender === this.self_player || battle.offender === this.self_player) && battle.offensive_card) {
+                            if (my_battle == null || (my_battle.round_no < battle.round_no || (my_battle.round_no === battle.round_no && my_battle.creation_order < battle.creation_order))) {
                                 my_battle = battle;
                             }
                         }
