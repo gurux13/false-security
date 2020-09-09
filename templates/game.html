@@ -157,7 +157,12 @@
                 });
 
                 socket.on('state', (data) => {
+                    if (data.value.redirect_to) {
+                        window.location.href = data.value.redirect_to;
+                        return;
+                    }
                     const game_data = data.value.game;
+
                     this.game_name = game_data.game_name;
                     this.round_no = game_data.round_no;
                     document.getElementById('round-no').innerText = game_data.round_no;

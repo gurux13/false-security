@@ -7,6 +7,7 @@ from sqlalchemy.exc import IntegrityError
 from Exceptions.hack_attempt import HackAttemptError
 from Exceptions.user_error import UserError
 from db_models.deckentry import DeckEntry
+from logic.game_logic import game2redirect
 from logic.game_manager import GameManager
 from logic.player_manager import PlayerManager
 from session import SessionKeys, SessionHelper
@@ -147,7 +148,7 @@ def index():
     join_form = JoinForm()
     create_form = CreateGameForm()
     if rejoin():
-        return redirect('/waitroom')
+        return redirect(game2redirect(GameManager(db).get_my_game()))
     form = None
     try:
         if join_form.validate_on_submit():

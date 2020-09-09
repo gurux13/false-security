@@ -3,7 +3,6 @@ from typing import List
 
 from dataclasses import dataclass
 
-
 class UiCardType(Enum):
     Defence = 0
     Offence = 1

@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from Exceptions.hack_attempt import HackAttemptError
 from Exceptions.user_error import UserError
 from globals import db
+from logic.game_logic import game2redirect
 from logic.game_manager import GameManager
 from logic.player_manager import PlayerManager
 from mod_gameselect.controller import ExitForm
@@ -21,8 +22,6 @@ mod_game_wr = Blueprint('game_wr', __name__)
 
 @dataclass
 class WaitroomResponse:
-    game_found: bool
-    in_waitroom: bool = False
     game_name: str = None
     players: list = None
     can_start: bool = False
@@ -36,14 +35,11 @@ class WaitroomResponse:
 def get_state():
     gm = GameManager(db)
     pm = PlayerManager(db)
-    if not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
-        return WaitroomResponse(game_found=False, redirect_to='/')
-    game = gm.get_my_game()
-    if not game.is_waitroom():
-        return WaitroomResponse(game_found=True, in_waitroom=False, redirect_to='/game')
+    game = gm.get_my_game(optional=True)
+    redirect_url = game2redirect(game)
+    if redirect_url is not None and redirect_url != '/waitroom':
+        return WaitroomResponse(redirect_to=redirect_url)
     return WaitroomResponse(
-        game_found=True,
-        in_waitroom=True,
         game_name=game.model.uniqueCode,
         current_player=pm.get_my_player().model.name,
         players=[{'name': x.model.name, 'is_admin': x.model.isAdmin, 'is_online': x.model.isOnline} for x in game.get_players(False)],
