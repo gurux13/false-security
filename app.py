@@ -13,8 +13,8 @@ app = Flask(__name__)
 # TODO: Replace with server-side configuration
 app.config['SECRET_KEY'] = 'secret!'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
+# install libmysqlclient-dev!
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqldb://root:Ey*zM5a1v4cu@localhost/fs?charset=utf8mb4'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 import globals

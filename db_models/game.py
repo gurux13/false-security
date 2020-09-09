@@ -7,7 +7,7 @@ import db_models.gameround
 class Game(db.Model):
     __tablename__ = 'game'
     id = db.Column(db.Integer, primary_key=True)
-    uniqueCode = db.Column(db.Integer, unique=True, nullable=False)
+    uniqueCode = db.Column(db.String(20), unique=True, nullable=False)
     params = db.Column(db.Text, nullable=False)
     roundsCompleted = db.Column(db.Integer, nullable=False)
     isComplete = db.Column(db.Boolean, default=False)

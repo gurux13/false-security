@@ -116,7 +116,7 @@ class GameLogic:
     def make_deck(self):
         deck_size = self.params.deck_size
         if deck_size is None:
-            deck_size = self.db.session.query(func.sum(Card.countInDeck).label('count')).scalar()
+            deck_size = int(self.db.session.query(func.sum(Card.countInDeck).label('count')).scalar())
         all_cards = self.db.session.query(Card).all()
         all_cards_dup = []
         for card in all_cards:
