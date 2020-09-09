@@ -406,7 +406,7 @@ def game2redirect(game: GameLogic) -> Optional[str]:
     if game.get_state() == GameLogic.State.RUNNING:
         return '/game'
     if game.get_state() == GameLogic.State.FINISHED:
-        return '/gameover'
+        return '/endgame'
     player = PlayerManager(db).get_my_player()
     if player is None or player.model.game != game.model:
         return '/'
