@@ -82,10 +82,21 @@ Vue.component('card', {
             if (this.can_play) {
                 this.$emit('clicked', this.card_id);
             }
+        },
+        popup: function () {
+            window.alert("Popup");
         }
     },
     template: `
     <div :class="css_cls" @click="clicked">
+        <div class="card_more_wrapper">
+            <div class="card_more" @click="popup">
+                Подробнее о карте
+            </div>
+            <div class="card_more" @click="clicked" v-if="can_play" style="top:50%">
+                Сыграть карту
+            </div>            
+        </div>
         <div class="card_falsics" v-if="tiny || dmg_value">
             {{dmg_value}}<span class="falsic"></span>
         </div>

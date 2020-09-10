@@ -97,6 +97,7 @@
     hyphens: auto;
     position: relative;
     margin-bottom: 4px;
+    overflow: hidden;
 }
 
 .hand .card {
@@ -123,6 +124,7 @@
 .card_inactive {
     opacity: 50%;
 }
+
 .card_active {
     cursor: pointer;
 }
@@ -178,7 +180,7 @@
 }
 
 .smaller {
-  font-size: 2.2em !important;
+    font-size: 2.2em !important;
 }
 
 .defence {
@@ -269,12 +271,12 @@
     background-color: #cccccc;
 }
 
-.log_body{
-  display: flex;
-  flex-direction: column;
-  height: 90%;
-  overflow-y: auto;
-  text-align: flex-start;
+.log_body {
+    display: flex;
+    flex-direction: column;
+    height: 90%;
+    overflow-y: auto;
+    text-align: flex-start;
 }
 
 .versus {
@@ -321,4 +323,42 @@
     }
 }
 
+.card_more_wrapper {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: all .5s ease;
+    opacity: 0;
+    transition: backdrop-filter 0s;
+}
 
+.card_more {
+    cursor: default;
+    position: absolute;
+    left: 0;
+    background: rgba(0, 0, 0, 0.5); /* Black see-through */
+    color: #f1f1f1;
+    width: 102%;
+    top: 0;
+    font-size: 20px;
+    text-align: center;
+    margin: -5px;
+    vertical-align: middle;
+    height: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+
+
+}
+.card_more:hover {
+    background: rgba(0, 255, 255, 0.5);
+    color: black;
+
+}
+
+.card_more_wrapper:hover {
+    opacity: 1;
+    backdrop-filter: blur(2px);
+}

@@ -39,6 +39,8 @@ class UiCard:
     off_against: List[CardPairing]
     dealt_by_player: int
     can_play: bool = None
+    pop_up_text: str = None
+    pop_up_url: str = None
 
 
 @dataclass

@@ -25,7 +25,7 @@ class CardLogic:
              defence.offence == offenciveCard]
         )
 
-    def to_ui(self) -> UiCard:
+    def to_ui(self, extended=False) -> UiCard:
         mapping = {
             CardTypeEnum.ACCIDENT: UiCardType.Accident,
             CardTypeEnum.OFFENCE: UiCardType.Offence,
@@ -36,6 +36,8 @@ class CardLogic:
             id=self.model.id,
             name=self.model.name,
             text=self.model.text,
+            pop_up_text=self.model.popUpText if extended else None,
+            pop_up_url=self.model.popUpURL if extended else None,
             type=card_type,
             off_against=None if card_type == UiCardType.Defence else
             [CardPairing(o.defenceCardId, o.value) for o in self.model.offensiveAgainst],

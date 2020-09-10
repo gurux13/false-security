@@ -140,7 +140,7 @@ def done_defending():
 
 @wrapped_socketio('card', 'card')
 def get_card(card_id):
-    return get_card_manager().get_card(card_id).to_ui()
+    return get_card_manager().get_card(card_id).to_ui(True)
 
 
 @wrapped_socketio('cards', 'cards')
