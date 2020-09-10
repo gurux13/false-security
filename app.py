@@ -34,6 +34,10 @@ def hello_world():
 def rules():
    return render_template('instruction.html')
 
+@app.route('/glossary')
+def glossary():
+   return render_template('glossary.html')
+
 
 if __name__ == '__main__':
     # Registering socketio listeners
