@@ -328,7 +328,7 @@ class GameLogic:
         if cur_damage is None or cur_damage <= 0:
             # The round is either fully played, or has no offensive card yet
             return False
-        return replace_none(card.get_defence_from(my_battle.offensiveCard), 0) > 0
+        return self.params.hardcore_mode or replace_none(card.get_defence_from(my_battle.offensiveCard), 0) > 0
 
     def play_card(self, card: CardLogic, player: PlayerLogic):
         if not self.can_play_card(card, player):

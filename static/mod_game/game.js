@@ -41,7 +41,8 @@ Vue.component('card', {
             if (!this.vs) {
                 return 0;
             }
-            return this.card.def_against.filter((x) => x.other_card == this.vs)[0].value;
+            const def = this.card.def_against.filter((x) => x.other_card == this.vs)[0];
+            return (def && def.value) || 0;
         },
         dmg_value: function () {
             if (this.card.type == -1) {

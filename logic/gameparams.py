@@ -20,7 +20,7 @@ class DefCardDeal(Enum):
 class GameParams:
     def __init__(self, initial_falsics, initial_defence_cards, initial_offence_cards, accident_probability,
                  end_game_deaths, deck_size, num_rounds, only_admin_starts, can_attack_anyone, def_card_deal,
-                 def_card_deal_size):
+                 def_card_deal_size, hardcore_mode):
         self.initial_falsics = initial_falsics
         self.initial_defence_cards = initial_defence_cards
         self.initial_offence_cards = initial_offence_cards
@@ -32,6 +32,7 @@ class GameParams:
         self.can_attack_anyone = can_attack_anyone
         self.def_card_deal = DefCardDeal(def_card_deal)
         self.def_card_deal_size = def_card_deal_size
+        self.hardcore_mode = hardcore_mode
 
     def to_db(self):
         # Hack to serialize an enum

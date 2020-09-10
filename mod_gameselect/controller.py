@@ -60,6 +60,7 @@ class CreateGameForm(GameForm):
     num_rounds = IntegerField()
     def_card_deal = IntegerField(validators=[InputRequired()])
     def_card_deal_size = IntegerField()
+    hardcore_mode = BooleanField(validators=[])
 
 
 class ExitForm(FlaskForm):
@@ -123,7 +124,7 @@ def on_create(form):
                         form.b_offence.data, form.acc_prob.data / 100.0,
                         endgame_map[form.endgame.data], form.deck_size.data, form.num_rounds.data,
                         form.only_admin_starts.data, form.can_attack_anyone.data, def_card_deal_map[form.def_card_deal.data],
-                        form.def_card_deal_size.data)
+                        form.def_card_deal_size.data, form.hardcore_mode.data)
     game = get_game_manager().create_game(params)
     # TODO: wipe the old player, if set in session
     player = get_player_manager().create_player(form.player_name.data, game)
