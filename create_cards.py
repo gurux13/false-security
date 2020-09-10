@@ -82,42 +82,42 @@ def create_offence_type(data: list):
     return cardTypeOffence
 
 
-def create_accident_type():
+def create_accident_type(data: list):
     cardTypeAccident = CardType(name='Случайность', color='Blue', enumType=CardTypeEnum.ACCIDENT)
 
     cardTypeAccident.cards = [Card(
         name='Уязвимости нулевого дня',
-        text='Хакеры уже знают об этой ошибке в ПО, а вот его производители о ней еще не догадываются...',
+        popUpText=get_popup_from_json(data, "Уязвимости нулевого дня"),
         countInDeck=3,
         damage=6),
         Card(
             name='Взлом серверов и утечка паролей',
-            text='Увы, не бывает абсолютно надежных сайтов и приложений',
+            popUpText=get_popup_from_json(data, "Взлом серверов и утечка паролей"),
             countInDeck=3,
             damage=5),
         Card(
             name='Железные бэкдоры',
-            text='Никто не может защитить Вас от недобросовестных производителей железа',
+            popUpText=get_popup_from_json(data, "Железные бэкдоры"),
             countInDeck=3,
             damage=3),
         Card(
             name='Катаклизмы',
-            text='Пожары, наводнения, короткие замыкания. Чего только не случается в этом мире',
+            popUpText=get_popup_from_json(data, "Катаклизмы"),
             countInDeck=3,
             damage=4),
         Card(
             name='Кража ноутбука',
-            text='21 век на дворе. А от краж никуда не деться. Да и кражи бывают разные',
+            popUpText=get_popup_from_json(data, "Кража ноутбука"),
             countInDeck=3,
             damage=5),
         Card(
             name='Блокировка доступа к ресурсам',
-            text='',
+            popUpText=get_popup_from_json(data, "Блокировка доступа к ресурсам"),
             countInDeck=3,
             damage=3),
         Card(
             name='COVID-19',
-            text='От коронавируса защитить не может ничто. Отдайте половину своих денег соседу',
+            popUpText=get_popup_from_json(data, "COVID-19"),
             isCovid=True,
             countInDeck=3,
             damage=0),
@@ -127,68 +127,68 @@ def create_accident_type():
     return cardTypeAccident
 
 
-def create_defence_type():
+def create_defence_type(data: list):
     cardTypeDefence = CardType(name='Защита', color='Green', enumType=CardTypeEnum.DEFENCE)
 
     cardTypeDefence.cards = [
         Card(
             name='Антивирус',
-            text='',
+            popUpText=get_popup_from_json(data, "Антивирус"),
             countInDeck=9,
             damage=None),
         Card(
             name='Двухфакторная аутентификация',
-            text='',
+            popUpText=get_popup_from_json(data, "Двухфакторная аутентификация"),
             countInDeck=8,
             damage=None),
         Card(
             name='Сложные пароли',
-            text='',
+            popUpText=get_popup_from_json(data, "Сложные пароли"),
             countInDeck=8,
             damage=None),
         Card(
             name='Полнодисковое шифрование',
-            text='',
+            popUpText=get_popup_from_json(data, "Полнодисковое шифрование"),
             countInDeck=8,
             damage=None),
         Card(
             name='Использование VPN',
-            text='',
+            popUpText=get_popup_from_json(data, "Использование VPN"),
             countInDeck=8,
             damage=None),
         Card(
             name='Регулярные обновления',
-            text='',
+            popUpText=get_popup_from_json(data, "Регулярные обновления"),
             countInDeck=8,
             damage=None),
         Card(
             name='Лицензионное ПО',
-            text='',
+            popUpText=get_popup_from_json(data, "Лицензионное ПО"),
             countInDeck=8,
             damage=None),
         Card(
             name='Надежные мессенджеры',
-            text='',
+            popUpText=get_popup_from_json(data, "Надежные мессенджеры"),
             countInDeck=8,
             damage=None),
         Card(
             name='Пользовательская осторожность',
-            text='',
+            popUpText=get_popup_from_json(data, "Пользовательская осторожность"),
             countInDeck=9,
             damage=None),
         Card(
             name='Использование HTTPS',
-            text='',
+            popUpText=get_popup_from_json(data, "Использование HTTPS"),
             countInDeck=8,
             damage=None),
         Card(
             name='Регулярные бэкапы',
-            text='',
+            popUpText=get_popup_from_json(data, "Регулярные бэкапы"),
             countInDeck=8,
             damage=None),
         Card(
             name='Цифровая подпись и шифрование писем',
-            text='',
+            popUpText=get_popup_from_json(data, "Цифровая подпись и шифрование писем"),
             countInDeck=8,
             damage=None), ]
 
@@ -279,9 +279,9 @@ def defence(cardTypeDefence, cardTypeOffence, cardTypeAccident):
 def fill():
     with open('descriptions.json') as f:
         data = json.load(f)
-    defenceCards = create_defence_type()
+    defenceCards = create_defence_type(data)
     offenceCards = create_offence_type(data)
-    accidentCards = create_accident_type()
+    accidentCards = create_accident_type(data)
     defence(defenceCards, offenceCards, accidentCards)
     db.session.commit()
     print("DB data initialized")
