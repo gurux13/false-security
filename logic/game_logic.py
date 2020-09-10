@@ -345,7 +345,9 @@ class GameLogic:
         self.complete_battle(BattleLogic(self.db, battle))
 
     def deal_roundcompleted(self, player: PlayerLogic, avg_spend: int):
-        self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE), len(self.model.players) - 1)
+        player_off_cards_count = len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.OFFENCE])
+        self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE), self.params.initial_offence_cards - player_off_cards_count)
+    
         player_def_cards_count = len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
         def_card_count = 0
         if self.params.def_card_deal == DefCardDeal.DealFixed:
