@@ -15,7 +15,12 @@ Vue.component('log', {
     },
     methods: {
         get_player_name: function (player_id) {
-            return this.players.filter(obj => {return obj.id === player_id}).name;
+            player = this.players.filter(obj => {return obj.id === player_id})[0];
+            if (player){
+                return this.players.filter(obj => {return obj.id === player_id})[0].name;
+            } else {
+                return undefined;
+            }
         },
 
         get_smooth_log: function(){

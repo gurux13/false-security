@@ -35,19 +35,34 @@ def make_ui(card: CardLogic, game: GameLogic, player: PlayerLogic) -> UiCard:
     rv.can_play = game.can_play_card(card, player)
     return rv
 
+
 @wrapped_socketio("subscribe", "subscribe")
 def subscribe():
     join_room(g.game.model.uniqueCode)
 
+
 @wrapped_socketio('state', 'state')
 def get_state():
     keep_alive()
-
-    pm = PlayerManager(db)
     game = g.game
     redirect_url = game2redirect(game)
     if redirect_url is not None and redirect_url != '/game':
         return GameState(redirect_to=redirect_url)
+    return prepare_state(game)
+
+
+@wrapped_socketio('endgame_state', 'endgame_state')
+def get_endgame_state():
+    keep_alive()
+    game = g.game
+    redirect_url = game2redirect(game)
+    if redirect_url is not None and redirect_url != '/endgame':
+        return GameState(redirect_to=redirect_url)
+    return prepare_state(game)
+
+
+def prepare_state(game: GameLogic):
+    pm = PlayerManager(db)
     player = pm.get_my_player()
     players = game.get_players(False)
     round_number = 0 if game.cur_round is None else game.cur_round.roundNo
@@ -78,19 +93,23 @@ def get_state():
         game=ui_game
     )
 
+
 def assert_has_game():
     if g.game is None:
         raise UserError("Игра не найдена")
 
+
 def keep_alive():
     if g.game is not None:
         g.game.keep_alive()
+
 
 @wrapped_socketio('log', 'log')
 def log(starting_from):
     assert_has_game()
     keep_alive()
     return [x.to_ui() for x in g.game.get_old_rounds(starting_from)]
+
 
 @wrapped_socketio('attack', 'attack')
 def attack(player_id):
@@ -153,6 +172,7 @@ def game():
     except UserError:
         return redirect(url_for('gameselect.index'))
     return render_template('game.html', form=ExitForm())
+
 
 @mod_game_process.route('/endgame')
 def endgame():

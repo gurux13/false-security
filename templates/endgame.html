@@ -10,75 +10,29 @@
     <script src="{{ url_for('static', filename='mod_game/log.js') }}"></script>
 
 <div id="app">
-    <h1 class="center">ИГРА ОКОНЧЕНА!</h1>
-        <div class="window">
-            <div>
+    <h1 style="text-align:center;">РЕЗУЛЬТАТЫ ИГРЫ</h1>
+    <div v-if="!is_game_loaded">Loading...</div>
+        <div class="window" v-else>
+            <div class="half">
                 <h2 class="center">Таблица участников:</h2>
                 <div class="table_cont">
-                    <table id="players">
+                    <table id="players" style="margin-left:auto;margin-right:auto;">
                       <tr>
                         <th>Игрок</th>
                         <th>Оставшиеся фолзики</th>
                       </tr>
-
-                      <tr>
-                        <td>Игрок1</td>
-                        <td>90</td>
-                      </tr>
-                      <tr>
-                        <td>Игрок2</td>
-                        <td>80</td>
-                      </tr>
-                      <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
-                        <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
-                        <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
-                        <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
-                        <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
-                        <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
-                        <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
-                        <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
-                       </tr>
-                        <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
-                        </tr>
-                        <tr>
-                        <td>Игрок3</td>
-                        <td>70</td>
-                      </tr>
+                          <tr v-for="player in players_list" :key="player.id">
+                              <td>[[player.name]]</td>
+                              <td>[[player.money]]</td>
+                          </tr>
                     </table>
                 </div>
 
             </div>
-            <div>
-                <h2 class="center">Лог битвы:</h2>
-                <log class="center" > </log>
-                <img class="canter" src="{{ url_for('static', filename='mod_game/keyboard.png') }}" width="250px">
+            <div class="half">
+                <h2 style="text-align:center;">Лог битвы:</h2>
+                <log  :log="log" :players="players_list" :cards="cards"> </log>
+                <img  src="{{ url_for('static', filename='mod_game/keyboard.png') }}" width="250px">
             </div>
         </div>
     </div>
@@ -95,9 +49,10 @@
                 log: [],
             },
             created() {
-                socket.emit('log',0);
                 socket.emit('cards');
-                socket.emit('state');
+                socket.emit('endgame_state');
+                socket.emit('log',0);
+
                 socket.on('log', (data) => {
                     this.log = data.value;
                 });
@@ -105,40 +60,41 @@
                 socket.on('cards', (data) => {
                     const cards = data.value;
                     this.cards = {};
-                    console.log('Cards');
 
                     for (i of cards) {
                         this.cards[i.id] = i;
                     }
                 });
 
-                socket.on('state', (data) => {
-                //this.is_game_loaded = true;
-                  /*  console.log('state', data);
+                socket.on('endgame_state', (data) => {
+                    console.log('endgame_state', data);
                     const game_data = data.value.game;
                     this.game_name = game_data.game_name;
                     this.round_no = game_data.round_no;
                     document.getElementById('round-no').innerText = game_data.round_no;
                     this.players_list = [];
-                    this.players_set = {};
                     this.self_player = game_data.self_player;
 
 
                     for (player of game_data.players) {
-                        const {id, name, money, is_online, can_attack} = player;
+                        const {id, name, money, is_online} = player;
                         this.players_list.push({
-                            id, name, money, is_online, can_attack,
-                            is_selected: this.current_battles.some(battle => (
-                                !battle.is_complete && battle.defender === id && battle.offender === this.self_player))
-                        });
-                        this.players_set[player.id] = player;
+                            id, name, money });
                     }
+                    this.players_list.sort(function(a,b){
+                    if (a.money < b.money)
+                        return 1
+                    if (a.money > b.money)
+                        return -1
+                    return 0
+                    });
+                    console.log('sorted', this.players_list);
 
-                    this.is_game_loaded = true;*/
+                    this.is_game_loaded = true;
                 });
 
                 socket.on('connect', function () {
-                     socket.emit('state');
+                     socket.emit('endgame_state');
                 });
 
 
