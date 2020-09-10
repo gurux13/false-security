@@ -183,6 +183,10 @@ class GameLogic:
         btl_model.isComplete = True
         if self.cur_round.isAccidentComplete:
             next_player = btl_model.offendingPlayer.neighbourRight
+            alive = [x.model for x in self.get_players(True)]
+            while not (next_player in alive):
+                next_player = next_player.neighbourRight
+
             if next_player != self.get_players(True)[0].model:
                 self.start_battle(PlayerLogic(self.db, next_player))
 
@@ -271,6 +275,8 @@ class GameLogic:
             # Logically, the rules don't forbid attacking self... But it's nonsense, right?
             # We don't have tail loss here, but the player might want to get rid of defense cards?..
             return False
+        if not defender.is_alive():
+            return False
         if not self.cur_round.isAccidentComplete:
             return False
         my_battle = self.get_player_battle(me)
@@ -347,7 +353,7 @@ class GameLogic:
     def deal_roundcompleted(self, player: PlayerLogic, avg_spend: int):
         player_off_cards_count = len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.OFFENCE])
         self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE), self.params.initial_offence_cards - player_off_cards_count)
-    
+
         player_def_cards_count = len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
         def_card_count = 0
         if self.params.def_card_deal == DefCardDeal.DealFixed:
