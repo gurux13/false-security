@@ -53,7 +53,7 @@ Vue.component('card', {
             }
             return this.card.damage;
         },
-        is_def: function() {
+        is_def: function () {
             return this.card.type == 0;
         },
         css_cls: function () {
@@ -71,7 +71,7 @@ Vue.component('card', {
                 case -1:
                     type_cls = 'card_money';
             }
-            return type_cls + ' ' + this.cls + ' card'
+            return type_cls + ' ' + this.cls + ' card';
         }
     },
     methods: {
@@ -89,16 +89,16 @@ Vue.component('card', {
             }
         },
         popup: function () {
-            window.alert("Popup");
+            cardBig.show(this.card.id);
         }
     },
     template: `
     <div :class="css_cls" @click="clicked_big">
         <div v-if="card.type != -1" class="card_more_wrapper">
             <div class="card_more" @click="popup">
-                Подробнее о карте
+                Подробнее
             </div>
-            <div class="card_more" @click="clicked" v-if="can_play" style="top:50%">
+            <div class="card_more card_play" @click="clicked" v-if="can_play">
                 Сыграть карту
             </div>            
         </div>
@@ -122,4 +122,103 @@ Vue.component('card', {
 `
 });
 
+const full_cards = {};
+
+Vue.component('cardbig', {
+    data: function () {
+        return {
+            name: "",
+            loaded: false,
+            id: -1,
+            text: "",
+            url: "",
+            shown: false,
+            subscribed: false
+        };
+    },
+    template: `
+        <div v-if="shown" class="cardbig">
+            <div class="overlay" @click="hide"></div>
+            <div v-if="loaded" :class="css_cls">
+                <div class="card_name">
+                    {{name}}
+                </div>
+                <p>
+                {{text}}
+                </p>
+                <a v-if="url" :href="url">Глоссарий</a>
+            </div>
+        </div>
+        
+    `,
+    mounted: function() {
+        const self = this;
+        socket.on('card', (data) => {
+            full_cards[data.value.id] = data.value;
+            self.onload();
+        });
+    },
+    computed: {
+        card: function() {
+            return full_cards[this.id];
+        },
+        css_cls: function () {
+            let type_cls = "";
+            switch (this.card.type) {
+                case 1:
+                    type_cls = 'card_offence';
+                    break;
+                case 2:
+                    type_cls = 'card_accident';
+                    break;
+                case 0:
+                    type_cls = 'card_defence';
+                    break;
+                case -1:
+                    type_cls = 'card_money';
+            }
+            return type_cls + ' cardbig-content';
+        }
+    },
+    methods: {
+        onload: function() {
+            if (full_cards[this.id]) {
+                const card = full_cards[this.id];
+                this.name = card.name;
+                this.text = card.pop_up_text;
+                this.url = card.pop_up_url;
+                this.loaded = true;
+            }
+        },
+        show: function (id) {
+            if (!this.subscribed) {
+                const self = this;
+
+            }
+            this.loaded = false;
+            this.id = id;
+            this.shown = true;
+            socket.emit('card', id);
+        },
+        hide: function () {
+            this.shown = false;
+        }
+    }
+});
+
+let cardBig = undefined;
+
+Vue.mixin(
+    {
+        mounted: function () {
+            if (this.$root === this) {
+                var ne = document.createElement("div");
+                ne.id = "placeholderGLOBAL";
+                this.$el.appendChild(ne);
+                var dp = Vue.component("cardbig");
+                cardBig = new dp({parent: this, el: "#placeholderGLOBAL"});
+                cardBig.$mount();
+            }
+        }
+    });
 

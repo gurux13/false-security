@@ -1,8 +1,7 @@
 body {
     font-family: arial, sans-serif;
     padding: 10px 10px;
-    background: url('green_felt.jpg');
-    text-align: center;
+    background: rgba(255,255,255, 0.1) url('green_felt.jpg');
 }
 
 .form-table {
@@ -16,7 +15,13 @@ body {
     content: "Ƒ";
     color: red;
 }
-
+a {
+    text-decoration-color: #a2dffb;
+    color: #122882;
+}
+a:hover {
+    background: linear-gradient(90deg, #e0bb96, #b38797);
+}
 .form-table td {
     padding-top: 5px;
     vertical-align: top;
