@@ -63,7 +63,7 @@ Vue.component('log', {
                     <div class="log_body auto_scroll_down">
                         <div class="log_record" v-for="record in get_smooth_log()">
                             <div v-if="record.accident">
-                                <div v-if="record.defensive_cards" class="marker">
+                                <div v-if="record.defensive_cards.length" class="marker">
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> отбился от атаки карты
                                     случайности <span class="blue_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span>
                                     с помощью <span v-for="(card, index) in record.defensive_cards" @click="popup(card)" class="green_text card_in_text">{{card.name}}<span v-if="index+1 < record.defensive_cards.length">, </span></span><br><br>
@@ -75,7 +75,7 @@ Vue.component('log', {
                                 </div>
                             </div>
                             <div v-else>
-                                <div v-if="record.defensive_cards" class="marker">
+                                <div v-if="record.defensive_cards.length" class="marker">
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> отбился от атаки карты
                                     <span class="red_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span> игрока
                                     <span class="red_text">{{record.offender}}</span>
