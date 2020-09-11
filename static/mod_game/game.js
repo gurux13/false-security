@@ -191,14 +191,14 @@ Vue.component('cardbig', {
             }
         },
         show: function (id) {
-            if (!this.subscribed) {
-                const self = this;
-
-            }
             this.loaded = false;
             this.id = id;
             this.shown = true;
-            socket.emit('card', id);
+            if (full_cards[id]) {
+                this.onload();
+            } else {
+                socket.emit('card', id);
+            }
         },
         hide: function () {
             this.shown = false;
