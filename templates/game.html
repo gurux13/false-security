@@ -52,13 +52,14 @@
                 <log :log="log" :cards="cards" :players="players_list"></log>
             </div>
             <div class="window-row">
-                <div class="versus" v-if="defender">
+                <div class="versus" v-if="defender && offender">
                     <span class="red_text">[[offender]]</span> нападает на <span class="green_text">[[defender]]</span>.
-                    Урон [[cur_damage]]<span class="falsic"></span>.
+                    <span v-if="cur_damage">Урон [[cur_damage]]<span class="falsic"></span>.</span>
                 </div>
-                <div class="versus" v-if="!defender">
+                <div class="versus" v-if="offender && !defender">
                     <span class="red_text">[[offender]]</span> думает, на кого напасть.
                 </div>
+                <div class="versus" v-if="!offender">Остальные игроки сражаются со случайностью.</div>
             </div>
             <div class="window-row">
                 <div class="hand">
