@@ -1,5 +1,5 @@
 .admin_player {
-    background-color: aquamarine;
+    background-color: #008B8B;
     border-radius: 5px;
     font-weight: bold;
 }
@@ -20,6 +20,10 @@
 
 .player-name {
     display: inline;
+    margin: 0px;
+    padding-left: 20px;
+    background-image: url('../images/player_small.png');
+    background-repeat: no-repeat;
 }
 
 .waitroom-container {

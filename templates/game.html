@@ -15,7 +15,7 @@
             <div class="window-row">
                 <div class="window-cell">
                     <div class="players">
-                        <div class="table-icon blue smaller">🧍</div>
+                        <div class="table-icon smaller"><img src="../static/images/player3.png" alt="" /></div>
                         <div v-for="player in players_list" :key="player.id" :class="{
                         player: true,
                         is_offline: !player.is_online,
@@ -32,7 +32,7 @@
                 <div class="table window-cell">
 
                     <div class="attack">
-                        <div class="table-icon darkred">⚔</div>
+                        <div class="table-icon"><img src="../static/images/sword.png" alt="" /></div>
                         <card v-if="attacking_card_id" :card_id="attacking_card_id" :cards="cards"
                               :type="accident ? 'acc' : 'off'"
                               cls="small_card"></card>
@@ -40,7 +40,7 @@
                     </div>
                     <!--<div class="separator"></div>-->
                     <div class="defence">
-                        <div class="table-icon darkgreen">🛡</div>
+                        <div class="table-icon"><img src="../static/images/shield3.png" alt="" /></div>
                         <!--                        [[create_defending_set()]]-->
                         <div class="defence_cards">
                             <!--                            [[defending_set]]-->
