@@ -4,7 +4,11 @@
     text-align: center;
     flex-direction: row;
 }
-
+.body {
+  padding: 10px 10px;
+  background: url('../green_felt.jpg');
+  text-align: center;
+}
 .half{
     flex-basis: 100%;
     display: flex;

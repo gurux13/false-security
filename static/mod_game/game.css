@@ -1,3 +1,8 @@
+body {
+  padding: 10px 10px;
+  background: url('../green_felt.jpg');
+  text-align: center;
+}
 .window {
     justify-content: space-around;
     text-align: justify;
@@ -40,11 +45,11 @@
 }
 
 .darkred {
-    color: darkred;
+    color: #7B001C;
 }
 
 .darkgreen {
-    color: darkgreen;
+    color: #002800;
 }
 
 .players .table-icon {
@@ -263,6 +268,7 @@
     border-radius: 5px;
     border: 2px solid black;
     flex-flow: row wrap;
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
 .log_header {

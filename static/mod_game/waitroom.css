@@ -3,10 +3,14 @@
     border-radius: 5px;
     font-weight: bold;
 }
-
+.body {
+  padding: 10px 10px;
+  background: url('../green_felt.jpg');
+  text-align: center;
+}
 /* Style the tab content */
 .waitroom-main {
-
+    background-color: rgba(255, 255, 255, 0.5);
     padding: 6px 12px;
     border: 1px solid #ccc;
     display: inline-block;

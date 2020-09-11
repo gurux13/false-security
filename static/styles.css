@@ -1,5 +1,8 @@
 body {
     font-family: arial, sans-serif;
+    padding: 10px 10px;
+    background: url('green_felt.jpg');
+    text-align: center;
 }
 
 .form-table {
@@ -39,7 +42,7 @@ body {
     align-items: flex-start;
     justify-content: space-between;
     flex-basis: 140px;
-    background-color: #cccccc;
+    background-color: #f1f1f1;
     padding: 5px;
     margin-bottom: 10px;
     margin-top: 0;
@@ -51,9 +54,7 @@ body {
     font-family: monospace;
     font-size: 13pt;
 }
-body {
-    margin: 0;
-}
+
 .content {
     margin: 5px;
 }
@@ -61,7 +62,7 @@ body {
     bottom: 0%;
     position: fixed;
     text-align: center;
-    background-color: aquamarine;
+    background-color: #f1f1f1;
     padding: 5px;
     left: 0;
     width: 100%;
