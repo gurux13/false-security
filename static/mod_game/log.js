@@ -22,7 +22,9 @@ Vue.component('log', {
                 return undefined;
             }
         },
-
+        popup: function(card) {
+            cardBig.show(card.id);
+        },
         get_smooth_log: function(){
             smooth_log = [];
             for (round in this.log) {
@@ -30,17 +32,16 @@ Vue.component('log', {
                     offender = this.get_player_name(battle.offender);
                     accident = (typeof offender === 'undefined') ? true : false;
                     if (this.cards[battle.offensive_card]) {
-                        offensive_card = this.cards[battle.offensive_card].name;
+                        offensive_card = {name: this.cards[battle.offensive_card].name, id: battle.offensive_card};
                     } else {
-                        offensive_card = '';
+                        offensive_card = {name: '', id:-1};
                     }
 
-                    defensive_cards = "";
+                    defensive_cards = [];
                     if (battle.defensive_cards) {
                         for (card of battle.defensive_cards) {
-                            defensive_cards += this.cards[card].name + ', ';
+                            defensive_cards.push({name: this.cards[card].name, id: card});
                         }
-                        defensive_cards = defensive_cards.substring(0, defensive_cards.length - 2);
                     }
                     if (battle.is_complete === true) {
                         smooth_log.push({
@@ -64,26 +65,26 @@ Vue.component('log', {
                             <div v-if="record.accident">
                                 <div v-if="record.defensive_cards" class="marker">
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> отбился от атаки карты
-                                    случайности <span class="blue_text">{{record.offensive_card}}</span>
-                                    с помощью <span class="green_text">{{record.defensive_cards}}</span><br><br>
+                                    случайности <span class="blue_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span>
+                                    с помощью <span v-for="(card, index) in record.defensive_cards" @click="popup(card)" class="green_text card_in_text">{{card.name}}<span v-if="index+1 < record.defensive_cards.length">, </span></span><br><br>
                                 </div>
                                 <div v-else class="marker">
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> не смог отбиться от
                                     атаки
-                                    карты случайности <span class="blue_text">{{record.offensive_card}}</span><br><br>
+                                    карты случайности <span class="blue_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span><br><br>
                                 </div>
                             </div>
                             <div v-else>
                                 <div v-if="record.defensive_cards" class="marker">
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> отбился от атаки карты
-                                    <span class="red_text">{{record.offensive_card}}</span> игрока
+                                    <span class="red_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span> игрока
                                     <span class="red_text">{{record.offender}}</span>
-                                    с помощью <span class="green_text">{{record.defensive_cards}}</span><br><br>
+                                    с помощью <span v-for="(card, index) in record.defensive_cards" @click="popup(card)" class="green_text card_in_text">{{card.name}}<span v-if="index+1 < record.defensive_cards.length">, </span></span><br><br>
                                 </div>
                                 <div v-else class="marker">
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> не смог отбиться от
                                     атаки
-                                    карты <span class="red_text">{{record.offensive_card}}</span> игрока
+                                    карты <span class="red_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span> игрока
                                     <span class="red_text">{{record.offender}}</span><br><br>
                                 </div>
                             </div>

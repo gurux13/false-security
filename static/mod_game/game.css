@@ -403,3 +403,12 @@ body {
     width: 100%;
     font-weight: bold;
 }
+
+.card_in_text {
+    text-decoration-color: #a2dffb;
+    text-decoration: underline;
+    cursor: pointer;
+}
+.card_in_text:hover {
+    background: linear-gradient(90deg, #e0bb96, #b38797);
+}
