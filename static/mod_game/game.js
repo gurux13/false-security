@@ -83,13 +83,18 @@ Vue.component('card', {
                 this.$emit('clicked', this.card_id);
             }
         },
+        clicked_big: function () {
+            if (this.card.type == -1) {
+                this.clicked();
+            }
+        },
         popup: function () {
             window.alert("Popup");
         }
     },
     template: `
-    <div :class="css_cls" @click="clicked">
-        <div class="card_more_wrapper">
+    <div :class="css_cls" @click="clicked_big">
+        <div v-if="card.type != -1" class="card_more_wrapper">
             <div class="card_more" @click="popup">
                 Подробнее о карте
             </div>
