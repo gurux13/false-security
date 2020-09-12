@@ -59,7 +59,7 @@ Vue.component('log', {
     },
     template: `
     <div class="log window-cell">
-                    <div class="log_header">События в игре:</div>
+                    <!-- <div class="log_header">События в игре:</div> -->
                     <div class="log_body auto_scroll_down">
                         <div class="log_record" v-for="record in get_smooth_log()">
                             <div v-if="record.accident">

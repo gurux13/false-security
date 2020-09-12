@@ -106,9 +106,9 @@ body {
 }
 
 .hand .card {
-    width: 180px;
+    width: 150px;
     font-size: 0.9em;
-    min-height: 250px;
+    min-height: 200px;
 }
 
 .card_defence {
@@ -172,14 +172,12 @@ body {
 
 .attack {
     justify-content: space-between;
-
-
 }
 
 .table-icon {
     font-size: 3em;
     text-align: center;
-
+    margin-bottom: 7px;
     bottom: 0%;
     width: 100%;
 }
@@ -280,13 +278,14 @@ body {
 .log_body {
     display: flex;
     flex-direction: column;
-    height: 90%;
+    height: 100%;
     overflow-y: auto;
     text-align: flex-start;
 }
 
 .versus {
     font-weight: bold;
+    margin-bottom: 7px;
 }
 
 .log_record {
