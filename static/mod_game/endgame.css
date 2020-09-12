@@ -62,7 +62,7 @@
 }
 
 .log {
-    height: 200px;
+    height: 400px;
     width: 90%;
     text-align: center;
     border-radius: 5px;
@@ -85,7 +85,7 @@
 }
 
 .green_text {
-    color: green;
+    color: #0f2901;
 }
 
 .red_text {
@@ -93,5 +93,5 @@
 }
 
 .blue_text {
-    color: blue;
+    color: darkblue;
 }

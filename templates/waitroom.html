@@ -9,15 +9,15 @@
             <div id="app">
                 <div v-if="ready">
                     <div class="players">
-                        Игроки:
+                        Игроки:<br><br>
 
                         <div v-for="player in players" :key="player.name" class="player-name"
                              v-bind:class="{admin_player:player.is_admin}">
-                            [[ player.name ]]
+                            [[ player.name ]]<br>
                         </div>
                     </div>
-                    Нажмите <gamelink :link="link" display_link="здесь"></gamelink>, чтобы скопировать ссылку на игру, и отправьте её другим игрокам.
-                    <br/>
+                    <br></br>Нажмите <gamelink :link="link" display_link="здесь"></gamelink>, чтобы скопировать ссылку на игру, и отправьте её другим игрокам.
+                    <br/><br>
                     <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
                 </div>
             </div>

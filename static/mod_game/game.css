@@ -1,6 +1,6 @@
 body {
   padding: 10px 10px;
-  background: url('../green_felt.jpg');
+  background: url('../green_felt__3.jpg');
   text-align: center;
 }
 .window {
@@ -294,15 +294,15 @@ body {
 }
 
 .green_text {
-    color: green;
+    color: #0f2901;
 }
 
 .red_text {
-    color: red;
+    color: darkred;
 }
 
 .blue_text {
-    color: blue;
+    color: darkblue;
 }
 
 @keyframes colorchange {
@@ -411,4 +411,14 @@ body {
 }
 .card_in_text:hover {
     background: linear-gradient(90deg, #e0bb96, #b38797);
+}
+
+div img {
+   width: 40px;
+   height: 40px;
+   display: block;
+   //width: 100%;
+   display: block;
+    margin-left: auto;
+    margin-right: auto
 }
