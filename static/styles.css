@@ -2,6 +2,7 @@ body {
     font-family: arial, sans-serif;
     padding: 10px 10px;
     background: rgba(255,255,255, 0.1) url('green_felt__3.jpg');
+    background-size: cover;
 }
 
 .form-table {
