@@ -230,22 +230,6 @@
                     }
                 },
 
-                get_card_supplement(card) {
-                    return this.cards[card];
-                    card_description = {}
-                    if (this.cards[card].type === 0) {
-                        //defence
-
-                    } else if (this.cards[card].type === 1) {
-                        //offence
-                        //console.log(1);
-                        return this.cards[card].def_against.filter((x) => x.other_card == card)[0].value.off_against;
-                    } else {
-                        //accident
-
-                    }
-                },
-
                 get_battles_in_progress() {
                     let battles_in_progress = [];
                     for (battle of this.current_battles) {
@@ -282,7 +266,6 @@
                         return;
                     }
                     player.is_selected = true;
-                    //console.log(player);
                     socket.emit('attack', player.id);
                 },
 
@@ -290,12 +273,10 @@
                     battles_in_progress = this.get_battles_in_progress();
                     defending_set = [];
                     const battle = this.get_my_latest_battle_with_cards();
-                    //console.log("BATTLE", battle);
 
                     if (battle && battle.defensive_cards) {
                         defending_set.push(...battle.defensive_cards);
                     }
-                    //console.log("DEF SET", defending_set);
                     this.defending_set = defending_set;
                     return defending_set;
                 },

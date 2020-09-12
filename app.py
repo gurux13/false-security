@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 
 from mod_test.test import mod_test
+from flask import send_from_directory
 
 if __name__ != '__main__':
     import sys
@@ -17,6 +18,12 @@ print('starting...')
 @app.route('/io')
 def hello_world():
     return render_template('test_io.html')
+
+@app.route('/favicon.ico')
+def favicon():
+    import os
+    return send_from_directory(os.path.join(app.root_path, 'static'),
+                          'favicon.ico',mimetype='image/vnd.microsoft.icon')
 
 @app.route('/instruction')
 def rules():
