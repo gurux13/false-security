@@ -8,20 +8,8 @@ if __name__ != '__main__':
     if os.path.split(sys.argv[0])[1].replace('.py', '') == __name__:
         raise ImportError('No. Please do not import app. It will lead too all kinds of ridiculous stuff.')
 
-app = Flask(__name__)
-
-# TODO: Replace with server-side configuration
-app.config['SECRET_KEY'] = 'secret!'
-app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
-# install libmysqlclient-dev!
-if False:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqldb://root:Ey*zM5a1v4cu@localhost/fs?charset=utf8mb4'
-else:
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 import globals
-
+app = globals.app
 
 print('starting...')
 
@@ -39,7 +27,7 @@ def glossary():
    return render_template('glossary.html')
 
 
-if __name__ == '__main__':
+if True or __name__ == '__main__':
     # Registering socketio listeners
     import mod_game.waitroom
     import mod_game.game_state
@@ -54,4 +42,5 @@ if __name__ == '__main__':
     app.register_blueprint(mod_game_wr)
     app.register_blueprint(mod_game_process)
     app.register_blueprint(mod_test, url_prefix="/test")
+if __name__ == '__main__':
     globals.socketio.run(app)

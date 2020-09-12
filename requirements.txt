@@ -4,3 +4,8 @@ SQLAlchemy~=1.3.18
 alembic~=1.4.2
 WTForms~=2.3.1
 mysqlclient
+flask_script
+flask_migrate
+flask_socketio
+dataclasses
+flask_wtf

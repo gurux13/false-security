@@ -75,9 +75,9 @@ body {
 
 .player.can_attack {
     cursor: url("/static/cursors/sword.cur"), default;
-    -webkit-animation: colorchange 3s linear infinite;
-    -o-animation: colorchange 3s linear infinite;
-    animation: colorchange 3s linear infinite;
+    -webkit-animation: colorchange 2s linear infinite;
+    -o-animation: colorchange 2s linear infinite;
+    animation: colorchange 2s linear infinite;
 }
 
 .head .status {
