@@ -193,7 +193,7 @@ class GameLogic:
                 self.start_battle(PlayerLogic(self.db, next_player))
 
         if all(map(lambda b: b.model.isComplete, self.get_battles())):
-            if btl_model.offensiveCard.type.enumType == CardTypeEnum.ACCIDENT:
+            if btl_model.offensiveCard is not None and btl_model.offensiveCard.type.enumType == CardTypeEnum.ACCIDENT:
                 print("Round", self.cur_round.roundNo, "has accident completed")
                 self.on_accident_played()
             else:
@@ -407,11 +407,12 @@ class GameLogic:
 
     def leave_player(self, player: PlayerLogic):
         player.leave()
-        player.model.neighbourLeft.neighbourRight = player.model.neighbourRight
-        for battle in self.get_battles(False):
-            if battle.model.offendingPlayer == player.model or battle.model.defendingPlayer == player.model:
-                self.complete_battle(battle, True)
-                self.db.session.delete(battle.model)
+        if self.is_running():
+            player.model.neighbourLeft.neighbourRight = player.model.neighbourRight
+            for battle in self.get_battles(False):
+                if battle.model.offendingPlayer == player.model or battle.model.defendingPlayer == player.model:
+                    self.complete_battle(battle, True)
+                    self.db.session.delete(battle.model)
 
 
 def game2redirect(game: GameLogic) -> Optional[str]:

@@ -11,7 +11,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 # install libmysqlclient-dev!
-if True:
+if False:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+mysqldb://fs:<FSPASSWORD>@localhost/fs?charset=utf8mb4'
 else:
     app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///test.db'
