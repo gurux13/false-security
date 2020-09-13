@@ -19,6 +19,8 @@
                     <br></br>Нажмите <gamelink :link="link" display_link="здесь"></gamelink>, чтобы скопировать ссылку на игру, и отправьте её другим игрокам.
                     <br/><br>
                     <button v-if="show_start" v-on:click="start" :disabled="start_disabled">Поехали!</button>
+                    <div v-if="show_start" :disabled="start_disabled"> <br><b>Внимание!</b> Дождитесь всех участников.
+                        После того, как Вы запустите игру, новые игроки уже не смогут присоединиться. </div>
                 </div>
             </div>
         </div>
