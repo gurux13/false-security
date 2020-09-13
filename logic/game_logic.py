@@ -88,7 +88,7 @@ class GameLogic:
 
     def join_player(self, player: PlayerLogic, is_admin: bool) -> None:
         if self.get_state() != GameLogic.State.WAITROOM:
-            raise UserError("Невозможно присоединиться к запущенной игре")
+            raise UserError("Невозможно присоединиться к запущенной игре", error_type=UserError.ErrorType.INVALID_GAME)
         if is_admin:
             player.make_admin()
         self.set_dirty()
@@ -173,7 +173,7 @@ class GameLogic:
             return
         PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-battle.get_curdamage())
 
-    def complete_battle(self, battle: BattleLogic, bypass: bool):
+    def complete_battle(self, battle: BattleLogic, bypass=False):
         if not bypass:
             self.assert_running()
         self.set_dirty()

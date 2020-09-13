@@ -68,18 +68,14 @@
     border-radius: 5px;
     border: 2px solid black;
     justify-content: center;
+    background-color: rgba(255, 255, 255, 0.5);
 }
 
-.log_header {
-    height: 20px;
-    text-align: center;
-    background-color: #cccccc;
-}
 
 .log_body{
   display: flex;
   flex-direction: column;
-  height: 90%;
+  height: 100%;
   overflow-y: auto;
   text-align: flex-start;
 }
@@ -89,7 +85,7 @@
 }
 
 .red_text {
-    color: red;
+    color: darkred;
 }
 
 .blue_text {

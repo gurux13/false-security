@@ -133,8 +133,10 @@
                 error_game: "{{ g.error_game }}",
                 def_card_deal: 0,
             },
-            delimiters: ['[[', ']]']
+            delimiters: ['[[', ']]'],
+
         });
+
         socket.on('upd', function (data) {
             app.message = data;
         });
