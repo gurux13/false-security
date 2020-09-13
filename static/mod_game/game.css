@@ -68,6 +68,10 @@
     background-color: #ffAAAA;
 }
 
+.player.has_left {
+    background-color: #bbb;
+}
+
 .player.can_attack {
     cursor: url("/static/cursors/sword.cur"), default;
     -webkit-animation: colorchange 2s linear infinite;

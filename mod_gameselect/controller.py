@@ -23,6 +23,7 @@ from globals import db
 import random
 import string
 
+from utils.conversion import first_or_none
 from utils.g_helper import set_current_player
 from utils.memoize import Memoize
 
@@ -84,12 +85,14 @@ def on_exit(form):
     if player is None:
         return redirect('/')
 
-    pm.delete_player(player)
-
     game = get_game_manager().get_my_game()
+    game.leave_player(player)
+    db.session.commit()
     game.notify()
-    if not any(game.get_players(False)):
+    if first_or_none(filter(lambda x: not x.model.hasLeft and x.model.isOnline, game.get_players(False))) is None:
         get_game_manager().delete_game(game)
+    SessionHelper.delete(SessionKeys.GAME_KEY)
+    SessionHelper.delete(SessionKeys.PLAYER_ID)
     return redirect('/')
 
 

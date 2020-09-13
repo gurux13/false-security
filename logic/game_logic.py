@@ -173,13 +173,15 @@ class GameLogic:
             return
         PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-battle.get_curdamage())
 
-    def complete_battle(self, battle: BattleLogic):
-        self.assert_running()
+    def complete_battle(self, battle: BattleLogic, bypass: bool):
+        if not bypass:
+            self.assert_running()
         self.set_dirty()
         btl_model = battle.model
-        if btl_model.offensiveCard is None:
+        if not bypass and btl_model.offensiveCard is None:
             raise UserError("Нельзя завершить битву без карты атаки!")
-        self.calculate_battle_falsics(battle)
+        if not bypass:
+            self.calculate_battle_falsics(battle)
         btl_model.isComplete = True
         if self.cur_round.isAccidentComplete:
             next_player = btl_model.offendingPlayer.neighbourRight
@@ -402,6 +404,14 @@ class GameLogic:
         if self.should_complete_game():
             self.set_dirty()
             self.model.isComplete = True
+
+    def leave_player(self, player: PlayerLogic):
+        player.leave()
+        player.model.neighbourLeft.neighbourRight = player.model.neighbourRight
+        for battle in self.get_battles(False):
+            if battle.model.offendingPlayer == player.model or battle.model.defendingPlayer == player.model:
+                self.complete_battle(battle, True)
+                self.db.session.delete(battle.model)
 
 
 def game2redirect(game: GameLogic) -> Optional[str]:

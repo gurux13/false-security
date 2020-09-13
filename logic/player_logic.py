@@ -23,7 +23,12 @@ class PlayerLogic:
     def set_online(self, is_online: bool):
         self.model.isOnline = is_online
 
+    def leave(self):
+        self.model.hasLeft = True
+
     def is_alive(self):
+        if self.model.hasLeft:
+            return False
         # A player is still alive if they have no money, but they had some when round started
         return self.model.money > 0 or replace_none(self.model.moneyAfterRound, -1) > 0
 

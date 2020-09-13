@@ -75,6 +75,7 @@ def prepare_state(game: GameLogic):
                 name=p.model.name,
                 is_admin=p.model.isAdmin,
                 is_online=p.model.isOnline,
+                has_left=p.model.hasLeft,
                 on_offence=False,
                 on_defence=False,
                 neighbour_right=p.model.neighbourId,

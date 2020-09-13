@@ -48,7 +48,10 @@ class PlayerManager:
         return PlayerLogic(self.db, player)
 
     def get_my_player(self) -> PlayerLogic:
-        return self.get_player(SessionHelper.get(SessionKeys.PLAYER_ID))
+        player = self.get_player(SessionHelper.get(SessionKeys.PLAYER_ID))
+        if player is None or player.model.hasLeft:
+            return None
+        return player
 
     def seat_game_players(self, game: 'GameLogic'):
         all_players = game.get_players(False)

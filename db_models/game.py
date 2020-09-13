@@ -35,6 +35,7 @@ class Player(db.Model):
     neighbourRight = db.relationship('Player', backref='neighbourLeft', remote_side='Player.id', uselist=False, post_update=True)
     isAdmin = db.Column(db.Boolean, nullable=False)
     isOnline = db.Column(db.Boolean, nullable=False)
+    hasLeft = db.Column(db.Boolean, nullable=False, default=False)
     __table_args__ = (db.UniqueConstraint('name', 'gameId', name='_name_gameid_uc'),
                       )
 

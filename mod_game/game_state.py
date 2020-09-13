@@ -21,6 +21,7 @@ class UiPlayer:
     name: str
     is_admin: bool
     is_online: bool
+    has_left: bool
     on_offence: bool
     on_defence: bool
     neighbour_right: int

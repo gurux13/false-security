@@ -19,6 +19,7 @@
                         <div v-for="player in players_list" :key="player.id" :class="{
                         player: true,
                         is_offline: !player.is_online,
+                        has_left: player.has_left,
                         is_selected: player.is_selected,
                         can_attack: player.can_attack,
                     }" @click="select_user_to_attack(player)">
@@ -166,14 +167,11 @@
                     }
 
                     for (player of game_data.players) {
-                        const {id, name, money, is_online, can_attack} = player;
-                        this.players_list.push({
-                            id, name, money, is_online, can_attack,
-                            is_selected: this.current_battles.some(battle => (
-                                !battle.is_complete && battle.defender === id && battle.offender === this.self_player))
-                        });
+                        player.is_selected = this.current_battles.some(battle => (
+                                !battle.is_complete && battle.defender === player.id && battle.offender === this.self_player))
                         this.players_set[player.id] = player;
                     }
+                    this.players_list = game_data.players;
                     //GET ATTACKING CARD INFO
                     my_battle = this.get_my_latest_battle_with_cards();
                     if (my_battle) {
