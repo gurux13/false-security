@@ -1,3 +1,11 @@
+Vue.component('logfalsics', {
+    props: [
+        'record'
+    ],
+    template: `
+        <span class="logfalsics">(<span v-if="record.damage">-</span>{{record.damage}}<span class="falsic"></span>)</span>
+    `
+});
 Vue.component('log', {
     props: [
         'cards',
@@ -50,6 +58,7 @@ Vue.component('log', {
                             'defensive_cards': defensive_cards,
                             'offensive_card': offensive_card,
                             'accident': accident,
+                            'damage': battle.damage_remains
                         });
                     }
                 }
@@ -66,12 +75,12 @@ Vue.component('log', {
                                 <div v-if="record.defensive_cards.length" class="marker">
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> отбился от атаки карты
                                     случайности <span class="blue_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span>
-                                    с помощью <span v-for="(card, index) in record.defensive_cards" @click="popup(card)" class="green_text card_in_text">{{card.name}}<span v-if="index+1 < record.defensive_cards.length">, </span></span><br><br>
+                                    с помощью <span v-for="(card, index) in record.defensive_cards" @click="popup(card)" class="green_text card_in_text">{{card.name}}<span v-if="index+1 < record.defensive_cards.length">, </span></span> <logfalsics :record="record"><br><br>
                                 </div>
                                 <div v-else class="marker">
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> не смог отбиться от
                                     атаки
-                                    карты случайности <span class="blue_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span><br><br>
+                                    карты случайности <span class="blue_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span> <logfalsics :record="record"><br><br>
                                 </div>
                             </div>
                             <div v-else>
@@ -79,13 +88,13 @@ Vue.component('log', {
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> отбился от атаки карты
                                     <span class="red_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span> игрока
                                     <span class="red_text">{{record.offender}}</span>
-                                    с помощью <span v-for="(card, index) in record.defensive_cards" @click="popup(card)" class="green_text card_in_text">{{card.name}}<span v-if="index+1 < record.defensive_cards.length">, </span></span><br><br>
+                                    с помощью <span v-for="(card, index) in record.defensive_cards" @click="popup(card)" class="green_text card_in_text">{{card.name}}<span v-if="index+1 < record.defensive_cards.length">, </span></span> <logfalsics :record="record"><br><br>
                                 </div>
                                 <div v-else class="marker">
                                     ⚔ Игрок <span class="green_text">{{record.defender}}</span> не смог отбиться от
                                     атаки
                                     карты <span class="red_text card_in_text" @click="popup(record.offensive_card)">{{record.offensive_card.name}}</span> игрока
-                                    <span class="red_text">{{record.offender}}</span><br><br>
+                                    <span class="red_text">{{record.offender}}</span> <logfalsics :record="record"><br><br>
                                 </div>
                             </div>
                         </div>
