@@ -52,7 +52,6 @@ class GameLogic:
         self.model.lastActionAt = datetime.now()
 
     def notify(self):
-        print("Notifying everyone in room", self.model.uniqueCode)
         socketio.emit('upd', room=self.model.uniqueCode)
         self.is_dirty_ = False
 
@@ -114,18 +113,22 @@ class GameLogic:
         self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE), self.params.initial_offence_cards)
         self.set_dirty()
 
-    def make_deck(self):
+    def make_deck(self, typ: CardType = None):
         deck_size = self.params.deck_size
-        if deck_size is None:
-            deck_size = int(self.db.session.query(func.sum(Card.countInDeck).label('count')).scalar())
-        all_cards = self.db.session.query(Card).all()
+        all_cards = self.db.session.query(Card)
+        if typ is not None:
+            all_cards = all_cards.filter(Card.type == typ)
+        all_cards = all_cards.all()
         all_cards_dup = []
         for card in all_cards:
             all_cards_dup.extend([card] * card.countInDeck)
         rv = []
-        while len(rv) < deck_size:
-            random.shuffle(all_cards_dup)
-            rv.extend(all_cards_dup[:deck_size - len(rv)])
+        if deck_size is None:
+            rv = all_cards_dup
+        else:
+            while len(rv) < deck_size:
+                random.shuffle(all_cards_dup)
+                rv.extend(all_cards_dup[:deck_size - len(rv)])
         for card in rv:
             de = DeckEntry(
                 cardId=card.id,
@@ -254,6 +257,9 @@ class GameLogic:
     def deal(self, player, typ, count):
         self.set_dirty()
         deck_entries = self.get_from_deck(typ, count)
+        if len(deck_entries) < count and self.params.deck_size is None:
+            self.make_deck(typ)
+            deck_entries.extend(self.get_from_deck(typ, count - len(deck_entries)))
         player.add_cards([CardLogic(self.db, x.card) for x in deck_entries])
         for entry in deck_entries:
             self.db.session.delete(entry)

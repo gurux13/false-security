@@ -32,7 +32,6 @@ def change_state(is_online: bool):
             g.game.set_dirty()
             player.set_online(is_online)
             change_admin(is_online, player)
-            print("made player online", player.model.name, is_online)
             commit_and_notify_if_dirty()
             db.session.remove()
         except Exception as e:
