@@ -68,7 +68,7 @@
         }
     </style>
 
-    <script src="../static/vue.js"></script>
+    <script src="../static/vue.min.js"></script>
     <script src="../static/renderjson.js"></script>
     <div id="app">
         Status: <b>[[ status ]]</b>
@@ -131,7 +131,6 @@
             }
         })
         socket.on('*', function (evt, data) {
-            console.log("Got event ", evt);
             holder = document.createElement('div');
             holder.className = 'holder';
             holder.innerHTML = "<div class='caption'>" + evt + "</div>";

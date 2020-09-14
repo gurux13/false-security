@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/game.css") }}">
 {% endblock %}
 {% block content %}
-    <script src="../static/vue.js"></script>
+    <script src="../static/vue.min.js"></script>
     <script src="../static/renderjson.js"></script>
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
     <script src="{{ url_for('static', filename='mod_game/log.js') }}"></script>
@@ -68,7 +68,6 @@
                 });
 
                 socket.on('endgame_state', (data) => {
-                    console.log('endgame_state', data);
                     const game_data = data.value.game;
                     this.game_name = game_data.game_name;
                     this.round_no = game_data.round_no;
@@ -89,7 +88,6 @@
                         return -1
                     return 0
                     });
-                    console.log('sorted', this.players_list);
 
                     this.is_game_loaded = true;
                 });

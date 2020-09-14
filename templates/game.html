@@ -4,7 +4,7 @@
     <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/game.css") }}">
 {% endblock %}
 {% block content %}
-    <script src="../static/vue.js"></script>
+    <script src="../static/vue.min.js"></script>
     <script src="../static/renderjson.js"></script>
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
     <script src="{{ url_for('static', filename='mod_game/log.js') }}"></script>
@@ -96,7 +96,6 @@
             updated() {
                 let container = this.$el.querySelector(".auto_scroll_down");
                 container.scrollTop = container.scrollHeight;
-                console.log('AUTOSCROLL', container, container.scrollHeight);
             },
             created() {
                 socket.on('log', (data) => {
@@ -151,7 +150,6 @@
                     this.on_defence = false;
                     this.cur_damage = 0;
 
-                    console.log('GAMEDATA', game_data);
                     this.hand = game_data.hand;
                     this.hand.sort((x, y) => y.type - x.type);
                     this.current_battles = game_data.current_battles;
@@ -197,7 +195,6 @@
                     }
                     this.on_defence = my_battle && my_battle.defender === this.self_player && !my_battle.is_complete && my_battle.offensive_card;
                     this.create_defending_set();
-                    console.log(game_data);
                     this.is_game_loaded = true;
                 });
 
