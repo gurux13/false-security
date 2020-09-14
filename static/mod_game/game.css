@@ -9,10 +9,6 @@
     justify-content: space-around;
 }
 
-.is_offline .player-name:after {
-    content: " ☒";
-}
-
 .head {
     display: flex;
     flex-direction: row;
