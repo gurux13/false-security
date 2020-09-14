@@ -3,6 +3,11 @@ body {
     background: white;
 }
 
+.back_to_game {
+  background-color: #f1f1f1;
+  color: black;
+}
+
 #toc_container {
     background: #f9f9f9 none repeat scroll 0 0;
     border: 1px solid #aaa;
