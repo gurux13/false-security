@@ -22,7 +22,7 @@
                         has_left: player.has_left,
                         is_selected: player.is_selected,
                         can_attack: player.can_attack,
-                    }" @click="select_user_to_attack(player)">
+                    }" @click="player.can_attack? select_user_to_attack(player):''">
                             <span class="player-name">[[player.name]]</span><br>
                             <span class="budget">[[player.money]]</span> <span class="falsic"></span>
                         </div>
@@ -251,15 +251,6 @@
                 },
 
                 select_user_to_attack(player) {
-                    if (player.can_attack == false) {
-                        alert("Вы не можете атаковать этого игрока. Выберите другого");
-                        return;
-                    }
-                    if (this.accident) {
-                        alert("Сейчас играет карта случайности. Выберите карту для защиты");
-                        alert(this.accident);
-                        return;
-                    }
                     player.is_selected = true;
                     socket.emit('attack', player.id);
                 },

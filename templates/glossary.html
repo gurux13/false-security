@@ -1,8 +1,10 @@
-{% extends 'layout.html' %}
-{{ super() }}
-{% block extrahead %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <script src="../static/vue.min.js"></script>
+    <script src="{{ url_for('static', filename='common.js') }}"></script>
     <link rel="stylesheet" href="{{ url_for("static", filename="instruction.css") }}">
-{% endblock %}
+{% block extrahead %}{% endblock %}
 {% block content %}
     <meta charset="UTF-8">
 
