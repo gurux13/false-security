@@ -269,7 +269,7 @@
 
                 choose_card(index) {
                     if (!this.hand[index].can_play) {
-                        alert('You can not choose this card');
+                        snackbar("Вы не можете выбрать эту карту");
                         return;
                     }
                     if (this.current_battles[this.current_battles.length - 1].offender == this.self_player) {
@@ -290,29 +290,6 @@
                         this.selected_card.push(parseInt(this.hand[index].id));
                     }
                 },
-
-                send_selected_card() {
-                    //if we play attack, we must choose a card
-                    if (this.current_battles[this.current_battles.length - 1].offender == this.self_player) {
-                        type = 1;
-                    } else {
-                        type = 0;
-                    }
-
-                    // if attack, gamer has to choose card
-                    if (this.selected_card.length == 0 && type == 1) {
-                        alert('You must choose card');
-                        return;
-                    } else if (this.selected_card.length == 0 && type == 0) {
-                        if (!confirm('Вы хотите осуществить пустой ход? Это приведет к потере фолзиков')) {
-                            return
-                        }
-                    }
-                    socket.emit('play', this.selected_card);
-                    if (type == 0) {
-                        socket.emit('done_def');
-                    }
-                }
             }
         })
     </script>
