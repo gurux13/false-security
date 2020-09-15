@@ -7,6 +7,10 @@
 {% block content %}
     <script src="../static/vue.min.js"></script>
     <script src="../static/renderjson.js"></script>
+    <script src="{{ url_for('static', filename='conn.js') }}"></script>
+    <script>
+        shouldWarn = false;
+    </script>
     <script src="{{ url_for('static', filename='mod_game/game.js') }}"></script>
     <script src="{{ url_for('static', filename='mod_game/log.js') }}"></script>
 

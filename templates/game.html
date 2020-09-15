@@ -2,6 +2,7 @@
 {{ super() }}
 {% block extrahead %}
     <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/game.css") }}">
+    <script src="{{ url_for('static', filename='conn.js') }}"></script>
 {% endblock %}
 {% block content %}
     <script src="../static/vue.min.js"></script>
@@ -108,6 +109,7 @@
 
                     socket.emit('state');
                     socket.emit('subscribe');
+                    shouldSubscribe = true;
                     socket.emit('log', 0);
 
                     for (i of cards) {
