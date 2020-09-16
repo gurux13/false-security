@@ -253,22 +253,21 @@
     font-size: 1.2em;
 }
 
-
-.log {
+.log_size{
     width: 250px;
     height: 300px;
+}
+
+.log {
+    height: 100%;
+    width: 90%;
     text-align: center;
     border-radius: 5px;
     border: 2px solid black;
-    flex-flow: row wrap;
     background-color: rgba(255, 255, 255, 0.5);
 }
 
-.log_header {
-    height: 20px;
-    text-align: left;
-    background-color: #cccccc;
-}
+
 
 .log_body {
     display: flex;

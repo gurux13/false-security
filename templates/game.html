@@ -51,7 +51,9 @@
                         </div>
                     </div>
                 </div>
-                <log :log="log" :cards="cards" :players="players_list"></log>
+                <div class="log_size">
+                    <log :log="log" :cards="cards" :players="players_list"></log>
+                </div>
             </div>
             <div class="window-row">
                 <div class="versus" v-if="defender && offender">
