@@ -3,6 +3,7 @@
 {% block extrahead %}
     <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/endgame.css") }}">
     <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/game.css") }}">
+
 {% endblock %}
 {% block content %}
     <script src="../static/vue.min.js"></script>
@@ -36,8 +37,9 @@
             </div>
             <div class="half">
                 <h2 style="text-align:center;">Лог битвы:</h2>
-                <log  :log="log" :players="players_list" :cards="cards"> </log>
-
+                <div class="log_size_endgame">
+                    <log  :log="log" :players="players_list" :cards="cards"> </log>
+                </div>
             </div>
         </div>
     </div>

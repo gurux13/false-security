@@ -61,15 +61,10 @@
   text-align: center;
 }
 
-.log {
+.log_size_endgame{
     height: 400px;
     width: 90%;
-    border-radius: 5px;
-    border: 2px solid black;
-    justify-content: center;
-    background-color: rgba(255, 255, 255, 0.5);
 }
-
 
 .log_body{
   display: flex;
