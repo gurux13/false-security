@@ -2,10 +2,14 @@
 {{ super() }}
 {% block extrahead %}
     <link rel="stylesheet" href="{{ url_for("static", filename="mod_game/waitroom.css") }}">
+    <script src="{{ url_for('static', filename='conn.js') }}"></script>
 {% endblock %}
 {% block content %}
 
     <style>
+        .holder {
+            background-color: white;i
+        }
         .renderjson a {
             text-decoration: none;
         }

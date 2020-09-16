@@ -168,7 +168,7 @@
 
                     for (player of game_data.players) {
                         player.is_selected = this.current_battles.some(battle => (
-                                !battle.is_complete && battle.defender === player.id && battle.offender === this.self_player))
+                                !battle.is_complete && battle.defender === player.id && battle.offender))
                         this.players_set[player.id] = player;
                     }
                     this.players_list = game_data.players;

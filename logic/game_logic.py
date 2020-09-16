@@ -44,10 +44,10 @@ class GameLogic:
 
     def is_dirty(self):
         return self.is_dirty_
-    
+
     def set_dirty(self):
         self.is_dirty_ = True
-        
+
     def keep_alive(self):
         self.model.lastActionAt = datetime.now()
 
@@ -66,12 +66,13 @@ class GameLogic:
         return [RoundLogic(self.db, x) for x in
                 self.db.session.query(GameRound).filter_by(game=self.model).filter(GameRound.roundNo >= starting_from)]
 
-    def get_battles(self, includePrevRound = False) -> List[BattleLogic]:
+    def get_battles(self, includePrevRound=False) -> List[BattleLogic]:
         if self.model.isComplete:
             return []
         extra = []
         if includePrevRound:
-            prev_round = self.db.session.query(GameRound).filter(GameRound.game == self.model).filter(GameRound.roundNo == self.cur_round.roundNo - 1).all()
+            prev_round = self.db.session.query(GameRound).filter(GameRound.game == self.model).filter(
+                GameRound.roundNo == self.cur_round.roundNo - 1).all()
             if (len(prev_round) != 0):
                 extra = prev_round[0].battles
         return [BattleLogic(self.db, b) for b in extra + self.cur_round.battles]
@@ -156,7 +157,7 @@ class GameLogic:
         self.db.session.add(new_battle)
         self.set_dirty()
         if not self.params.can_attack_anyone:
-            self.attack(offendingPlayer, PlayerLogic(self.db, offendingPlayer.model.neighbourRight, game=self))
+            self.attack(offendingPlayer, PlayerLogic(self.db, self.get_neighbour(offendingPlayer), game=self))
         return new_battle
 
     def on_accident_played(self):
@@ -166,15 +167,21 @@ class GameLogic:
             self.start_battle(self.get_players(True)[0])
         self.set_dirty()
 
-
     def calculate_battle_falsics(self, battle: BattleLogic):
         btl_model = battle.model
         if btl_model.offensiveCard.isCovid:
             transfer_amount = btl_model.defendingPlayer.money // 2
-            PlayerLogic(self.db, btl_model.defendingPlayer.neighbourRight).change_money(transfer_amount)
+            PlayerLogic(self.db, self.get_neighbour(PlayerLogic(self.db, btl_model.defendingPlayer))).change_money(transfer_amount)
             PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-transfer_amount)
-            return
-        PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-battle.get_curdamage())
+        else:
+            PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-battle.get_curdamage())
+
+    def get_neighbour(self, player: PlayerLogic):
+        next_player = player.model.neighbourRight
+        alive = [x.model for x in self.get_players(True)]
+        while not (next_player in alive):
+            next_player = next_player.neighbourRight
+        return next_player
 
     def complete_battle(self, battle: BattleLogic, bypass=False):
         if not bypass:
@@ -187,11 +194,7 @@ class GameLogic:
             self.calculate_battle_falsics(battle)
         btl_model.isComplete = True
         if self.cur_round.isAccidentComplete:
-            next_player = btl_model.offendingPlayer.neighbourRight
-            alive = [x.model for x in self.get_players(True)]
-            while not (next_player in alive):
-                next_player = next_player.neighbourRight
-
+            next_player = self.get_neighbour(PlayerLogic(self.db, btl_model.offendingPlayer))
             if next_player != self.get_players(True)[0].model:
                 self.start_battle(PlayerLogic(self.db, next_player))
 
@@ -360,7 +363,8 @@ class GameLogic:
 
     def deal_roundcompleted(self, player: PlayerLogic, avg_spend: int):
         player_off_cards_count = len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.OFFENCE])
-        self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE), self.params.initial_offence_cards - player_off_cards_count)
+        self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE),
+                  self.params.initial_offence_cards - player_off_cards_count)
 
         player_def_cards_count = len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
         def_card_count = 0
@@ -382,7 +386,7 @@ class GameLogic:
             player.on_round_completed()
         num_alive_players = len(self.get_players(True))
         if num_alive_players == 0:
-            num_alive_players = 1 #doesn't matter, the game is over anyway
+            num_alive_players = 1  # doesn't matter, the game is over anyway
         avg_spend = sum(
             len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
             for player in self.get_players(True)
