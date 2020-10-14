@@ -180,7 +180,7 @@ class GameLogic:
         if not self.params.can_attack_anyone:
             self.attack(
                 offendingPlayer,
-                PlayerLogic(self.db, self.get_neighbour(offendingPlayer))
+                PlayerLogic(self.db, self.get_neighbour(offendingPlayer)),
             )
         return new_battle
 
