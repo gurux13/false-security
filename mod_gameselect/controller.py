@@ -1,5 +1,4 @@
-from flask import request, render_template, \
-    flash, g, session, redirect, url_for
+from flask import request, render_template, flash, g, session, redirect, url_for
 
 from flask import Blueprint
 from sqlalchemy.exc import IntegrityError
@@ -27,7 +26,7 @@ from utils.conversion import first_or_none
 from utils.g_helper import set_current_player
 from utils.memoize import Memoize
 
-mod_gameselect = Blueprint('gameselect', __name__)
+mod_gameselect = Blueprint("gameselect", __name__)
 
 
 @Memoize
@@ -76,30 +75,41 @@ def on_join(form):
     SessionHelper.set(SessionKeys.GAME_KEY, form.game_key.data)
     SessionHelper.set(SessionKeys.PLAYER_ID, player.model.id)
 
-    return redirect('/waitroom')
+    return redirect("/waitroom")
 
 
 def on_exit(form):
     pm = get_player_manager()
     player = pm.get_my_player()
     if player is None:
-        return redirect('/')
+        return redirect("/")
 
     game = get_game_manager().get_my_game()
     game.leave_player(player)
     db.session.commit()
     game.notify()
-    if first_or_none(filter(lambda x: not x.model.hasLeft and x.model.isOnline, game.get_players(False))) is None:
+    if (
+        first_or_none(
+            filter(
+                lambda x: not x.model.hasLeft and x.model.isOnline,
+                game.get_players(False),
+            )
+        )
+        is None
+    ):
         get_game_manager().delete_game(game)
     SessionHelper.delete(SessionKeys.GAME_KEY)
     SessionHelper.delete(SessionKeys.PLAYER_ID)
-    return redirect('/')
+    return redirect("/")
 
 
 def rejoin() -> bool:
     player = get_player_manager().get_my_player()
     try:
-        if player is not None and player.model.game.id == get_game_manager().get_my_game().model.id:
+        if (
+            player is not None
+            and player.model.game.id == get_game_manager().get_my_game().model.id
+        ):
             print("this player is already in this game with name", player.model.name)
             return True
     except BaseException as e:
@@ -114,7 +124,7 @@ def on_create(form):
         0: EndGameDeaths.NotEnabled,
         1: EndGameDeaths.NotEnabled,
         2: EndGameDeaths.OneDead,
-        3: EndGameDeaths.AllButOneDead
+        3: EndGameDeaths.AllButOneDead,
     }
     def_card_deal_map = {
         0: DefCardDeal.DealFixed,
@@ -123,11 +133,20 @@ def on_create(form):
         3: DefCardDeal.DealAverageSpend,
         4: DefCardDeal.RemainingPlusFixed,
     }
-    params = GameParams(form.b_falsics.data, form.b_defence.data,
-                        form.b_offence.data, form.acc_prob.data / 100.0,
-                        endgame_map[form.endgame.data], form.deck_size.data, form.num_rounds.data,
-                        form.only_admin_starts.data, form.can_attack_anyone.data, def_card_deal_map[form.def_card_deal.data],
-                        form.def_card_deal_size.data, form.hardcore_mode.data)
+    params = GameParams(
+        form.b_falsics.data,
+        form.b_defence.data,
+        form.b_offence.data,
+        form.acc_prob.data / 100.0,
+        endgame_map[form.endgame.data],
+        form.deck_size.data,
+        form.num_rounds.data,
+        form.only_admin_starts.data,
+        form.can_attack_anyone.data,
+        def_card_deal_map[form.def_card_deal.data],
+        form.def_card_deal_size.data,
+        form.hardcore_mode.data,
+    )
     game = get_game_manager().create_game(params)
     # TODO: wipe the old player, if set in session
     player = get_player_manager().create_player(form.player_name.data, game)
@@ -135,18 +154,18 @@ def on_create(form):
     db.session.commit()
     SessionHelper.set(SessionKeys.GAME_KEY, game.model.uniqueCode)
     SessionHelper.set(SessionKeys.PLAYER_ID, player.model.id)
-    return redirect('/waitroom')
+    return redirect("/waitroom")
 
 
-@mod_gameselect.route('/logout', methods=['POST'])
+@mod_gameselect.route("/logout", methods=["POST"])
 def logout():
     exit_form = ExitForm()
     if exit_form.validate_on_submit():
         return on_exit(exit_form)
-    return redirect('/')
+    return redirect("/")
 
 
-@mod_gameselect.route('/', methods=['GET', 'POST'])
+@mod_gameselect.route("/", methods=["GET", "POST"])
 def index():
     set_current_player()
     join_form = JoinForm()
@@ -168,12 +187,12 @@ def index():
             g.error_game = e.message
         else:
             raise
-        return render_template('index.html', form=form)
-    game_key = SessionHelper.get(SessionKeys.GAME_KEY, '')
-    if 'k' in request.args:
-        if not request.args['k'].isalpha():
+        return render_template("index.html", form=form)
+    game_key = SessionHelper.get(SessionKeys.GAME_KEY, "")
+    if "k" in request.args:
+        if not request.args["k"].isalpha():
             raise HackAttemptError("Некорректный ключ игры")
-        game_key = request.args['k']
+        game_key = request.args["k"]
 
     g.game_key = game_key
     return render_template("index.html", form=create_form)

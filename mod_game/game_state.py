@@ -3,6 +3,7 @@ from typing import List
 
 from dataclasses import dataclass
 
+
 class UiCardType(Enum):
     Defence = 0
     Offence = 1
@@ -66,6 +67,7 @@ class UiGame:
     current_battles: List[UiBattle]
     round_no: int
     is_complete: bool
+
 
 @dataclass
 class UiRound:

@@ -1,5 +1,4 @@
 class Memoize:
-
     def __init__(self, fn):
         self.fn = fn
         self.memo = {}

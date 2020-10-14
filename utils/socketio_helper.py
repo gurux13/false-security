@@ -40,7 +40,7 @@ def wrapped_socketio(message, response_message=None):
             if response_message is not None:
                 emit(response_message, rv)
             else:
-                if not rv['ok']:
+                if not rv["ok"]:
                     print("NOT OK Response:", rv.message)
 
         return socketio.on(message)(thehandler)

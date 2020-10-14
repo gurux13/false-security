@@ -21,7 +21,7 @@ from utils.response import Response
 from globals import socketio
 from utils.socketio_helper import wrapped_socketio
 
-mod_game_process = Blueprint('game_process', __name__)
+mod_game_process = Blueprint("game_process", __name__)
 
 
 @dataclass
@@ -41,22 +41,22 @@ def subscribe():
     join_room(g.game.model.uniqueCode)
 
 
-@wrapped_socketio('state', 'state')
+@wrapped_socketio("state", "state")
 def get_state():
     keep_alive()
     game = g.game
     redirect_url = game2redirect(game)
-    if redirect_url is not None and redirect_url != '/game':
+    if redirect_url is not None and redirect_url != "/game":
         return GameState(redirect_to=redirect_url)
     return prepare_state(game)
 
 
-@wrapped_socketio('endgame_state', 'endgame_state')
+@wrapped_socketio("endgame_state", "endgame_state")
 def get_endgame_state():
     keep_alive()
     game = g.game
     redirect_url = game2redirect(game)
-    if redirect_url is not None and redirect_url != '/endgame':
+    if redirect_url is not None and redirect_url != "/endgame":
         return GameState(redirect_to=redirect_url)
     return prepare_state(game)
 
@@ -81,7 +81,8 @@ def prepare_state(game: GameLogic):
                 neighbour_right=p.model.neighbourId,
                 can_attack=game.can_attack(player, p),
                 money=p.get_money(),
-            ) for p in players
+            )
+            for p in players
         ],
         hand=map_opt(lambda c: make_ui(c, game, player), player.get_hand()),
         current_battles=[battle.to_ui() for battle in game.get_battles(True)],
@@ -89,10 +90,7 @@ def prepare_state(game: GameLogic):
         is_complete=game.is_complete(),
     )
 
-    return GameState(
-        redirect_to='',
-        game=ui_game
-    )
+    return GameState(redirect_to="", game=ui_game)
 
 
 def assert_has_game():
@@ -105,24 +103,23 @@ def keep_alive():
         g.game.keep_alive()
 
 
-@wrapped_socketio('log', 'log')
+@wrapped_socketio("log", "log")
 def log(starting_from):
     assert_has_game()
     keep_alive()
     return [x.to_ui() for x in g.game.get_old_rounds(starting_from)]
 
 
-@wrapped_socketio('attack', 'attack')
+@wrapped_socketio("attack", "attack")
 def attack(player_id):
     assert_has_game()
     keep_alive()
     g.game.attack(
-        get_player_manager().get_my_player(),
-        get_player_manager().get_player(player_id)
+        get_player_manager().get_my_player(), get_player_manager().get_player(player_id)
     )
 
 
-@wrapped_socketio('play', 'play')
+@wrapped_socketio("play", "play")
 def play_card(card_ids):
     assert_has_game()
     keep_alive()
@@ -132,19 +129,19 @@ def play_card(card_ids):
     return True
 
 
-@wrapped_socketio('done_def', 'done_def')
+@wrapped_socketio("done_def", "done_def")
 def done_defending():
     assert_has_game()
     keep_alive()
     g.game.end_battle(get_player_manager().get_my_player())
 
 
-@wrapped_socketio('card', 'card')
+@wrapped_socketio("card", "card")
 def get_card(card_id):
     return get_card_manager().get_card(card_id).to_ui(True)
 
 
-@wrapped_socketio('cards', 'cards')
+@wrapped_socketio("cards", "cards")
 def get_cards():
     return [c.to_ui() for c in get_card_manager().get_all_cards()]
 
@@ -164,23 +161,23 @@ def get_card_manager():
     return CardManager(db)
 
 
-@mod_game_process.route('/game')
+@mod_game_process.route("/game")
 def game():
     set_current_player()
     try:
         game = get_game_manager().get_my_game()
         player = get_player_manager().get_my_player()
     except UserError:
-        return redirect(url_for('gameselect.index'))
-    return render_template('game.html', form=ExitForm())
+        return redirect(url_for("gameselect.index"))
+    return render_template("game.html", form=ExitForm())
 
 
-@mod_game_process.route('/endgame')
+@mod_game_process.route("/endgame")
 def endgame():
     set_current_player()
     try:
         game = get_game_manager().get_my_game()
         player = get_player_manager().get_my_player()
     except UserError:
-        return redirect(url_for('gameselect.index'))
-    return render_template('endgame.html', form=ExitForm())
+        return redirect(url_for("gameselect.index"))
+    return render_template("endgame.html", form=ExitForm())
