@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 
 from db_models.card import Card
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from db_models.cardtype import CardTypeEnum
 from utils.conversion import first_or_none
@@ -17,7 +17,7 @@ class CardLogic:
         self.model = model
         self.owner = owner
 
-    def get_defence_from(self, offenciveCard: Card) -> int:
+    def get_defence_from(self, offenciveCard: Card) -> Optional[int]:
         if self.model.type.enumType != CardTypeEnum.DEFENCE:
             return None
         return first_or_none(

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Optional
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -60,7 +61,7 @@ class GameManager:
                 UserError.ErrorType.INVALID_GAME_DELETION,
             )
 
-    def get_game(self, game_key: str, optional=False) -> GameLogic:
+    def get_game(self, game_key: str, optional=False) -> Optional[GameLogic]:
         game = Game.query.filter_by(uniqueCode=game_key).first()
         if game is None and not optional:
             raise UserError(
@@ -71,5 +72,5 @@ class GameManager:
             return None
         return GameLogic(self.db, game)
 
-    def get_my_game(self, optional=False) -> GameLogic:
+    def get_my_game(self, optional=False) -> Optional[GameLogic]:
         return self.get_game(SessionHelper.get(SessionKeys.GAME_KEY), optional)

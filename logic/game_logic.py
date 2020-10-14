@@ -39,7 +39,7 @@ class GameLogic:
         self.params = GameParams.from_db(model.params)
         self.card_manager = CardManager(self.db)
         self.player_manager = PlayerManager(self.db)
-        self.cur_round: GameRound = next(iter(self.model.rounds), None)
+        self.cur_round: Optional[GameRound] = next(iter(self.model.rounds), None)
         self.is_dirty_ = False
 
     def is_dirty(self):
@@ -105,7 +105,7 @@ class GameLogic:
         self.set_dirty()
 
     def get_players(self, only_live):
-        all_players = [PlayerLogic(self.db, x, self) for x in self.model.players]
+        all_players = [PlayerLogic(self.db, x) for x in self.model.players]
         if only_live:
             return [p for p in all_players if p.is_alive()]
         else:
@@ -180,7 +180,7 @@ class GameLogic:
         if not self.params.can_attack_anyone:
             self.attack(
                 offendingPlayer,
-                PlayerLogic(self.db, self.get_neighbour(offendingPlayer), game=self),
+                PlayerLogic(self.db, self.get_neighbour(offendingPlayer))
             )
         return new_battle
 

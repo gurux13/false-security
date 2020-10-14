@@ -11,10 +11,9 @@ from utils.conversion import replace_none
 
 
 class PlayerLogic:
-    def __init__(self, db: SQLAlchemy, model: Player, game: "GameLogic" = None):
+    def __init__(self, db: SQLAlchemy, model: Player):
         self.db = db
         self.model = model
-        self.game = game
         self.hand: List[int] = (
             [] if self.model.hand is None else json.loads(self.model.hand)
         )

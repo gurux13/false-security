@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import List
+from typing import List, Optional
 
 from dataclasses import dataclass
 
@@ -37,9 +37,9 @@ class UiCard:
     text: str
     type: UiCardType
     damage: int
-    def_against: List[CardPairing]
-    off_against: List[CardPairing]
-    dealt_by_player: int
+    def_against: Optional[List[CardPairing]]
+    off_against: Optional[List[CardPairing]]
+    dealt_by_player: Optional[int]
     can_play: bool = None
     pop_up_text: str = None
     pop_up_url: str = None

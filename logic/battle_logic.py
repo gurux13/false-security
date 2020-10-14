@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -32,7 +33,7 @@ class BattleLogic:
         lst.append(card.model.id)
         self.model.defensiveCards = json.dumps(lst)
 
-    def get_curdamage(self) -> int:
+    def get_curdamage(self) -> Optional[int]:
         if self.model.offensiveCard is None:
             return None
         if self.model.defensiveCards is None:
