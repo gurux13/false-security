@@ -61,9 +61,13 @@ def get_endgame_state():
     return prepare_state(game)
 
 
-def prepare_state(game: GameLogic):
+def prepare_state(game: GameLogic) -> GameState:
     pm = PlayerManager(db)
     player = pm.get_my_player()
+    if player is None:
+        return GameState(
+            redirect_to='/'
+        )
     players = game.get_players(False)
     round_number = 0 if game.cur_round is None else game.cur_round.roundNo
     ui_game = UiGame(
