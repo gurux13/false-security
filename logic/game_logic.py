@@ -420,7 +420,9 @@ class GameLogic:
         if self.is_running():
             player.model.neighbourLeft.neighbourRight = player.model.neighbourRight
             for battle in self.get_battles(False):
-                if battle.model.offendingPlayer == player.model or battle.model.defendingPlayer == player.model:
+                if battle.model.offendingPlayer == player.model \
+                        or battle.model.defendingPlayer == player.model \
+                        and not battle.model.isComplete:
                     self.complete_battle(battle, True)
                     self.db.session.delete(battle.model)
 
