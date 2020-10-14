@@ -38,7 +38,10 @@ def make_ui(card: CardLogic, game: GameLogic, player: PlayerLogic) -> UiCard:
 
 @wrapped_socketio("subscribe", "subscribe")
 def subscribe():
-    join_room(g.game.model.uniqueCode)
+    if g.game is not None and g.game.model is not None:
+        join_room(g.game.model.uniqueCode)
+    else:
+        raise UserError("Ошибка подписки на события - нет игры")
 
 
 @wrapped_socketio('state', 'state')
