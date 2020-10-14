@@ -27,3 +27,4 @@ jobs:
           black: true
           mypy: true
           auto_fix: true
+          mypy_args: "--ignore-missing-imports"
