@@ -152,7 +152,7 @@ def index():
     join_form = JoinForm()
     create_form = CreateGameForm()
     if rejoin():
-        return redirect(game2redirect(GameManager(db).get_my_game()))
+        return redirect(game2redirect(GameManager(db).get_my_game(), get_player_manager().get_my_player()))
     form = None
     try:
         if join_form.validate_on_submit():

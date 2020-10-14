@@ -45,25 +45,26 @@ def subscribe():
 def get_state():
     keep_alive()
     game = g.game
-    redirect_url = game2redirect(game)
+    self = get_player_manager().get_my_player()
+    redirect_url = game2redirect(game, self)
     if redirect_url is not None and redirect_url != '/game':
         return GameState(redirect_to=redirect_url)
-    return prepare_state(game)
+    return prepare_state(game, self)
 
 
 @wrapped_socketio('endgame_state', 'endgame_state')
 def get_endgame_state():
     keep_alive()
     game = g.game
-    redirect_url = game2redirect(game)
+    self = get_player_manager().get_my_player()
+    redirect_url = game2redirect(game, self)
     if redirect_url is not None and redirect_url != '/endgame':
         return GameState(redirect_to=redirect_url)
-    return prepare_state(game)
+    return prepare_state(game, self)
 
 
-def prepare_state(game: GameLogic) -> GameState:
+def prepare_state(game: GameLogic, player: PlayerLogic) -> GameState:
     pm = PlayerManager(db)
-    player = pm.get_my_player()
     if player is None:
         return GameState(
             redirect_to='/'

@@ -427,7 +427,7 @@ class GameLogic:
                     self.db.session.delete(battle.model)
 
 
-def game2redirect(game: GameLogic) -> Optional[str]:
+def game2redirect(game: GameLogic, player: PlayerLogic) -> Optional[str]:
     if not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
         return '/'
     if game is None:
@@ -438,7 +438,6 @@ def game2redirect(game: GameLogic) -> Optional[str]:
         return '/game'
     if game.get_state() == GameLogic.State.FINISHED:
         return '/endgame'
-    player = PlayerManager(db).get_my_player()
     if player is None or player.model.game != game.model:
         return '/'
     return None
