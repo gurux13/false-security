@@ -10,12 +10,12 @@ from utils.response import Response
 from utils.socketio_helper import commit_and_notify_if_dirty
 
 
-@socketio.on('disconnect')
+@socketio.on("disconnect")
 def on_disconnect():
     change_state(False)
 
 
-@socketio.on('connect')
+@socketio.on("connect")
 def on_connect():
     change_state(True)
 
@@ -44,10 +44,16 @@ def change_state(is_online: bool):
 def change_admin(is_online: bool, player: PlayerLogic):
     if not is_online and player.model.isAdmin:
         gm = GameManager(db)
-        new_adm = next((p.model for p in gm.get_my_game().get_players(True) if (not p.model.isAdmin and p.model.isOnline)), None)
+        new_adm = next(
+            (
+                p.model
+                for p in gm.get_my_game().get_players(True)
+                if (not p.model.isAdmin and p.model.isOnline)
+            ),
+            None,
+        )
         if new_adm is not None:
             new_adm.isAdmin = True
             player.model.isAdmin = False
             db.session.commit()
             gm.get_my_game().notify()
-

@@ -3,8 +3,8 @@ from flask import session
 
 
 class SessionKeys:
-    PLAYER_ID = 'player'
-    GAME_KEY = 'game'
+    PLAYER_ID = "player"
+    GAME_KEY = "game"
 
 
 class SessionHelper:

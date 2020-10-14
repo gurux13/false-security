@@ -1,4 +1,5 @@
 import json
+from typing import Optional
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -17,9 +18,13 @@ class BattleLogic:
     def get_defensive_cards(self):
         if self.model.defensiveCards is None:
             return []
-        return [CardLogic(self.db, card) for card in
-                [self.db.session.query(Card).filter_by(id=cardId).first() for cardId in
-                 json.loads(self.model.defensiveCards)]]
+        return [
+            CardLogic(self.db, card)
+            for card in [
+                self.db.session.query(Card).filter_by(id=cardId).first()
+                for cardId in json.loads(self.model.defensiveCards)
+            ]
+        ]
 
     def add_defensive_card(self, card: CardLogic):
         lst = []
@@ -28,7 +33,7 @@ class BattleLogic:
         lst.append(card.model.id)
         self.model.defensiveCards = json.dumps(lst)
 
-    def get_curdamage(self) -> int:
+    def get_curdamage(self) -> Optional[int]:
         if self.model.offensiveCard is None:
             return None
         if self.model.defensiveCards is None:
@@ -45,7 +50,9 @@ class BattleLogic:
             offender=self.model.offendingPlayerId,
             defender=self.model.defendingPlayerId,
             offensive_card=self.model.offensiveCardId,
-            defensive_cards=None if self.model.defensiveCards is None else json.loads(self.model.defensiveCards),
+            defensive_cards=None
+            if self.model.defensiveCards is None
+            else json.loads(self.model.defensiveCards),
             damage_remains=self.get_curdamage(),
             is_complete=self.model.isComplete,
             creation_order=self.model.creationOrder,

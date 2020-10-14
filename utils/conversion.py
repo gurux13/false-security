@@ -7,6 +7,7 @@ def map_opt(callable, iterable):
 def first_or_none(iterable):
     return next(iter(iterable), None)
 
+
 def replace_none(value, default):
     if value is None:
         return default

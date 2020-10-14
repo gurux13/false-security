@@ -39,7 +39,7 @@ class GameLogic:
         self.params = GameParams.from_db(model.params)
         self.card_manager = CardManager(self.db)
         self.player_manager = PlayerManager(self.db)
-        self.cur_round: GameRound = next(iter(self.model.rounds), None)
+        self.cur_round: Optional[GameRound] = next(iter(self.model.rounds), None)
         self.is_dirty_ = False
 
     def is_dirty(self):
@@ -52,7 +52,7 @@ class GameLogic:
         self.model.lastActionAt = datetime.now()
 
     def notify(self):
-        socketio.emit('upd', room=self.model.uniqueCode)
+        socketio.emit("upd", room=self.model.uniqueCode)
         self.is_dirty_ = False
 
     def get_state(self) -> State:
@@ -63,17 +63,25 @@ class GameLogic:
         return GameLogic.State.WAITROOM
 
     def get_old_rounds(self, starting_from: int) -> List[RoundLogic]:
-        return [RoundLogic(self.db, x) for x in
-                self.db.session.query(GameRound).filter_by(game=self.model).filter(GameRound.roundNo >= starting_from)]
+        return [
+            RoundLogic(self.db, x)
+            for x in self.db.session.query(GameRound)
+            .filter_by(game=self.model)
+            .filter(GameRound.roundNo >= starting_from)
+        ]
 
     def get_battles(self, includePrevRound=False) -> List[BattleLogic]:
         if self.model.isComplete:
             return []
         extra = []
         if includePrevRound:
-            prev_round = self.db.session.query(GameRound).filter(GameRound.game == self.model).filter(
-                GameRound.roundNo == self.cur_round.roundNo - 1).all()
-            if (len(prev_round) != 0):
+            prev_round = (
+                self.db.session.query(GameRound)
+                .filter(GameRound.game == self.model)
+                .filter(GameRound.roundNo == self.cur_round.roundNo - 1)
+                .all()
+            )
+            if len(prev_round) != 0:
                 extra = prev_round[0].battles
         return [BattleLogic(self.db, b) for b in extra + self.cur_round.battles]
 
@@ -88,13 +96,16 @@ class GameLogic:
 
     def join_player(self, player: PlayerLogic, is_admin: bool) -> None:
         if self.get_state() != GameLogic.State.WAITROOM:
-            raise UserError("Невозможно присоединиться к запущенной игре", error_type=UserError.ErrorType.INVALID_GAME)
+            raise UserError(
+                "Невозможно присоединиться к запущенной игре",
+                error_type=UserError.ErrorType.INVALID_GAME,
+            )
         if is_admin:
             player.make_admin()
         self.set_dirty()
 
     def get_players(self, only_live):
-        all_players = [PlayerLogic(self.db, x, self) for x in self.model.players]
+        all_players = [PlayerLogic(self.db, x) for x in self.model.players]
         if only_live:
             return [p for p in all_players if p.is_alive()]
         else:
@@ -110,8 +121,16 @@ class GameLogic:
 
     def initialize_player(self, player):
         player.model.money = self.params.initial_falsics
-        self.deal(player, self.card_manager.get_type(CardTypeEnum.DEFENCE), self.params.initial_defence_cards)
-        self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE), self.params.initial_offence_cards)
+        self.deal(
+            player,
+            self.card_manager.get_type(CardTypeEnum.DEFENCE),
+            self.params.initial_defence_cards,
+        )
+        self.deal(
+            player,
+            self.card_manager.get_type(CardTypeEnum.OFFENCE),
+            self.params.initial_offence_cards,
+        )
         self.set_dirty()
 
     def make_deck(self, typ: CardType = None):
@@ -129,7 +148,7 @@ class GameLogic:
         else:
             while len(rv) < deck_size:
                 random.shuffle(all_cards_dup)
-                rv.extend(all_cards_dup[:deck_size - len(rv)])
+                rv.extend(all_cards_dup[: deck_size - len(rv)])
         for card in rv:
             de = DeckEntry(
                 cardId=card.id,
@@ -147,17 +166,22 @@ class GameLogic:
         self.assert_running()
         new_battle_no = 0
         if any(self.cur_round.battles):
-            new_battle_no = max(map(lambda x: x.creationOrder, self.cur_round.battles)) + 1
+            new_battle_no = (
+                max(map(lambda x: x.creationOrder, self.cur_round.battles)) + 1
+            )
         new_battle = RoundBattle(
             round=self.cur_round,
             offendingPlayer=None if offendingPlayer is None else offendingPlayer.model,
             isComplete=False,
-            creationOrder=new_battle_no
+            creationOrder=new_battle_no,
         )
         self.db.session.add(new_battle)
         self.set_dirty()
         if not self.params.can_attack_anyone:
-            self.attack(offendingPlayer, PlayerLogic(self.db, self.get_neighbour(offendingPlayer), game=self))
+            self.attack(
+                offendingPlayer,
+                PlayerLogic(self.db, self.get_neighbour(offendingPlayer)),
+            )
         return new_battle
 
     def on_accident_played(self):
@@ -171,10 +195,17 @@ class GameLogic:
         btl_model = battle.model
         if btl_model.offensiveCard.isCovid:
             transfer_amount = btl_model.defendingPlayer.money // 2
-            PlayerLogic(self.db, self.get_neighbour(PlayerLogic(self.db, btl_model.defendingPlayer))).change_money(transfer_amount)
-            PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-transfer_amount)
+            PlayerLogic(
+                self.db,
+                self.get_neighbour(PlayerLogic(self.db, btl_model.defendingPlayer)),
+            ).change_money(transfer_amount)
+            PlayerLogic(self.db, btl_model.defendingPlayer).change_money(
+                -transfer_amount
+            )
         else:
-            PlayerLogic(self.db, btl_model.defendingPlayer).change_money(-battle.get_curdamage())
+            PlayerLogic(self.db, btl_model.defendingPlayer).change_money(
+                -battle.get_curdamage()
+            )
 
     def get_neighbour(self, player: PlayerLogic):
         next_player = player.model.neighbourRight
@@ -194,12 +225,17 @@ class GameLogic:
             self.calculate_battle_falsics(battle)
         btl_model.isComplete = True
         if self.cur_round.isAccidentComplete:
-            next_player = self.get_neighbour(PlayerLogic(self.db, btl_model.offendingPlayer))
+            next_player = self.get_neighbour(
+                PlayerLogic(self.db, btl_model.offendingPlayer)
+            )
             if next_player != self.get_players(True)[0].model:
                 self.start_battle(PlayerLogic(self.db, next_player))
 
         if all(map(lambda b: b.model.isComplete, self.get_battles())):
-            if btl_model.offensiveCard is not None and btl_model.offensiveCard.type.enumType == CardTypeEnum.ACCIDENT:
+            if (
+                btl_model.offensiveCard is not None
+                and btl_model.offensiveCard.type.enumType == CardTypeEnum.ACCIDENT
+            ):
                 print("Round", self.cur_round.roundNo, "has accident completed")
                 self.on_accident_played()
             else:
@@ -229,10 +265,7 @@ class GameLogic:
         self.set_dirty()
         round_no = 0 if self.cur_round is None else self.cur_round.roundNo + 1
         the_round = GameRound(
-            game=self.model,
-            roundNo=round_no,
-            isComplete=False,
-            currentPlayer=None
+            game=self.model, roundNo=round_no, isComplete=False, currentPlayer=None
         )
         self.db.session.add(the_round)
         self.cur_round = the_round
@@ -252,10 +285,12 @@ class GameLogic:
         self.new_round()
 
     def get_from_deck(self, typ: CardType, count: int):
-        return self.db.session.query(DeckEntry) \
-                   .filter_by(game=self.model) \
-                   .filter(DeckEntry.card.has(type=typ)) \
-                   .order_by(DeckEntry.order)[:count]
+        return (
+            self.db.session.query(DeckEntry)
+            .filter_by(game=self.model)
+            .filter(DeckEntry.card.has(type=typ))
+            .order_by(DeckEntry.order)[:count]
+        )
 
     def deal(self, player, typ, count):
         self.set_dirty()
@@ -269,10 +304,17 @@ class GameLogic:
 
     def get_player_battle(self, player: PlayerLogic) -> RoundBattle:
         # There can be at most one btl_model the player belongs to
-        return first_or_none([x for x in
-                              self.cur_round.battles
-                              if (x.defendingPlayer == player.model or x.offendingPlayer == player.model)
-                              and not x.isComplete])
+        return first_or_none(
+            [
+                x
+                for x in self.cur_round.battles
+                if (
+                    x.defendingPlayer == player.model
+                    or x.offendingPlayer == player.model
+                )
+                and not x.isComplete
+            ]
+        )
 
     def get_player_battlelogic(self, player: PlayerLogic) -> BattleLogic:
         # There can be at most one btl_model the player belongs to
@@ -339,7 +381,10 @@ class GameLogic:
         if cur_damage is None or cur_damage <= 0:
             # The round is either fully played, or has no offensive card yet
             return False
-        return self.params.hardcore_mode or replace_none(card.get_defence_from(my_battle.offensiveCard), 0) > 0
+        return (
+            self.params.hardcore_mode
+            or replace_none(card.get_defence_from(my_battle.offensiveCard), 0) > 0
+        )
 
     def play_card(self, card: CardLogic, player: PlayerLogic):
         if not self.can_play_card(card, player):
@@ -362,11 +407,26 @@ class GameLogic:
         self.complete_battle(BattleLogic(self.db, battle))
 
     def deal_roundcompleted(self, player: PlayerLogic, avg_spend: int):
-        player_off_cards_count = len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.OFFENCE])
-        self.deal(player, self.card_manager.get_type(CardTypeEnum.OFFENCE),
-                  self.params.initial_offence_cards - player_off_cards_count)
+        player_off_cards_count = len(
+            [
+                x
+                for x in player.get_hand()
+                if x.model.type.enumType == CardTypeEnum.OFFENCE
+            ]
+        )
+        self.deal(
+            player,
+            self.card_manager.get_type(CardTypeEnum.OFFENCE),
+            self.params.initial_offence_cards - player_off_cards_count,
+        )
 
-        player_def_cards_count = len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
+        player_def_cards_count = len(
+            [
+                x
+                for x in player.get_hand()
+                if x.model.type.enumType == CardTypeEnum.DEFENCE
+            ]
+        )
         def_card_count = 0
         if self.params.def_card_deal == DefCardDeal.DealFixed:
             def_card_count = self.params.def_card_deal_size
@@ -379,7 +439,9 @@ class GameLogic:
         elif self.params.def_card_deal == DefCardDeal.DealAverageSpend:
             def_card_count = avg_spend
         def_card_count = max(0, def_card_count)
-        self.deal(player, self.card_manager.get_type(CardTypeEnum.DEFENCE), def_card_count)
+        self.deal(
+            player, self.card_manager.get_type(CardTypeEnum.DEFENCE), def_card_count
+        )
 
     def on_round_completed(self):
         for player in self.get_players(True):
@@ -387,10 +449,19 @@ class GameLogic:
         num_alive_players = len(self.get_players(True))
         if num_alive_players == 0:
             num_alive_players = 1  # doesn't matter, the game is over anyway
-        avg_spend = sum(
-            len([x for x in player.get_hand() if x.model.type.enumType == CardTypeEnum.DEFENCE])
-            for player in self.get_players(True)
-        ) / num_alive_players
+        avg_spend = (
+            sum(
+                len(
+                    [
+                        x
+                        for x in player.get_hand()
+                        if x.model.type.enumType == CardTypeEnum.DEFENCE
+                    ]
+                )
+                for player in self.get_players(True)
+            )
+            / num_alive_players
+        )
         for player in self.get_players(True):
             self.deal_roundcompleted(player, avg_spend)
         self.complete_game_if_needed()
@@ -400,9 +471,15 @@ class GameLogic:
         n_live_players = len(self.get_players(True))
         if n_live_players == 0:
             return True  # Graveyard
-        if self.params.end_game_deaths == EndGameDeaths.OneDead and n_players != n_live_players:
+        if (
+            self.params.end_game_deaths == EndGameDeaths.OneDead
+            and n_players != n_live_players
+        ):
             return True
-        if self.params.end_game_deaths == EndGameDeaths.AllButOneDead and n_live_players <= 1:
+        if (
+            self.params.end_game_deaths == EndGameDeaths.AllButOneDead
+            and n_live_players <= 1
+        ):
             return True
         if self.params.num_rounds is not None and self.cur_round is not None:
             return self.cur_round.roundNo + 1 >= self.params.num_rounds
@@ -420,23 +497,29 @@ class GameLogic:
         if self.is_running():
             player.model.neighbourLeft.neighbourRight = player.model.neighbourRight
             for battle in self.get_battles(False):
-                if battle.model.offendingPlayer == player.model or battle.model.defendingPlayer == player.model:
+                if (
+                    battle.model.offendingPlayer == player.model
+                    or battle.model.defendingPlayer == player.model
+                ):
                     self.complete_battle(battle, True)
                     self.db.session.delete(battle.model)
 
 
 def game2redirect(game: GameLogic) -> Optional[str]:
-    if not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
-        return '/'
+    if not (
+        SessionHelper.has(SessionKeys.PLAYER_ID)
+        and SessionHelper.has(SessionKeys.GAME_KEY)
+    ):
+        return "/"
     if game is None:
-        return '/'
+        return "/"
     if game.get_state() == GameLogic.State.WAITROOM:
-        return '/waitroom'
+        return "/waitroom"
     if game.get_state() == GameLogic.State.RUNNING:
-        return '/game'
+        return "/game"
     if game.get_state() == GameLogic.State.FINISHED:
-        return '/endgame'
+        return "/endgame"
     player = PlayerManager(db).get_my_player()
     if player is None or player.model.game != game.model:
-        return '/'
+        return "/"
     return None

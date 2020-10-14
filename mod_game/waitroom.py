@@ -17,7 +17,7 @@ from utils.response import Response
 from globals import socketio
 from utils.socketio_helper import wrapped_socketio
 
-mod_game_wr = Blueprint('game_wr', __name__)
+mod_game_wr = Blueprint("game_wr", __name__)
 
 
 @dataclass
@@ -31,31 +31,38 @@ class WaitroomResponse:
     current_player: str = None
 
 
-
 def get_state():
     gm = GameManager(db)
     pm = PlayerManager(db)
     game = gm.get_my_game(optional=True)
     redirect_url = game2redirect(game)
-    if redirect_url is not None and redirect_url != '/waitroom':
+    if redirect_url is not None and redirect_url != "/waitroom":
         return WaitroomResponse(redirect_to=redirect_url)
     return WaitroomResponse(
         game_name=game.model.uniqueCode,
         current_player=pm.get_my_player().model.name,
-        players=[{'name': x.model.name, 'is_admin': x.model.isAdmin, 'is_online': x.model.isOnline} for x in game.get_players(False)],
+        players=[
+            {
+                "name": x.model.name,
+                "is_admin": x.model.isAdmin,
+                "is_online": x.model.isOnline,
+            }
+            for x in game.get_players(False)
+        ],
         can_start=game.can_start(pm.get_my_player()),
-        game_link='?k=' + game.model.uniqueCode,
+        game_link="?k=" + game.model.uniqueCode,
     )
 
 
-@wrapped_socketio('waitroom', 'waitroom')
+@wrapped_socketio("waitroom", "waitroom")
 def waitroom():
     result = get_state()
     if result.game_name is not None:
         join_room(result.game_name)
     return result
 
-@wrapped_socketio('start', 'start')
+
+@wrapped_socketio("start", "start")
 def start_game():
     gm = get_game_manager()
     pm = get_player_manager()
@@ -63,9 +70,12 @@ def start_game():
     if not game.is_waitroom():
         raise UserError("Игра не может быть начата без комнаты ожидания!")
     if not game.can_start(pm.get_my_player()):
-        raise HackAttemptError("Попытка начать игру игроком, который не может этого делать!")
+        raise HackAttemptError(
+            "Попытка начать игру игроком, который не может этого делать!"
+        )
     game.start()
     return True
+
 
 @Memoize
 def get_game_manager():
@@ -77,13 +87,13 @@ def get_player_manager():
     return PlayerManager(db)
 
 
-@mod_game_wr.route('/waitroom')
+@mod_game_wr.route("/waitroom")
 def wr():
     set_current_player()
     try:
         game = get_game_manager().get_my_game()
         player = get_player_manager().get_my_player()
     except UserError:
-        return redirect(url_for('gameselect.index'))
-    #TODO move ExitForm to different file
-    return render_template('waitroom.html', form=ExitForm())
+        return redirect(url_for("gameselect.index"))
+    # TODO move ExitForm to different file
+    return render_template("waitroom.html", form=ExitForm())
