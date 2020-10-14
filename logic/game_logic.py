@@ -356,9 +356,9 @@ class GameLogic:
         self.assert_running()
         self.set_dirty()
         battle = self.get_player_battle(player)
-        if battle.defendingPlayer != player.model:
-            raise UserError("Нельзя завершить раунд, если Вы не защищаетесь!")
 
+        if battle is None or battle.defendingPlayer != player.model:
+            raise UserError("Нельзя завершить раунд, если Вы не защищаетесь!")
         self.complete_battle(BattleLogic(self.db, battle))
 
     def deal_roundcompleted(self, player: PlayerLogic, avg_spend: int):
