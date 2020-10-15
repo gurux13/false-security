@@ -356,9 +356,9 @@ class GameLogic:
         self.assert_running()
         self.set_dirty()
         battle = self.get_player_battle(player)
-        if battle.defendingPlayer != player.model:
-            raise UserError("Нельзя завершить раунд, если Вы не защищаетесь!")
 
+        if battle is None or battle.defendingPlayer != player.model:
+            raise UserError("Нельзя завершить раунд, если Вы не защищаетесь!")
         self.complete_battle(BattleLogic(self.db, battle))
 
     def deal_roundcompleted(self, player: PlayerLogic, avg_spend: int):
@@ -420,12 +420,14 @@ class GameLogic:
         if self.is_running():
             player.model.neighbourLeft.neighbourRight = player.model.neighbourRight
             for battle in self.get_battles(False):
-                if battle.model.offendingPlayer == player.model or battle.model.defendingPlayer == player.model:
+                if battle.model.offendingPlayer == player.model \
+                        or battle.model.defendingPlayer == player.model \
+                        and not battle.model.isComplete:
                     self.complete_battle(battle, True)
                     self.db.session.delete(battle.model)
 
 
-def game2redirect(game: GameLogic) -> Optional[str]:
+def game2redirect(game: GameLogic, player: PlayerLogic) -> Optional[str]:
     if not (SessionHelper.has(SessionKeys.PLAYER_ID) and SessionHelper.has(SessionKeys.GAME_KEY)):
         return '/'
     if game is None:
@@ -436,7 +438,6 @@ def game2redirect(game: GameLogic) -> Optional[str]:
         return '/game'
     if game.get_state() == GameLogic.State.FINISHED:
         return '/endgame'
-    player = PlayerManager(db).get_my_player()
     if player is None or player.model.game != game.model:
         return '/'
     return None

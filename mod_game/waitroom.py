@@ -36,7 +36,8 @@ def get_state():
     gm = GameManager(db)
     pm = PlayerManager(db)
     game = gm.get_my_game(optional=True)
-    redirect_url = game2redirect(game)
+    self = pm.get_my_player()
+    redirect_url = game2redirect(game, self)
     if redirect_url is not None and redirect_url != '/waitroom':
         return WaitroomResponse(redirect_to=redirect_url)
     return WaitroomResponse(

@@ -38,32 +38,40 @@ def make_ui(card: CardLogic, game: GameLogic, player: PlayerLogic) -> UiCard:
 
 @wrapped_socketio("subscribe", "subscribe")
 def subscribe():
-    join_room(g.game.model.uniqueCode)
+    if g.game is not None and g.game.model is not None:
+        join_room(g.game.model.uniqueCode)
+    else:
+        raise UserError("Ошибка подписки на события - нет игры")
 
 
 @wrapped_socketio('state', 'state')
 def get_state():
     keep_alive()
     game = g.game
-    redirect_url = game2redirect(game)
+    self = get_player_manager().get_my_player()
+    redirect_url = game2redirect(game, self)
     if redirect_url is not None and redirect_url != '/game':
         return GameState(redirect_to=redirect_url)
-    return prepare_state(game)
+    return prepare_state(game, self)
 
 
 @wrapped_socketio('endgame_state', 'endgame_state')
 def get_endgame_state():
     keep_alive()
     game = g.game
-    redirect_url = game2redirect(game)
+    self = get_player_manager().get_my_player()
+    redirect_url = game2redirect(game, self)
     if redirect_url is not None and redirect_url != '/endgame':
         return GameState(redirect_to=redirect_url)
-    return prepare_state(game)
+    return prepare_state(game, self)
 
 
-def prepare_state(game: GameLogic):
+def prepare_state(game: GameLogic, player: PlayerLogic) -> GameState:
     pm = PlayerManager(db)
-    player = pm.get_my_player()
+    if player is None:
+        return GameState(
+            redirect_to='/'
+        )
     players = game.get_players(False)
     round_number = 0 if game.cur_round is None else game.cur_round.roundNo
     ui_game = UiGame(
